@@ -1,14 +1,14 @@
 
 
-## Plan: Create Admin Account in Live Environment
+## Plan: Reset Admin Password
 
-**Problem**: The admin user `healingbudsglobal@gmail.com` was created in the test database. The published site at `mystrain.healingbuds.co.za` uses the live database, which has no admin account.
+The password was set to `HealingBuds2025!` but should be `H34l1ng@buds2025`.
 
 ### Steps
 
-1. **Re-create the `create-admin` edge function** temporarily — same as before, uses `supabase.auth.admin.createUser()` with email auto-confirmed
-2. **Deploy and invoke it against the live environment** to create the admin account with the same credentials
-3. **Delete the edge function** again after the account is created (security cleanup)
+1. **Re-create the `create-admin` edge function** temporarily to update the password using `supabase.auth.admin.updateUserById()`
+2. **Deploy and invoke it** with the correct password `H34l1ng@buds2025`
+3. **Delete the edge function** immediately after
 
-This is a backend-only change — no UI code changes needed. The login page and dashboard code are already correct.
+No code changes — backend-only password reset.
 
