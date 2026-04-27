@@ -17,6 +17,8 @@ export type Database = {
       leads: {
         Row: {
           compatibility: string | null
+          contacted: boolean
+          contacted_at: string | null
           created_at: string
           email: string
           id: string
@@ -32,9 +34,15 @@ export type Database = {
           strain_thc: string | null
           survey_answers: Json | null
           whatsapp: string | null
+          whatsapp_e164: string | null
+          whatsapp_opt_in: boolean
+          whatsapp_sent_at: string | null
+          whatsapp_status: string | null
         }
         Insert: {
           compatibility?: string | null
+          contacted?: boolean
+          contacted_at?: string | null
           created_at?: string
           email: string
           id?: string
@@ -50,9 +58,15 @@ export type Database = {
           strain_thc?: string | null
           survey_answers?: Json | null
           whatsapp?: string | null
+          whatsapp_e164?: string | null
+          whatsapp_opt_in?: boolean
+          whatsapp_sent_at?: string | null
+          whatsapp_status?: string | null
         }
         Update: {
           compatibility?: string | null
+          contacted?: boolean
+          contacted_at?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -68,6 +82,10 @@ export type Database = {
           strain_thc?: string | null
           survey_answers?: Json | null
           whatsapp?: string | null
+          whatsapp_e164?: string | null
+          whatsapp_opt_in?: boolean
+          whatsapp_sent_at?: string | null
+          whatsapp_status?: string | null
         }
         Relationships: []
       }
