@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Search, Download, Users, TrendingUp, Calendar } from "lucide-react";
+import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle } from "lucide-react";
 import { motion } from "framer-motion";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
 
@@ -11,16 +11,46 @@ interface Lead {
   email: string;
   name: string | null;
   whatsapp: string | null;
+  whatsapp_e164: string | null;
+  whatsapp_opt_in: boolean;
+  contacted: boolean;
+  contacted_at: string | null;
   province: string | null;
   matched_strain: string | null;
   compatibility: string | null;
+  strain_shop_url: string | null;
   survey_answers: Record<string, string> | null;
 }
+
+// Healing Buds WhatsApp Business number (for reference / future API sender)
+const HB_WHATSAPP_BUSINESS = "+351939455949";
+
+const buildWhatsAppLink = (lead: Lead): string | null => {
+  // Prefer validated E.164; fall back to legacy free-text whatsapp field
+  const raw = lead.whatsapp_e164 || lead.whatsapp;
+  if (!raw) return null;
+  // Strip everything except digits — wa.me requires no plus sign
+  const digits = raw.replace(/[^0-9]/g, "");
+  if (digits.length < 8) return null;
+
+  const firstName = (lead.name || "there").split(" ")[0];
+  const strain = lead.matched_strain || "your strain match";
+  const compat = lead.compatibility ? ` (${lead.compatibility} compatibility)` : "";
+  const shopLine = lead.strain_shop_url ? `\n\nView & order: ${lead.strain_shop_url}` : "";
+
+  const message =
+    `Hi ${firstName}, this is Healing Buds 🌿\n\n` +
+    `Your Bio-Map strain match is *${strain}*${compat}.${shopLine}\n\n` +
+    `Reply here if you'd like personalised dosing guidance or have any questions about your match.`;
+
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+};
 
 const AdminDashboard = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [showUncontactedOnly, setShowUncontactedOnly] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const navigate = useNavigate();
 
@@ -59,23 +89,50 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  const filteredLeads = leads.filter((l) => {
-    const q = search.toLowerCase();
-    return (
-      l.email.toLowerCase().includes(q) ||
-      (l.name?.toLowerCase().includes(q) ?? false) ||
-      (l.matched_strain?.toLowerCase().includes(q) ?? false) ||
-      (l.province?.toLowerCase().includes(q) ?? false)
+  const toggleContacted = async (lead: Lead, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    const next = !lead.contacted;
+    // Optimistic update
+    setLeads((prev) =>
+      prev.map((l) => (l.id === lead.id ? { ...l, contacted: next, contacted_at: next ? new Date().toISOString() : null } : l))
     );
-  });
+    await supabase
+      .from("leads")
+      .update({ contacted: next, contacted_at: next ? new Date().toISOString() : null })
+      .eq("id", lead.id);
+  };
+
+  const openWhatsApp = (lead: Lead, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const link = buildWhatsAppLink(lead);
+    if (!link) return;
+    window.open(link, "_blank", "noopener,noreferrer");
+    // Auto-mark as contacted on first send
+    if (!lead.contacted) toggleContacted(lead);
+  };
+
+  const filteredLeads = leads
+    .filter((l) => (showUncontactedOnly ? !l.contacted : true))
+    .filter((l) => {
+      const q = search.toLowerCase();
+      if (!q) return true;
+      return (
+        l.email.toLowerCase().includes(q) ||
+        (l.name?.toLowerCase().includes(q) ?? false) ||
+        (l.matched_strain?.toLowerCase().includes(q) ?? false) ||
+        (l.province?.toLowerCase().includes(q) ?? false)
+      );
+    });
 
   const exportCSV = () => {
-    const headers = ["Date", "Name", "Email", "WhatsApp", "Province", "Strain", "Compatibility"];
+    const headers = ["Date", "Name", "Email", "WhatsApp", "Opt-In", "Contacted", "Province", "Strain", "Compatibility"];
     const rows = filteredLeads.map((l) => [
       new Date(l.created_at).toLocaleDateString("en-ZA"),
       l.name || "",
       l.email,
-      l.whatsapp || "",
+      l.whatsapp_e164 || l.whatsapp || "",
+      l.whatsapp_opt_in ? "Yes" : "No",
+      l.contacted ? "Yes" : "No",
       l.province || "",
       l.matched_strain || "",
       l.compatibility || "",
@@ -94,6 +151,8 @@ const AdminDashboard = () => {
     (l) => new Date(l.created_at).toDateString() === new Date().toDateString()
   ).length;
 
+  const uncontactedCount = leads.filter((l) => !l.contacted && (l.whatsapp_e164 || l.whatsapp)).length;
+
   const surveyLabels: Record<string, string> = {
     exp_level: "Experience Level",
     primary_vibe: "Desired Vibe",
@@ -106,30 +165,34 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <img src={hbLogoWhite} alt="Healing Buds" className="h-7" />
             <span className="text-sm font-semibold text-muted-foreground">Admin</span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline text-[11px] text-muted-foreground">
+              Sender: <span className="text-foreground font-mono">{HB_WHATSAPP_BUSINESS}</span>
+            </span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
         {/* Stats */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Users className="h-4 w-4" />
-              <span className="text-xs font-medium uppercase tracking-wider">Total Leads</span>
+              <span className="text-xs font-medium uppercase tracking-wider">Total</span>
             </div>
             <p className="text-2xl font-bold text-foreground">{leads.length}</p>
           </div>
@@ -142,10 +205,17 @@ const AdminDashboard = () => {
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <MessageCircle className="h-4 w-4" />
+              <span className="text-xs font-medium uppercase tracking-wider">To Contact</span>
+            </div>
+            <p className="text-2xl font-bold text-[hsl(var(--brand-gold))]">{uncontactedCount}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <TrendingUp className="h-4 w-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Top Strain</span>
             </div>
-            <p className="text-lg font-bold text-[hsl(var(--brand-gold))]">
+            <p className="text-sm font-bold text-[hsl(var(--brand-gold))] truncate">
               {leads.length > 0
                 ? Object.entries(
                     leads.reduce((acc, l) => {
@@ -170,7 +240,17 @@ const AdminDashboard = () => {
               className="w-full rounded-lg border border-border bg-input pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setShowUncontactedOnly((v) => !v)}
+              className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                showUncontactedOnly
+                  ? "border-[hsl(var(--accent-green))] bg-[hsl(var(--accent-green)_/_0.1)] text-[hsl(var(--accent-green))]"
+                  : "border-border text-foreground hover:bg-accent"
+              }`}
+            >
+              {showUncontactedOnly ? "✓ Uncontacted" : "Uncontacted only"}
+            </button>
             <button
               onClick={fetchLeads}
               className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-accent transition-colors"
@@ -193,42 +273,89 @@ const AdminDashboard = () => {
         ) : filteredLeads.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
             <Users className="h-12 w-12 mb-3 opacity-30" />
-            <p>{search ? "No leads match your search" : "No leads yet"}</p>
+            <p>{search || showUncontactedOnly ? "No leads match your filters" : "No leads yet"}</p>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Date</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">WhatsApp</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Province</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Strain</th>
-                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Match</th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground w-8"></th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground">Date</th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground">Name</th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Email</th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">WhatsApp</th>
+                  <th className="px-3 py-3 text-left font-medium text-muted-foreground">Strain</th>
+                  <th className="px-3 py-3 text-right font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredLeads.map((lead) => (
-                  <motion.tr
-                    key={lead.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="border-b border-border hover:bg-accent/50 cursor-pointer transition-colors"
-                    onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
-                  >
-                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                      {new Date(lead.created_at).toLocaleDateString("en-ZA", { day: "2-digit", month: "short" })}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-foreground">{lead.name || "—"}</td>
-                    <td className="px-4 py-3 text-[hsl(var(--accent-green))]">{lead.email}</td>
-                    <td className="px-4 py-3 text-foreground hidden md:table-cell">{lead.whatsapp || "—"}</td>
-                    <td className="px-4 py-3 text-foreground hidden lg:table-cell">{lead.province || "—"}</td>
-                    <td className="px-4 py-3 font-semibold text-[hsl(var(--brand-gold))]">{lead.matched_strain || "—"}</td>
-                    <td className="px-4 py-3 text-foreground hidden sm:table-cell">{lead.compatibility || "—"}</td>
-                  </motion.tr>
-                ))}
+                {filteredLeads.map((lead) => {
+                  const waLink = buildWhatsAppLink(lead);
+                  const displayPhone = lead.whatsapp_e164 || lead.whatsapp;
+                  return (
+                    <motion.tr
+                      key={lead.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className={`border-b border-border hover:bg-accent/50 cursor-pointer transition-colors ${
+                        lead.contacted ? "opacity-60" : ""
+                      }`}
+                      onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
+                    >
+                      <td className="px-3 py-3">
+                        <button
+                          onClick={(e) => toggleContacted(lead, e)}
+                          title={lead.contacted ? "Mark uncontacted" : "Mark contacted"}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          {lead.contacted ? (
+                            <CheckCircle2 className="h-5 w-5 text-[hsl(var(--accent-green))]" />
+                          ) : (
+                            <Circle className="h-5 w-5" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">
+                        {new Date(lead.created_at).toLocaleDateString("en-ZA", { day: "2-digit", month: "short" })}
+                      </td>
+                      <td className="px-3 py-3 font-medium text-foreground">{lead.name || "—"}</td>
+                      <td className="px-3 py-3 text-[hsl(var(--accent-green))] hidden sm:table-cell">{lead.email}</td>
+                      <td className="px-3 py-3 hidden md:table-cell">
+                        {displayPhone ? (
+                          <span className="font-mono text-xs text-foreground">
+                            {displayPhone}
+                            {lead.whatsapp_opt_in && (
+                              <span className="ml-1.5 text-[10px] text-[hsl(var(--accent-green))]">✓ opt-in</span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 font-semibold text-[hsl(var(--brand-gold))]">
+                        {lead.matched_strain || "—"}
+                        {lead.compatibility && (
+                          <span className="ml-1 text-xs font-normal text-muted-foreground">{lead.compatibility}</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        {waLink ? (
+                          <button
+                            onClick={(e) => openWhatsApp(lead, e)}
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110 transition-all"
+                            title={`Send WhatsApp from ${HB_WHATSAPP_BUSINESS}`}
+                          >
+                            <MessageCircle className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">WhatsApp</span>
+                          </button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">No phone</span>
+                        )}
+                      </td>
+                    </motion.tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -245,6 +372,11 @@ const AdminDashboard = () => {
               <div>
                 <h3 className="font-display text-lg font-bold text-foreground">{selectedLead.name || "Anonymous"}</h3>
                 <p className="text-sm text-muted-foreground">{selectedLead.email}</p>
+                {selectedLead.contacted && selectedLead.contacted_at && (
+                  <p className="text-[11px] text-[hsl(var(--accent-green))] mt-1">
+                    ✓ Contacted {new Date(selectedLead.contacted_at).toLocaleString("en-ZA")}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => setSelectedLead(null)}
@@ -256,7 +388,10 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">WhatsApp</p>
-                <p className="text-sm font-medium text-foreground">{selectedLead.whatsapp || "—"}</p>
+                <p className="text-sm font-mono text-foreground">{selectedLead.whatsapp_e164 || selectedLead.whatsapp || "—"}</p>
+                {selectedLead.whatsapp_opt_in && (
+                  <p className="text-[10px] text-[hsl(var(--accent-green))]">✓ Opted in</p>
+                )}
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Province</p>

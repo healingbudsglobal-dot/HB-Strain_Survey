@@ -333,10 +333,18 @@ Deno.serve(async (req) => {
 
     // 1. Save lead to database
     try {
+      // Validate E.164 format server-side (defence in depth)
+      const e164 = typeof payload.whatsapp_e164 === 'string' && /^\+[1-9]\d{6,14}$/.test(payload.whatsapp_e164)
+        ? payload.whatsapp_e164
+        : null;
+      const optIn = payload.whatsapp_opt_in === 'true' || payload.whatsapp_opt_in === true;
+
       await supabase.from('leads').insert({
         email,
         name: payload.name || null,
         whatsapp: payload.whatsapp || null,
+        whatsapp_e164: e164,
+        whatsapp_opt_in: optIn && !!e164,
         province: payload.province || null,
         matched_strain: payload.matched_strain || null,
         compatibility: payload.compatibility || null,

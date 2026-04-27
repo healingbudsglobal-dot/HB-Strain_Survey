@@ -312,3 +312,14 @@
     font-size: 0.95em;
   }
 }
+
+/* react-phone-number-input — match dark glass form style */
+.hb-phone-wrap .PhoneInput { display: flex; align-items: center; gap: 0.5rem; }
+.hb-phone-wrap .PhoneInputCountry { display: flex; align-items: center; gap: 0.35rem; padding-right: 0.5rem; border-right: 1px solid hsl(var(--border)); }
+.hb-phone-wrap .PhoneInputCountryIcon { width: 1.25rem; height: 0.9rem; box-shadow: none; background: transparent; }
+.hb-phone-wrap .PhoneInputCountrySelectArrow { color: hsl(var(--muted-foreground)); opacity: 0.7; }
+.hb-phone-wrap .PhoneInputInput {
+  flex: 1; min-width: 0; background: transparent; border: 0; outline: none;
+  color: hsl(var(--foreground)); font-size: 16px; padding: 0.4rem 0;
+}
+.hb-phone-wrap .PhoneInputInput::placeholder { color: hsl(var(--muted-foreground)); }
