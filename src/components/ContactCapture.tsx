@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, User, Phone, Lock } from "lucide-react";
+import { ArrowRight, Shield, User, Lock } from "lucide-react";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
 import heroFlower from "@/assets/hero-flower.jpg";
 
 interface ContactCaptureProps {
-  onSubmit: (name: string, whatsapp?: string) => void;
+  onSubmit: (name: string, whatsappE164?: string, optIn?: boolean) => void;
   onSkip: () => void;
   strainName?: string;
   userEmail?: string;
@@ -23,7 +25,8 @@ const itemVariants = {
 
 const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCaptureProps) => {
   const [name, setName] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [whatsapp, setWhatsapp] = useState<string | undefined>(undefined);
+  const [optIn, setOptIn] = useState(true);
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,12 +35,14 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       setError("Please enter your name");
       return;
     }
-    if (whatsapp.trim() && whatsapp.trim().length < 8) {
+    if (whatsapp && !isValidPhoneNumber(whatsapp)) {
       setError("Please enter a valid WhatsApp number");
       return;
     }
     setError("");
-    onSubmit(name.trim(), whatsapp.trim() || undefined);
+    // Only pass the number if user opted in AND it's valid
+    const finalNumber = whatsapp && optIn ? whatsapp : undefined;
+    onSubmit(name.trim(), finalNumber, !!finalNumber);
   };
 
   return (
@@ -47,7 +52,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic flower backdrop — subtle, professional */}
+      {/* Cinematic flower backdrop */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <img
           src={heroFlower}
@@ -70,13 +75,11 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
         Your Strain Match Is <span className="text-[hsl(var(--brand-gold))]">Ready</span>
       </motion.h2>
 
-      {/* Blurred strain teaser with flower peek */}
       {strainName && (
         <motion.div
           variants={itemVariants}
           className="mb-4 w-full rounded-xl border border-[hsl(var(--accent-green)_/_0.3)] bg-[hsl(175_6%_16%_/_0.8)] backdrop-blur-xl p-4 relative overflow-hidden"
         >
-          {/* Cropped flower peek behind locked area */}
           <motion.img
             src={heroFlower}
             alt=""
@@ -115,11 +118,10 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
         onSubmit={handleSubmit}
         className="flex w-full flex-col gap-3 glass-card-elevated rounded-2xl p-5 relative overflow-hidden"
       >
-        {/* Green-to-gold shimmer line */}
         <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(var(--accent-green)), hsl(var(--brand-gold)))' }} />
 
         <div className="relative">
-          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
           <input
             type="text"
             placeholder="Your first name"
@@ -129,16 +131,37 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
           />
         </div>
 
-        <div className="relative">
-          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="tel"
+        {/* Phone input with country selector — defaults to South Africa */}
+        <div className="hb-phone-wrap rounded-2xl border border-border bg-[hsl(var(--surface-elevated))] px-4 py-3 focus-within:ring-2 focus-within:ring-[hsl(var(--brand-gold)_/_0.4)] focus-within:border-[hsl(var(--brand-gold)_/_0.5)] transition-all">
+          <PhoneInput
+            international
+            defaultCountry="ZA"
+            countryCallingCodeEditable={false}
             placeholder="WhatsApp number (optional)"
             value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value)}
-            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated))] pl-11 pr-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all text-[16px]"
+            onChange={setWhatsapp}
+            className="text-foreground"
           />
         </div>
+
+        {/* POPIA opt-in */}
+        {whatsapp && (
+          <motion.label
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="flex items-start gap-2 text-left cursor-pointer px-1"
+          >
+            <input
+              type="checkbox"
+              checked={optIn}
+              onChange={(e) => setOptIn(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-border accent-[hsl(var(--accent-green))]"
+            />
+            <span className="text-[11px] leading-snug text-muted-foreground">
+              Send my strain match and follow-up via WhatsApp. POPIA-compliant — opt out anytime.
+            </span>
+          </motion.label>
+        )}
 
         {error && (
           <motion.p
@@ -176,7 +199,6 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
         )}
       </motion.form>
 
-      {/* POPIA */}
       <motion.div
         variants={itemVariants}
         className="mt-5 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.04)] px-4 py-2 text-xs text-muted-foreground"

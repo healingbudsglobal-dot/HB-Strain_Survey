@@ -92,7 +92,7 @@ const Index = () => {
   }, []);
 
   const handleSendResults = useCallback(
-    async (contactName?: string, whatsapp?: string) => {
+    async (contactName?: string, whatsappE164?: string, optIn?: boolean) => {
       if (!strainResult) return;
 
       setScreen("loading");
@@ -111,7 +111,11 @@ const Index = () => {
       };
 
       if (contactName) payload.name = contactName;
-      if (whatsapp) payload.whatsapp = whatsapp;
+      if (whatsappE164) {
+        payload.whatsapp = whatsappE164;
+        payload.whatsapp_e164 = whatsappE164;
+        payload.whatsapp_opt_in = optIn ? "true" : "false";
+      }
 
       surveyQuestions.forEach((q) => {
         payload[q.id] = surveyAnswers[q.id] || "";
@@ -132,8 +136,8 @@ const Index = () => {
   );
 
   const handleContactSubmit = useCallback(
-    (name: string, whatsapp?: string) => {
-      handleSendResults(name, whatsapp);
+    (name: string, whatsappE164?: string, optIn?: boolean) => {
+      handleSendResults(name, whatsappE164, optIn);
     },
     [handleSendResults]
   );
