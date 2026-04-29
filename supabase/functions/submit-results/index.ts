@@ -419,6 +419,7 @@ Deno.serve(async (req) => {
           compatibility: payload.compatibility || null,
           payload,
           webhook_status: 'pending',
+          ...utmFields,
         })
         .select('id')
         .single();
