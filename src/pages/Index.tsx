@@ -123,6 +123,9 @@ const Index = () => {
         payload[q.id] = surveyAnswers[q.id] || "";
       });
 
+      // Attach UTM / attribution
+      Object.assign(payload, utmToPayload(utm));
+
       const success = await submitResults(payload);
       if (!success) {
         toast({
