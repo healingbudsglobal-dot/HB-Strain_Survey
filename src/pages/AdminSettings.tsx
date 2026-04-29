@@ -29,7 +29,11 @@ const AdminSettings = () => {
   const [waNumber, setWaNumber] = useState("");
   const [channelPriority, setChannelPriority] = useState("whatsapp_first");
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [sampleVars, setSampleVars] = useState<Record<string, string>>(getSampleVars());
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+
+  const updateSampleVar = (key: string, value: string) =>
+    setSampleVars((prev) => ({ ...prev, [key]: value }));
 
   useEffect(() => {
     const init = async () => {
