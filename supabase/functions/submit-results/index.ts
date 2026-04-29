@@ -8,6 +8,29 @@ const corsHeaders = {
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/70z505ty60nkksvtl6l6r1yzj4cs58tb";
 const ADMIN_EMAIL = "healingbudsglobal@gmail.com";
 
+const DISPOSABLE_DOMAINS = new Set([
+  "mailinator.com","tempmail.com","guerrillamail.com","throwaway.email","yopmail.com",
+  "sharklasers.com","guerrillamailblock.com","grr.la","dispostable.com","mailnesia.com",
+  "maildrop.cc","trashmail.com","trashmail.net","trashmail.org","10minutemail.com",
+  "tempail.com","fakeinbox.com","mailcatch.com","temp-mail.org","mintemail.com",
+  "discard.email","mailsac.com","mytemp.email","mohmal.com","getnada.com",
+  "emailondeck.com","tempinbox.com","burnermail.io","mailtemp.net","harakirimail.com",
+  "jetable.org","spamgourmet.com","trash-mail.com","tempr.email","crazymailing.com",
+  "tmail.ws","tempmailo.com","emailfake.com","inboxbear.com","mailforspam.com",
+]);
+const FAKE_LOCAL_PARTS = new Set(["test","fake","asdf","aaa","bbb","xxx","abc","none","noreply","no-reply","noemail","nobody","null"]);
+
+function validateEmailServer(raw: unknown): { valid: boolean; error?: string; email?: string } {
+  if (typeof raw !== 'string') return { valid: false, error: 'Email is required' };
+  const trimmed = raw.trim().toLowerCase();
+  if (trimmed.length > 255) return { valid: false, error: 'Email too long' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return { valid: false, error: 'Invalid email format' };
+  const [local, domain] = trimmed.split('@');
+  if (DISPOSABLE_DOMAINS.has(domain)) return { valid: false, error: 'Disposable email addresses are not allowed' };
+  if (FAKE_LOCAL_PARTS.has(local) || local.length < 2) return { valid: false, error: 'Please use a real email address' };
+  return { valid: true, email: trimmed };
+}
+
 function buildEffectPills(effects: string): string {
   return effects.split(', ').map(e =>
     `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#162220; border:1px solid #2F3633; border-radius:20px; font-size:12px; color:#4DBFA1; font-weight:500;">${e}</span></td>`
