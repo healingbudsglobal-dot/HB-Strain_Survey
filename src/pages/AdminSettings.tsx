@@ -10,6 +10,7 @@ import {
   renderTemplate,
   extractVariables,
   getSampleVars,
+  buildWaLink,
 } from "@/lib/whatsappTemplate";
 
 interface Template {
@@ -29,7 +30,11 @@ const AdminSettings = () => {
   const [waNumber, setWaNumber] = useState("");
   const [channelPriority, setChannelPriority] = useState("whatsapp_first");
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [sampleVars, setSampleVars] = useState<Record<string, string>>(getSampleVars());
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+
+  const updateSampleVar = (key: string, value: string) =>
+    setSampleVars((prev) => ({ ...prev, [key]: value }));
 
   useEffect(() => {
     const init = async () => {
@@ -292,10 +297,42 @@ const AdminSettings = () => {
             </button>
           </div>
 
+          {/* Sample variables editor — drives all previews */}
+          <div className="mb-4 rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              Sample Variables (for live preview)
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Edit these values to see how your message will look with real data — changes update every preview below instantly.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {TEMPLATE_VARIABLES.map((v) => (
+                <div key={v.key} className="flex items-center gap-2">
+                  <span className="w-28 shrink-0 text-xs font-mono text-muted-foreground">
+                    {`{{${v.key}}}`}
+                  </span>
+                  <input
+                    value={sampleVars[v.key] ?? ""}
+                    onChange={(e) => updateSampleVar(v.key, e.target.value)}
+                    placeholder={v.sample}
+                    className="flex-1 rounded-md border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setSampleVars(getSampleVars())}
+              className="mt-3 text-xs text-primary hover:underline"
+            >
+              Reset to defaults
+            </button>
+          </div>
+
           <div className="space-y-4">
             {templates.map((t) => {
-              const sample = getSampleVars();
-              const preview = renderTemplate(t.body, sample);
+              const preview = renderTemplate(t.body, sampleVars);
+              const waLink = buildWaLink(waNumber, preview);
+              const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
               return (
                 <div key={t.id} className="rounded-xl border border-border bg-card p-5">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -326,33 +363,85 @@ const AdminSettings = () => {
                     </button>
                   </div>
 
-                  <textarea
-                    ref={(el) => (textareaRefs.current[t.id] = el)}
-                    value={t.body}
-                    onChange={(e) => updateTemplateField(t.id, "body", e.target.value)}
-                    rows={5}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-ring resize-y"
-                    placeholder="Hi {{name}}, your match is {{strain}}..."
-                  />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Editor */}
+                    <div>
+                      <textarea
+                        ref={(el) => (textareaRefs.current[t.id] = el)}
+                        value={t.body}
+                        onChange={(e) => updateTemplateField(t.id, "body", e.target.value)}
+                        rows={8}
+                        className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+                        placeholder="Hi {{name}}, your match is {{strain}}..."
+                      />
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Insert:</span>
+                        {TEMPLATE_VARIABLES.map((v) => (
+                          <button
+                            key={v.key}
+                            onClick={() => insertVariable(t.id, v.key)}
+                            className="px-2 py-1 rounded-md bg-muted text-xs font-mono text-foreground hover:bg-accent transition-colors"
+                          >
+                            {`{{${v.key}}}`}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {preview.length} chars · {extractVariables(t.body).length} variable(s)
+                      </p>
+                    </div>
 
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Insert:</span>
-                    {TEMPLATE_VARIABLES.map((v) => (
-                      <button
-                        key={v.key}
-                        onClick={() => insertVariable(t.id, v.key)}
-                        className="px-2 py-1 rounded-md bg-muted text-xs font-mono text-foreground hover:bg-accent transition-colors"
+                    {/* WhatsApp-style live preview */}
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                        Live WhatsApp Preview
+                      </p>
+                      <div
+                        className="rounded-xl p-3 min-h-[220px] border border-border"
+                        style={{
+                          backgroundColor: "#0b141a",
+                          backgroundImage:
+                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.03) 0, transparent 40%), radial-gradient(circle at 75% 85%, rgba(255,255,255,0.03) 0, transparent 40%)",
+                        }}
                       >
-                        {`{{${v.key}}}`}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="mt-3 rounded-lg bg-muted/50 p-3 border border-border">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-                      Preview (sample data)
-                    </p>
-                    <p className="text-sm text-foreground whitespace-pre-wrap">{preview}</p>
+                        <div className="flex justify-end">
+                          <div
+                            className="relative max-w-[85%] rounded-lg px-3 py-2 shadow-md"
+                            style={{ backgroundColor: "#005c4b", color: "#e9edef" }}
+                          >
+                            <p className="text-[13px] leading-relaxed whitespace-pre-wrap break-words">
+                              {preview || (
+                                <span className="opacity-50 italic">Empty message…</span>
+                              )}
+                            </p>
+                            <div className="mt-1 flex items-center justify-end gap-1">
+                              <span className="text-[10px]" style={{ color: "#a8c4bd" }}>
+                                {now}
+                              </span>
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path
+                                  d="M2 8.5l3 3 6-7M7 11.5l3 3 5-7"
+                                  stroke="#53bdeb"
+                                  strokeWidth="1.4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {waLink && (
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-2 text-xs text-primary hover:underline"
+                        >
+                          <MessageSquare className="h-3 w-3" /> Test on WhatsApp
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mt-3 flex justify-end">
