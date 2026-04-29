@@ -16,12 +16,27 @@ interface Lead {
   whatsapp_opt_in: boolean;
   contacted: boolean;
   contacted_at: string | null;
+  pipeline_status: string;
   province: string | null;
   matched_strain: string | null;
   compatibility: string | null;
   strain_shop_url: string | null;
   survey_answers: Record<string, string> | null;
 }
+
+interface LeadEvent {
+  id: string;
+  event_type: string;
+  payload: Record<string, any>;
+  created_at: string;
+}
+
+type PipelineStatus = "new" | "contacted" | "customer";
+const PIPELINE_STAGES: { value: PipelineStatus; label: string; color: string }[] = [
+  { value: "new", label: "New", color: "bg-muted text-muted-foreground" },
+  { value: "contacted", label: "Contacted", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400" },
+  { value: "customer", label: "Customer", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" },
+];
 
 const FALLBACK_TEMPLATE =
   "Hi {{name}}, this is Healing Buds 🌿\n\nYour Bio-Map strain match is *{{strain}}* ({{compatibility}} compatibility).\n\nReply here for personalised dosing guidance.";
