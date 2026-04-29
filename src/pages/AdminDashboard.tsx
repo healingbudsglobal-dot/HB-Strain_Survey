@@ -117,17 +117,64 @@ const AdminDashboard = () => {
       .eq("id", lead.id);
   };
 
+  const logEvent = async (leadId: string, event_type: string, payload: Record<string, any> = {}) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("lead_events").insert({
+      lead_id: leadId,
+      event_type,
+      payload,
+      created_by: user?.id ?? null,
+    });
+  };
+
+  const setPipelineStatus = async (lead: Lead, next: PipelineStatus, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (lead.pipeline_status === next) return;
+    const prev = lead.pipeline_status;
+    const contactedFlag = next !== "new";
+    const contactedAt = contactedFlag ? new Date().toISOString() : null;
+    setLeads((prevLeads) =>
+      prevLeads.map((l) =>
+        l.id === lead.id
+          ? { ...l, pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt }
+          : l
+      )
+    );
+    if (selectedLead?.id === lead.id) {
+      setSelectedLead({ ...lead, pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt });
+    }
+    await supabase
+      .from("leads")
+      .update({ pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt })
+      .eq("id", lead.id);
+    await logEvent(lead.id, "status_changed", { from: prev, to: next });
+    if (selectedLead?.id === lead.id) loadTimeline(lead.id);
+  };
+
   const openWhatsApp = (lead: Lead, e: React.MouseEvent) => {
     e.stopPropagation();
     const link = buildWhatsAppLink(lead);
     if (!link) return;
     window.open(link, "_blank", "noopener,noreferrer");
-    // Auto-mark as contacted on first send
-    if (!lead.contacted) toggleContacted(lead);
+    logEvent(lead.id, "whatsapp_clicked", { number: lead.whatsapp_e164 || lead.whatsapp });
+    // Auto-advance to "contacted" if still new
+    if (lead.pipeline_status === "new") setPipelineStatus(lead, "contacted");
+  };
+
+  const loadTimeline = async (leadId: string) => {
+    setTimelineLoading(true);
+    const { data } = await supabase
+      .from("lead_events")
+      .select("id, event_type, payload, created_at")
+      .eq("lead_id", leadId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setTimeline((data as LeadEvent[]) || []);
+    setTimelineLoading(false);
   };
 
   const filteredLeads = leads
-    .filter((l) => (showUncontactedOnly ? !l.contacted : true))
+    .filter((l) => (showUncontactedOnly ? l.pipeline_status === "new" : true))
     .filter((l) => {
       const q = search.toLowerCase();
       if (!q) return true;
