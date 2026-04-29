@@ -362,7 +362,11 @@ const AdminDashboard = () => {
                       className={`border-b border-border hover:bg-accent/50 cursor-pointer transition-colors ${
                         lead.contacted ? "opacity-60" : ""
                       }`}
-                      onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
+                      onClick={() => {
+                        const next = selectedLead?.id === lead.id ? null : lead;
+                        setSelectedLead(next);
+                        if (next) loadTimeline(next.id);
+                      }}
                     >
                       <td className="px-3 py-3">
                         <button
@@ -445,6 +449,22 @@ const AdminDashboard = () => {
                     ✓ Contacted {new Date(selectedLead.contacted_at).toLocaleString("en-ZA")}
                   </p>
                 )}
+                {/* Pipeline status switcher */}
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {PIPELINE_STAGES.map((s) => (
+                    <button
+                      key={s.value}
+                      onClick={(e) => setPipelineStatus(selectedLead, s.value, e)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                        selectedLead.pipeline_status === s.value
+                          ? `${s.color} ring-2 ring-offset-2 ring-offset-card ring-current`
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button
                 onClick={() => setSelectedLead(null)}
