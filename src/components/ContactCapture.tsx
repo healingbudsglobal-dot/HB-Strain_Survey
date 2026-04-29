@@ -110,9 +110,9 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
 
       <motion.p
         variants={itemVariants}
-        className="mb-6 text-sm text-muted-foreground leading-relaxed max-w-xs"
+        className="mb-5 text-sm text-muted-foreground leading-relaxed max-w-xs"
       >
-        Add your name to personalise your results
+        Get your match instantly on WhatsApp <span className="text-[hsl(var(--accent-green))]">📱</span>
       </motion.p>
 
       <motion.form
@@ -133,17 +133,25 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
           />
         </div>
 
-        {/* Phone input with country selector — defaults to South Africa */}
-        <div className="hb-phone-wrap rounded-2xl border border-border bg-[hsl(var(--surface-elevated))] px-4 py-3 focus-within:ring-2 focus-within:ring-[hsl(var(--brand-gold)_/_0.4)] focus-within:border-[hsl(var(--brand-gold)_/_0.5)] transition-all">
-          <PhoneInput
-            international
-            defaultCountry="ZA"
-            countryCallingCodeEditable={false}
-            placeholder="WhatsApp number (optional)"
-            value={whatsapp}
-            onChange={setWhatsapp}
-            className="text-foreground"
-          />
+        {/* WhatsApp number — primary delivery channel */}
+        <div className="relative">
+          <div className="mb-1.5 flex items-center gap-1.5 px-1">
+            <MessageCircle className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--accent-green))]">
+              Recommended · 98% open rate
+            </span>
+          </div>
+          <div className="hb-phone-wrap rounded-2xl border-2 border-[hsl(var(--accent-green)_/_0.3)] bg-[hsl(var(--accent-green)_/_0.04)] px-4 py-3 focus-within:ring-2 focus-within:ring-[hsl(var(--accent-green)_/_0.5)] focus-within:border-[hsl(var(--accent-green))] transition-all">
+            <PhoneInput
+              international
+              defaultCountry="ZA"
+              countryCallingCodeEditable={false}
+              placeholder="Your WhatsApp number"
+              value={whatsapp}
+              onChange={setWhatsapp}
+              className="text-foreground"
+            />
+          </div>
         </div>
 
         {/* POPIA opt-in */}
@@ -175,28 +183,44 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
           </motion.p>
         )}
 
+        {/* Primary CTA — adapts based on whether WA is filled */}
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className="group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px]"
+          className={`group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px] ${
+            hasValidWa && optIn
+              ? 'bg-[#25D366] shadow-[0_8px_24px_-6px_rgba(37,211,102,0.4)]'
+              : 'gradient-accent'
+          }`}
         >
-          Reveal My Match
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          {hasValidWa && optIn ? (
+            <>
+              <MessageCircle className="h-5 w-5" />
+              Send My Match on WhatsApp
+            </>
+          ) : (
+            <>
+              Reveal My Match
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </motion.button>
 
+        {/* Secondary: email-only fallback */}
         <motion.button
           type="button"
           onClick={onSkip}
           whileHover={{ x: 4 }}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-1 min-h-[44px] px-4"
+          className="inline-flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mt-1 min-h-[44px] px-4"
         >
-          Skip — email my results →
+          <Mail className="h-3.5 w-3.5" />
+          Email me instead
         </motion.button>
 
         {userEmail && (
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Your results are also sent to <span className="text-foreground">{userEmail}</span>
+          <p className="text-[11px] text-muted-foreground text-center">
+            Results also sent to <span className="text-foreground">{userEmail}</span>
           </p>
         )}
       </motion.form>
