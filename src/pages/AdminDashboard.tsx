@@ -34,7 +34,15 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
   const [showUncontactedOnly, setShowUncontactedOnly] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [senderNumber, setSenderNumber] = useState<string>(FALLBACK_NUMBER);
+  const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_TEMPLATE);
   const navigate = useNavigate();
+
+  const buildWhatsAppLink = (lead: Lead): string | null => {
+    const recipient = lead.whatsapp_e164 || lead.whatsapp;
+    const message = renderTemplate(defaultTemplate, getLeadVars(lead));
+    return buildWaLink(recipient, message);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,6 +52,7 @@ const AdminDashboard = () => {
         return;
       }
       fetchLeads();
+      loadConfig();
     };
     checkAuth();
 
