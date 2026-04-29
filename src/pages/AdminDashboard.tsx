@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle } from "lucide-react";
+import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import { renderTemplate, buildWaLink, getLeadVars } from "@/lib/whatsappTemplate";
 
 interface Lead {
   id: string;
@@ -22,29 +23,10 @@ interface Lead {
   survey_answers: Record<string, string> | null;
 }
 
-// Healing Buds WhatsApp Business number (for reference / future API sender)
-const HB_WHATSAPP_BUSINESS = "+351939455949";
+const FALLBACK_TEMPLATE =
+  "Hi {{name}}, this is Healing Buds 🌿\n\nYour Bio-Map strain match is *{{strain}}* ({{compatibility}} compatibility).\n\nReply here for personalised dosing guidance.";
+const FALLBACK_NUMBER = "+351939455949";
 
-const buildWhatsAppLink = (lead: Lead): string | null => {
-  // Prefer validated E.164; fall back to legacy free-text whatsapp field
-  const raw = lead.whatsapp_e164 || lead.whatsapp;
-  if (!raw) return null;
-  // Strip everything except digits — wa.me requires no plus sign
-  const digits = raw.replace(/[^0-9]/g, "");
-  if (digits.length < 8) return null;
-
-  const firstName = (lead.name || "there").split(" ")[0];
-  const strain = lead.matched_strain || "your strain match";
-  const compat = lead.compatibility ? ` (${lead.compatibility} compatibility)` : "";
-  const shopLine = lead.strain_shop_url ? `\n\nView & order: ${lead.strain_shop_url}` : "";
-
-  const message =
-    `Hi ${firstName}, this is Healing Buds 🌿\n\n` +
-    `Your Bio-Map strain match is *${strain}*${compat}.${shopLine}\n\n` +
-    `Reply here if you'd like personalised dosing guidance or have any questions about your match.`;
-
-  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
-};
 
 const AdminDashboard = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
