@@ -51,6 +51,8 @@ const AdminDashboard = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [senderNumber, setSenderNumber] = useState<string>(FALLBACK_NUMBER);
   const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_TEMPLATE);
+  const [timeline, setTimeline] = useState<LeadEvent[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
   const navigate = useNavigate();
 
   const buildWhatsAppLink = (lead: Lead): string | null => {
@@ -104,18 +106,7 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  const toggleContacted = async (lead: Lead, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    const next = !lead.contacted;
-    // Optimistic update
-    setLeads((prev) =>
-      prev.map((l) => (l.id === lead.id ? { ...l, contacted: next, contacted_at: next ? new Date().toISOString() : null } : l))
-    );
-    await supabase
-      .from("leads")
-      .update({ contacted: next, contacted_at: next ? new Date().toISOString() : null })
-      .eq("id", lead.id);
-  };
+  // toggleContacted removed — replaced by setPipelineStatus
 
   const logEvent = async (leadId: string, event_type: string, payload: Record<string, any> = {}) => {
     const { data: { user } } = await supabase.auth.getUser();
