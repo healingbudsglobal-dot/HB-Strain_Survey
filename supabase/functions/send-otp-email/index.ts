@@ -82,6 +82,21 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Server-side email format validation
+    const trimmed = String(email).trim().toLowerCase();
+    if (trimmed.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (!/^\d{6}$/.test(String(otp_code))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid OTP code format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     if (!RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY not configured');
