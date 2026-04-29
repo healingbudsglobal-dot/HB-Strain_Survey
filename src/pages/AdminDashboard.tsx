@@ -507,6 +507,45 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Activity timeline */}
+            <div className="mt-5 pt-5 border-t border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Activity Timeline
+              </p>
+              {timelineLoading ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : timeline.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">No events yet — actions you take here will appear in the timeline.</p>
+              ) : (
+                <ol className="space-y-2">
+                  {timeline.map((ev) => (
+                    <li key={ev.id} className="flex gap-3 text-sm">
+                      <div className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          <span className="font-mono text-xs px-2 py-0.5 rounded bg-muted text-foreground">
+                            {ev.event_type}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {new Date(ev.created_at).toLocaleString("en-ZA")}
+                          </span>
+                        </div>
+                        {ev.payload && Object.keys(ev.payload).length > 0 && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                            {Object.entries(ev.payload)
+                              .filter(([, v]) => v !== null && v !== "")
+                              .slice(0, 4)
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
           </motion.div>
         )}
       </main>
