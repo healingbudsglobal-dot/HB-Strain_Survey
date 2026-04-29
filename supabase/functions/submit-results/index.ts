@@ -488,6 +488,21 @@ Deno.serve(async (req) => {
     const resendData = await resendRes.json();
     if (!resendRes.ok) {
       console.error('Resend error:', resendData);
+    } else if (leadId) {
+      // Log email_sent event
+      try {
+        await supabase.from('lead_events').insert({
+          lead_id: leadId,
+          event_type: 'email_sent',
+          payload: {
+            template: 'results',
+            resend_id: resendData?.id ?? null,
+            subject: `Your Strain Match: ${payload.matched_strain}`,
+          },
+        });
+      } catch (e) {
+        console.error('lead_events insert (email_sent) failed:', e);
+      }
     }
 
     // 3. Send admin notification email
