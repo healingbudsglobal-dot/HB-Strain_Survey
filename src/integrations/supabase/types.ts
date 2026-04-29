@@ -255,6 +255,50 @@ export type Database = {
           },
         ]
       }
+      lead_sequence_state: {
+        Row: {
+          completed_at: string | null
+          current_step: number
+          enrolled_at: string
+          id: string
+          last_error: string | null
+          lead_id: string
+          next_run_at: string
+          sequence_id: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_error?: string | null
+          lead_id: string
+          next_run_at?: string
+          sequence_id: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_error?: string | null
+          lead_id?: string
+          next_run_at?: string
+          sequence_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_sequence_state_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "nurture_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           browser: string | null
@@ -273,6 +317,7 @@ export type Database = {
           matched_strain: string | null
           name: string | null
           notes: string | null
+          pipeline_status: string
           province: string | null
           referrer: string | null
           source: string | null
@@ -314,6 +359,7 @@ export type Database = {
           matched_strain?: string | null
           name?: string | null
           notes?: string | null
+          pipeline_status?: string
           province?: string | null
           referrer?: string | null
           source?: string | null
@@ -355,6 +401,7 @@ export type Database = {
           matched_strain?: string | null
           name?: string | null
           notes?: string | null
+          pipeline_status?: string
           province?: string | null
           referrer?: string | null
           source?: string | null
@@ -378,6 +425,39 @@ export type Database = {
           whatsapp_opt_in?: boolean
           whatsapp_sent_at?: string | null
           whatsapp_status?: string | null
+        }
+        Relationships: []
+      }
+      nurture_sequences: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          steps: Json
+          trigger_event: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          steps?: Json
+          trigger_event: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          steps?: Json
+          trigger_event?: string
+          updated_at?: string
         }
         Relationships: []
       }

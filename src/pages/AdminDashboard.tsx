@@ -16,12 +16,27 @@ interface Lead {
   whatsapp_opt_in: boolean;
   contacted: boolean;
   contacted_at: string | null;
+  pipeline_status: string;
   province: string | null;
   matched_strain: string | null;
   compatibility: string | null;
   strain_shop_url: string | null;
   survey_answers: Record<string, string> | null;
 }
+
+interface LeadEvent {
+  id: string;
+  event_type: string;
+  payload: Record<string, any>;
+  created_at: string;
+}
+
+type PipelineStatus = "new" | "contacted" | "customer";
+const PIPELINE_STAGES: { value: PipelineStatus; label: string; color: string }[] = [
+  { value: "new", label: "New", color: "bg-muted text-muted-foreground" },
+  { value: "contacted", label: "Contacted", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400" },
+  { value: "customer", label: "Customer", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" },
+];
 
 const FALLBACK_TEMPLATE =
   "Hi {{name}}, this is Healing Buds 🌿\n\nYour Bio-Map strain match is *{{strain}}* ({{compatibility}} compatibility).\n\nReply here for personalised dosing guidance.";
@@ -36,6 +51,8 @@ const AdminDashboard = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [senderNumber, setSenderNumber] = useState<string>(FALLBACK_NUMBER);
   const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_TEMPLATE);
+  const [timeline, setTimeline] = useState<LeadEvent[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
   const navigate = useNavigate();
 
   const buildWhatsAppLink = (lead: Lead): string | null => {
@@ -89,17 +106,40 @@ const AdminDashboard = () => {
     navigate("/admin/login");
   };
 
-  const toggleContacted = async (lead: Lead, e?: React.MouseEvent) => {
+  // toggleContacted removed — replaced by setPipelineStatus
+
+  const logEvent = async (leadId: string, event_type: string, payload: Record<string, any> = {}) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("lead_events").insert({
+      lead_id: leadId,
+      event_type,
+      payload,
+      created_by: user?.id ?? null,
+    });
+  };
+
+  const setPipelineStatus = async (lead: Lead, next: PipelineStatus, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    const next = !lead.contacted;
-    // Optimistic update
-    setLeads((prev) =>
-      prev.map((l) => (l.id === lead.id ? { ...l, contacted: next, contacted_at: next ? new Date().toISOString() : null } : l))
+    if (lead.pipeline_status === next) return;
+    const prev = lead.pipeline_status;
+    const contactedFlag = next !== "new";
+    const contactedAt = contactedFlag ? new Date().toISOString() : null;
+    setLeads((prevLeads) =>
+      prevLeads.map((l) =>
+        l.id === lead.id
+          ? { ...l, pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt }
+          : l
+      )
     );
+    if (selectedLead?.id === lead.id) {
+      setSelectedLead({ ...lead, pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt });
+    }
     await supabase
       .from("leads")
-      .update({ contacted: next, contacted_at: next ? new Date().toISOString() : null })
+      .update({ pipeline_status: next, contacted: contactedFlag, contacted_at: contactedAt })
       .eq("id", lead.id);
+    await logEvent(lead.id, "status_changed", { from: prev, to: next });
+    if (selectedLead?.id === lead.id) loadTimeline(lead.id);
   };
 
   const openWhatsApp = (lead: Lead, e: React.MouseEvent) => {
@@ -107,12 +147,25 @@ const AdminDashboard = () => {
     const link = buildWhatsAppLink(lead);
     if (!link) return;
     window.open(link, "_blank", "noopener,noreferrer");
-    // Auto-mark as contacted on first send
-    if (!lead.contacted) toggleContacted(lead);
+    logEvent(lead.id, "whatsapp_clicked", { number: lead.whatsapp_e164 || lead.whatsapp });
+    // Auto-advance to "contacted" if still new
+    if (lead.pipeline_status === "new") setPipelineStatus(lead, "contacted");
+  };
+
+  const loadTimeline = async (leadId: string) => {
+    setTimelineLoading(true);
+    const { data } = await supabase
+      .from("lead_events")
+      .select("id, event_type, payload, created_at")
+      .eq("lead_id", leadId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setTimeline((data as LeadEvent[]) || []);
+    setTimelineLoading(false);
   };
 
   const filteredLeads = leads
-    .filter((l) => (showUncontactedOnly ? !l.contacted : true))
+    .filter((l) => (showUncontactedOnly ? l.pipeline_status === "new" : true))
     .filter((l) => {
       const q = search.toLowerCase();
       if (!q) return true;
@@ -309,16 +362,27 @@ const AdminDashboard = () => {
                       className={`border-b border-border hover:bg-accent/50 cursor-pointer transition-colors ${
                         lead.contacted ? "opacity-60" : ""
                       }`}
-                      onClick={() => setSelectedLead(selectedLead?.id === lead.id ? null : lead)}
+                      onClick={() => {
+                        const next = selectedLead?.id === lead.id ? null : lead;
+                        setSelectedLead(next);
+                        if (next) loadTimeline(next.id);
+                      }}
                     >
                       <td className="px-3 py-3">
                         <button
-                          onClick={(e) => toggleContacted(lead, e)}
-                          title={lead.contacted ? "Mark uncontacted" : "Mark contacted"}
+                          onClick={(e) => {
+                            const next: PipelineStatus =
+                              lead.pipeline_status === "new" ? "contacted" :
+                              lead.pipeline_status === "contacted" ? "customer" : "new";
+                            setPipelineStatus(lead, next, e);
+                          }}
+                          title={`Status: ${lead.pipeline_status} · click to advance`}
                           className="text-muted-foreground hover:text-foreground"
                         >
-                          {lead.contacted ? (
-                            <CheckCircle2 className="h-5 w-5 text-[hsl(var(--accent-green))]" />
+                          {lead.pipeline_status === "customer" ? (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                          ) : lead.pipeline_status === "contacted" ? (
+                            <CheckCircle2 className="h-5 w-5 text-amber-500" />
                           ) : (
                             <Circle className="h-5 w-5" />
                           )}
@@ -385,6 +449,22 @@ const AdminDashboard = () => {
                     ✓ Contacted {new Date(selectedLead.contacted_at).toLocaleString("en-ZA")}
                   </p>
                 )}
+                {/* Pipeline status switcher */}
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {PIPELINE_STAGES.map((s) => (
+                    <button
+                      key={s.value}
+                      onClick={(e) => setPipelineStatus(selectedLead, s.value, e)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                        selectedLead.pipeline_status === s.value
+                          ? `${s.color} ring-2 ring-offset-2 ring-offset-card ring-current`
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button
                 onClick={() => setSelectedLead(null)}
@@ -427,6 +507,45 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Activity timeline */}
+            <div className="mt-5 pt-5 border-t border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Activity Timeline
+              </p>
+              {timelineLoading ? (
+                <p className="text-xs text-muted-foreground">Loading…</p>
+              ) : timeline.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">No events yet — actions you take here will appear in the timeline.</p>
+              ) : (
+                <ol className="space-y-2">
+                  {timeline.map((ev) => (
+                    <li key={ev.id} className="flex gap-3 text-sm">
+                      <div className="flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-2">
+                          <span className="font-mono text-xs px-2 py-0.5 rounded bg-muted text-foreground">
+                            {ev.event_type}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {new Date(ev.created_at).toLocaleString("en-ZA")}
+                          </span>
+                        </div>
+                        {ev.payload && Object.keys(ev.payload).length > 0 && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                            {Object.entries(ev.payload)
+                              .filter(([, v]) => v !== null && v !== "")
+                              .slice(0, 4)
+                              .map(([k, v]) => `${k}: ${v}`)
+                              .join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
           </motion.div>
         )}
       </main>
