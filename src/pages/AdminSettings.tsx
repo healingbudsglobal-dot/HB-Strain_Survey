@@ -10,6 +10,7 @@ import {
   renderTemplate,
   extractVariables,
   getSampleVars,
+  buildWaLink,
 } from "@/lib/whatsappTemplate";
 
 interface Template {
