@@ -75,6 +75,15 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
+  const loadConfig = async () => {
+    const [{ data: settings }, { data: tmpl }] = await Promise.all([
+      supabase.from("app_settings").select("key, value").eq("key", "whatsapp_business_number").maybeSingle(),
+      supabase.from("whatsapp_templates").select("body").eq("is_default", true).maybeSingle(),
+    ]);
+    if (settings?.value) setSenderNumber(String(settings.value));
+    if (tmpl?.body) setDefaultTemplate(tmpl.body);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/admin/login");
@@ -164,8 +173,16 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden sm:inline text-[11px] text-muted-foreground">
-              Sender: <span className="text-foreground font-mono">{HB_WHATSAPP_BUSINESS}</span>
+              Sender: <span className="text-foreground font-mono">{senderNumber}</span>
             </span>
+            <Link
+              to="/admin/settings"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              title="Settings"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Settings</span>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
