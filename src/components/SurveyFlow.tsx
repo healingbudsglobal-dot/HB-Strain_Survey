@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import { useSurveyProgress } from "@/hooks/useSurveyProgress";
 
 
 interface SurveyFlowProps {
@@ -28,6 +29,7 @@ const getIconColor = (_questionId: string, optionLabel: string): string => {
 };
 
 const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
+  const { hydrated, initial, save, clear } = useSurveyProgress();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -35,6 +37,21 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
   const [direction, setDirection] = useState(1);
   const [showSectionCard, setShowSectionCard] = useState(false);
   const [pendingSectionName, setPendingSectionName] = useState("");
+
+  // Restore saved progress on first hydration
+  useEffect(() => {
+    if (hydrated && initial && Object.keys(answers).length === 0) {
+      setAnswers(initial.answers);
+      setCurrentIndex(Math.min(initial.index, surveyQuestions.length - 1));
+    }
+  }, [hydrated, initial]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist on every change
+  useEffect(() => {
+    if (hydrated && Object.keys(answers).length > 0) {
+      save(answers, currentIndex);
+    }
+  }, [answers, currentIndex, hydrated, save]);
 
   const question = surveyQuestions[currentIndex];
   const isMulti = question.type === "multi";
