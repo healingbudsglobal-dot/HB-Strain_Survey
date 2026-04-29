@@ -163,7 +163,7 @@ const AdminSettings = () => {
         name: data.name,
         body: data.body,
         is_default: data.is_default,
-        variables: Array.isArray(data.variables) ? data.variables : [],
+        variables: Array.isArray(data.variables) ? (data.variables as string[]) : [],
       },
     ]);
   };
