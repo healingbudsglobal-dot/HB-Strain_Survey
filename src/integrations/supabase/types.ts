@@ -89,6 +89,66 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_submissions: {
+        Row: {
+          compatibility: string | null
+          created_at: string
+          email: string
+          id: string
+          matched_strain: string | null
+          name: string | null
+          payload: Json
+          source: string | null
+          survey_answers: Json
+          updated_at: string
+          webhook_attempts: number
+          webhook_error: string | null
+          webhook_last_attempt_at: string | null
+          webhook_response: string | null
+          webhook_status: string
+          webhook_status_code: number | null
+          webhook_url: string
+        }
+        Insert: {
+          compatibility?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          matched_strain?: string | null
+          name?: string | null
+          payload?: Json
+          source?: string | null
+          survey_answers?: Json
+          updated_at?: string
+          webhook_attempts?: number
+          webhook_error?: string | null
+          webhook_last_attempt_at?: string | null
+          webhook_response?: string | null
+          webhook_status?: string
+          webhook_status_code?: number | null
+          webhook_url?: string
+        }
+        Update: {
+          compatibility?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          matched_strain?: string | null
+          name?: string | null
+          payload?: Json
+          source?: string | null
+          survey_answers?: Json
+          updated_at?: string
+          webhook_attempts?: number
+          webhook_error?: string | null
+          webhook_last_attempt_at?: string | null
+          webhook_response?: string | null
+          webhook_status?: string
+          webhook_status_code?: number | null
+          webhook_url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
