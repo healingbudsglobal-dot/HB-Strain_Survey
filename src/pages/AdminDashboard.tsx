@@ -366,12 +366,19 @@ const AdminDashboard = () => {
                     >
                       <td className="px-3 py-3">
                         <button
-                          onClick={(e) => toggleContacted(lead, e)}
-                          title={lead.contacted ? "Mark uncontacted" : "Mark contacted"}
+                          onClick={(e) => {
+                            const next: PipelineStatus =
+                              lead.pipeline_status === "new" ? "contacted" :
+                              lead.pipeline_status === "contacted" ? "customer" : "new";
+                            setPipelineStatus(lead, next, e);
+                          }}
+                          title={`Status: ${lead.pipeline_status} · click to advance`}
                           className="text-muted-foreground hover:text-foreground"
                         >
-                          {lead.contacted ? (
-                            <CheckCircle2 className="h-5 w-5 text-[hsl(var(--accent-green))]" />
+                          {lead.pipeline_status === "customer" ? (
+                            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                          ) : lead.pipeline_status === "contacted" ? (
+                            <CheckCircle2 className="h-5 w-5 text-amber-500" />
                           ) : (
                             <Circle className="h-5 w-5" />
                           )}
