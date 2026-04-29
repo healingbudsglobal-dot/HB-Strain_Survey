@@ -448,19 +448,47 @@ Deno.serve(async (req) => {
       console.error('Admin email error:', adminEmailErr);
     }
 
-    // 4. Forward to Make.com webhook for Google Sheets logging
+    // 4. Forward to Make.com webhook for Google Sheets logging + record status
+    let webhookStatus: 'success' | 'failed' = 'failed';
+    let webhookStatusCode: number | null = null;
+    let webhookResponse: string | null = null;
+    let webhookError: string | null = null;
     try {
-      await fetch(MAKE_WEBHOOK_URL, {
+      const whRes = await fetch(MAKE_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           timestamp: new Date().toISOString(),
           source: 'healing-buds-biomap',
+          submission_id: submissionId,
           ...payload,
         }),
       });
+      webhookStatusCode = whRes.status;
+      webhookResponse = (await whRes.text()).slice(0, 1000);
+      webhookStatus = whRes.ok ? 'success' : 'failed';
+      if (!whRes.ok) webhookError = `HTTP ${whRes.status}`;
     } catch (webhookErr) {
       console.error('Make.com webhook error:', webhookErr);
+      webhookError = webhookErr instanceof Error ? webhookErr.message : String(webhookErr);
+    }
+
+    if (submissionId) {
+      try {
+        await supabase
+          .from('survey_submissions')
+          .update({
+            webhook_status: webhookStatus,
+            webhook_status_code: webhookStatusCode,
+            webhook_response: webhookResponse,
+            webhook_error: webhookError,
+            webhook_attempts: 1,
+            webhook_last_attempt_at: new Date().toISOString(),
+          })
+          .eq('id', submissionId);
+      } catch (e) {
+        console.error('Failed to update submission webhook status:', e);
+      }
     }
 
     return new Response(
