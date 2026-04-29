@@ -350,14 +350,17 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Collect survey answers into a JSONB object
-    const surveyKeys = ['exp_level', 'primary_vibe', 'specific_benefit', 'body_impact', 'terpene_pref', 'consumption_format', 'time_of_day'];
+    // Collect ALL survey answers into a JSONB object (up to 15 questions)
+    const surveyKeys = [
+      'exp_level','primary_vibe','specific_benefit','body_impact','terpene_pref',
+      'consumption_format','time_of_day','frequency','duration','onset_pref',
+      'tolerance','medical_conditions','goals','lifestyle','budget'
+    ];
     const surveyAnswers: Record<string, string> = {};
     surveyKeys.forEach(k => { if (payload[k]) surveyAnswers[k] = payload[k]; });
 
-    // 1. Save lead to database
+    // 1a. Save lead to database
     try {
-      // Validate E.164 format server-side (defence in depth)
       const e164 = typeof payload.whatsapp_e164 === 'string' && /^\+[1-9]\d{6,14}$/.test(payload.whatsapp_e164)
         ? payload.whatsapp_e164
         : null;
@@ -381,7 +384,29 @@ Deno.serve(async (req) => {
         survey_answers: surveyAnswers,
       });
     } catch (dbErr) {
-      console.error('DB insert error:', dbErr);
+      console.error('DB insert error (leads):', dbErr);
+    }
+
+    // 1b. Log full survey submission for admin review (with webhook tracking)
+    let submissionId: string | null = null;
+    try {
+      const { data: subRow, error: subErr } = await supabase
+        .from('survey_submissions')
+        .insert({
+          email,
+          name: payload.name || null,
+          survey_answers: surveyAnswers,
+          matched_strain: payload.matched_strain || null,
+          compatibility: payload.compatibility || null,
+          payload,
+          webhook_status: 'pending',
+        })
+        .select('id')
+        .single();
+      if (subErr) console.error('DB insert error (survey_submissions):', subErr);
+      else submissionId = subRow?.id ?? null;
+    } catch (e) {
+      console.error('survey_submissions insert failed:', e);
     }
 
     // 2. Send results email to user via Resend
@@ -423,19 +448,47 @@ Deno.serve(async (req) => {
       console.error('Admin email error:', adminEmailErr);
     }
 
-    // 4. Forward to Make.com webhook for Google Sheets logging
+    // 4. Forward to Make.com webhook for Google Sheets logging + record status
+    let webhookStatus: 'success' | 'failed' = 'failed';
+    let webhookStatusCode: number | null = null;
+    let webhookResponse: string | null = null;
+    let webhookError: string | null = null;
     try {
-      await fetch(MAKE_WEBHOOK_URL, {
+      const whRes = await fetch(MAKE_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           timestamp: new Date().toISOString(),
           source: 'healing-buds-biomap',
+          submission_id: submissionId,
           ...payload,
         }),
       });
+      webhookStatusCode = whRes.status;
+      webhookResponse = (await whRes.text()).slice(0, 1000);
+      webhookStatus = whRes.ok ? 'success' : 'failed';
+      if (!whRes.ok) webhookError = `HTTP ${whRes.status}`;
     } catch (webhookErr) {
       console.error('Make.com webhook error:', webhookErr);
+      webhookError = webhookErr instanceof Error ? webhookErr.message : String(webhookErr);
+    }
+
+    if (submissionId) {
+      try {
+        await supabase
+          .from('survey_submissions')
+          .update({
+            webhook_status: webhookStatus,
+            webhook_status_code: webhookStatusCode,
+            webhook_response: webhookResponse,
+            webhook_error: webhookError,
+            webhook_attempts: 1,
+            webhook_last_attempt_at: new Date().toISOString(),
+          })
+          .eq('id', submissionId);
+      } catch (e) {
+        console.error('Failed to update submission webhook status:', e);
+      }
     }
 
     return new Response(
