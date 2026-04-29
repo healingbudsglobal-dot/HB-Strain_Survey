@@ -1,68 +1,51 @@
-# Admin Settings — WhatsApp Templates & Number
+# Admin Login Convenience + WhatsApp Clarification
 
-## What you'll get
+## Three things you asked about
 
-A new **Settings** page inside the admin area where you can:
+### 1. WhatsApp Business API — keeping manual wa.me (your choice ✓)
 
-1. **Edit the WhatsApp Business number** that messages are sent from (currently hardcoded as `+351939455949` — Portugal number from chat). Saved to the `app_settings` table so changing it later is one-click.
-2. **Manage WhatsApp message templates** — edit the existing 2 templates, add new ones, mark one as **Default** (the one used when you click "WhatsApp" on a lead in the dashboard).
-3. **Insert variables with one click**: `{{name}}`, `{{strain}}`, `{{compatibility}}`, `{{shop_url}}`, `{{province}}` — pasted into the message body wherever your cursor is.
-4. **Live preview** showing the message with sample data filled in.
-5. **Channel priority toggle** (WhatsApp-first vs Email-first) — already exists as a setting, surfaced here.
+No code change needed. Current setup in `AdminDashboard` and `AdminSettings` already opens prefilled WhatsApp via `wa.me/<number>?text=<rendered template>`. It's free, no Meta verification, no template approval, you control every send. We can swap to Twilio/Meta Cloud API later — the template engine in `src/lib/whatsappTemplate.ts` will still work.
 
-The Admin Dashboard's existing "WhatsApp" button on each lead row will read the **Default template** + **business number** from settings instead of using hardcoded text.
+### 2. Admin password & login info
 
-## Page layout
+- **Email**: `healingbudsglobal@gmail.com` (whoever signs up with this email is auto-promoted to admin via the `handle_new_admin_user` trigger).
+- **Password**: I cannot read your password — it's hashed in Supabase auth and not visible to anyone, including me. If you've forgotten it, the safe path is **password reset** (see "Optional follow-up" below).
+- **Login URL**: `/admin/login` → redirects to `/admin` on success.
 
-```text
-/admin/settings
-─────────────────────────────────────────
-[ Channel & Number ]
-  Business WhatsApp number: [+351939455949    ] [Save]
-  Channel priority:         (•) WhatsApp first  ( ) Email first
+### 3. Dev-only auto-fill button + password eye
 
-[ Message Templates ]                   [ + New Template ]
-  ┌──────────────────────────────────┐
-  │ ★ Default Match Follow-up        │ [Set Default] [Delete]
-  │ Variables: name, strain, compat. │
-  │ ┌──────────────────────────────┐ │
-  │ │ Hi {{name}} 👋 ...           │ │  ← editable textarea
-  │ └──────────────────────────────┘ │
-  │ Insert: [name][strain][compat.]  │
-  │ Preview: "Hi Sarah 👋 ..."       │
-  │                          [Save]  │
-  └──────────────────────────────────┘
-  ┌── Quick Check-in ──────────────────┐
-  ...
+- **Eye toggle**: already implemented at `AdminLogin.tsx:71-77` — works today. No change.
+- **Auto-fill button**: new. Only renders when `import.meta.env.DEV === true` (i.e. localhost + Lovable preview). Hidden on the published `mystrain.healingbuds.co.za` site.
+
+## How auto-fill will work
+
+You add two values to your local `.env` (NOT committed since `.env` is in `.gitignore`):
+
+```
+VITE_DEV_ADMIN_EMAIL=healingbudsglobal@gmail.com
+VITE_DEV_ADMIN_PASSWORD=your-dev-password
 ```
 
-## Technical notes
+The login page will show a small **"Auto-fill dev login"** button under the form (dev only). Click it → email + password fields populate → you click Sign In as normal. No automatic submit (safer; lets you verify before logging in).
 
-**Files to create**
-- `src/pages/AdminSettings.tsx` — the settings page (auth-guarded, admin-role checked)
-- `src/lib/whatsappTemplate.ts` — shared helper `renderTemplate(body, lead)` that swaps `{{var}}` → real values, plus `buildWaLink(number, body)` that returns the `https://wa.me/...` URL
+If the env vars are missing, the button doesn't render at all.
 
-**Files to update**
-- `src/App.tsx` — add `/admin/settings` route
-- `src/pages/AdminDashboard.tsx` — add a **Settings** link in the header; replace the inline `buildWhatsAppLink` and `HB_WHATSAPP_BUSINESS` constant with `renderTemplate` + `buildWaLink` reading from `app_settings.whatsapp_business_number` and the default `whatsapp_templates` row (fetched once on mount, cached in state)
+### Security guarantees
 
-**Database** — no schema changes needed. Both tables (`app_settings`, `whatsapp_templates`) already exist with correct RLS (`Admins manage` policies). We'll use:
-- `app_settings.whatsapp_business_number` (existing, value `+351939455949`)
-- `app_settings.channel_priority` (existing, value `whatsapp_first`)
-- `whatsapp_templates` (2 existing rows, `is_default` flag drives which is used)
+- Button hidden in production builds (`import.meta.env.DEV` is `false` after `vite build`).
+- Password sits in your local `.env` only — Lovable doesn't sync it to git, and it isn't bundled into the published app.
+- Even if someone sees the button on dev, they need your local `.env` values for it to do anything.
 
-**Variables supported in templates** — `{{name}}`, `{{strain}}`, `{{compatibility}}`, `{{shop_url}}`, `{{province}}`. The `variables` jsonb column on each template tracks which ones are referenced so the preview/insert chips match.
+## Files to change
 
-**Default-template invariant** — when a user marks a template as default, we run a 2-step update: clear `is_default` on all rows, then set it on the chosen row. (Simple client-side, no trigger needed.)
+- `src/pages/AdminLogin.tsx` — add the conditional auto-fill button under the Sign In button.
 
-**Auth** — the page checks `session` and `has_role(admin)` exactly like `AdminDashboard.tsx` does today; redirects to `/admin/login` otherwise.
+That's it. One file, ~15 lines.
 
-## Out of scope (future)
+## Optional follow-up (ask if you want it)
 
-- Auto-send via Meta Cloud API or Twilio — this page sets you up so when we add auto-send, your templates and number are already configured.
-- Email template editor — `email_templates` table exists; can be added in a follow-up using the same pattern.
-- Per-campaign template overrides.
+If you don't remember your admin password, I can add a **"Forgot password"** link on the login page that emails a reset link via the existing Resend setup. Requires:
+- A new `/reset-password` page that handles the recovery token and lets you set a new password.
+- Calling `supabase.auth.resetPasswordForEmail(email, { redirectTo: ... })`.
 
-## Approve to build
-
-Ship this and your dashboard immediately uses whatever number + message you save, no more code edits to change copy.
+Say the word and I'll add it in the same pass.
