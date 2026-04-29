@@ -1,69 +1,169 @@
+## Healing Buds Growth Platform — Strategic Roadmap
 
+Goal: evolve the current single-page funnel into a measurable growth engine with a separated admin portal, full analytics, ad-platform integrations, campaign automation, and exportable reports.
 
-## Plan: WhatsApp Lead Collection & Automation Strategy
+---
 
-### Research Summary — Current Method
+### Domain & App Architecture
 
-**What you already have:**
-- ✅ Optional WhatsApp number captured on `ContactCapture` screen (free text, no validation)
-- ✅ Stored in `leads.whatsapp` column in Lovable Cloud database
-- ✅ Sent in admin email notification via Resend
-- ✅ Forwarded to Make.com webhook → Google Sheets
-- ✅ Visible in admin dashboard
+```text
+mystrain.healingbuds.co.za   →  Public funnel (survey, OTP, results)
+sosuit.healingbuds.co.za     →  Admin portal (login, dashboard, campaigns, reports)
+```
 
-**Gaps:**
-1. No phone format validation (any text accepted — bad data risk)
-2. No country code prefix helper (SA users may type `0821234567` instead of `+27821234567` — breaks WhatsApp deep links)
-3. No automated WhatsApp message sent to the lead (manual follow-up only)
-4. No "Click to WhatsApp" button in the admin dashboard for fast outreach
-5. No tracking of which leads have been contacted
+How: same Lovable project, same DB. Detect hostname at boot in `App.tsx`:
+- `mystrain.*` → mounts public routes only (`/`, `/results`)
+- `sosuit.*` → mounts admin routes only (`/login`, `/dashboard`, `/campaigns`, `/reports`, `/settings`)
+- Localhost/preview → both
 
-### Best Practice Research
+DNS: A-record `sosuit` → `185.158.133.1`, then add the custom domain in Project Settings → Domains.
 
-**WhatsApp Business — three tiers:**
+---
 
-| Option | Cost | Use Case | Setup |
-|---|---|---|---|
-| **WhatsApp Business App** (free) | Free | <100 msgs/day, manual replies on a phone | Just install the app |
-| **WhatsApp Click-to-Chat links** (`wa.me/`) | Free | Send pre-filled messages from email/dashboard | No setup — works today |
-| **WhatsApp Business API (Cloud API via Meta)** | Pay-per-conversation (~$0.03–0.08 per SA conversation) | Automated messages, templates, chatbots | Meta Business verification + approved templates |
+### Phase 2A — Conversion Optimization (funnel)
 
-**Industry best practice for cannabis/medical leads (POPIA-compliant):**
-- Always require explicit opt-in checkbox before storing WhatsApp number
-- Send a single "session-opening" WhatsApp template within 24h of opt-in
-- Use it to deliver the strain match + a single CTA (book consult / shop)
-- Never spam — WhatsApp will block your number fast
+Industry-validated lifts:
 
-### Proposed Solution — Three-Phase Rollout
+1. Survey FIRST, OTP AFTER teasing the result ("Your match is ready — verify email to unlock"). Expected +25–40% completed leads.
+2. Trim survey to 8 core required questions + 7 optional "refine my match".
+3. Persist survey progress to localStorage (resume on refresh).
+4. WhatsApp opt-in becomes the primary CTA on the contact step ("Get your match instantly on WhatsApp"); email is fallback.
+5. Social proof bar on squeeze (live counter + 3 rotating testimonials).
+6. Capture UTM params (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `referrer`, `landing_page`, `device`, `gclid`, `fbclid`, `ttclid`) into the `leads` and `survey_submissions` tables.
 
-**Phase 1 — Quick wins (no API cost, ship today)**
-1. Add a proper phone input with country selector (default +27 South Africa) on `ContactCapture.tsx` — uses `react-phone-number-input` library, validates E.164 format
-2. Add explicit POPIA opt-in checkbox: *"Send my strain match via WhatsApp"*
-3. Store validated `whatsapp_e164` + `whatsapp_opt_in` (boolean) in the `leads` table
-4. Add a **"Message on WhatsApp"** button on each row in the admin dashboard — opens `https://wa.me/{number}?text={pre-filled-strain-match-message}` in a new tab
-5. Add a **"Contacted"** toggle on each lead so you can track follow-up status
+---
 
-**Phase 2 — Automated WhatsApp delivery (requires Meta setup)**
-1. Connect **Twilio WhatsApp** (already available as a Lovable connector — uses gateway, no SDK needed) OR **Meta Cloud API** directly
-2. Create an edge function `send-whatsapp-match` that fires after `submit-results` when `whatsapp_opt_in = true`
-3. Send an approved template message: *"Hi {name}, your Healing Buds strain match is {strain} ({compatibility}). View details: {link}"*
-4. Log delivery status back to the lead row (`whatsapp_sent_at`, `whatsapp_status`)
+### Phase 2B — Admin Portal at sosuit.healingbuds.co.za
 
-**Phase 3 — Spreadsheet & CRM sync improvements**
-1. Replace fragile Make.com webhook with a direct **Google Sheets connector** edge function (already available, uses gateway) — adds a row per lead with all fields including WhatsApp opt-in status
-2. Add daily digest: edge function on cron sends a summary of new leads to admin
-3. Optional: pipe leads into HubSpot connector for full CRM if volume grows
+Sections:
 
-### Recommended starting point
+- **Login** — email/password + Google sign-in. Admin role enforced via `user_roles` table + `has_role()` security-definer function. Only `healingbudsglobal@gmail.com` seeded as admin initially.
+- **Dashboard** — KPIs: leads today/week/month, completion rate, top strain, top province, top campaign, WA opt-in %, unread/uncontacted count.
+- **Leads** — current table + filters (campaign, source, contacted, opted-in WA, province, date range), bulk export CSV.
+- **Campaigns** — see Phase 2C.
+- **Reports** — see Phase 2D.
+- **Settings**:
+  - Editable WhatsApp Business number
+  - Editable WhatsApp prefilled message templates (named, multiple)
+  - Editable OTP email subject/body
+  - Editable results email template
+  - Toggle: WhatsApp-first vs email-first delivery
+  - Pixel IDs: Meta Pixel, TikTok Pixel, Google Ads, GA4 measurement ID
+  - Webhook URL (Make.com) editable
 
-**Build Phase 1 only first** — it's free, ships today, gives you validated WhatsApp numbers and 1-click outreach from the dashboard. Phase 2 (automated sending) needs a Twilio or Meta Business account decision and ~$50–100 in template-approval lead time, so we tackle that once Phase 1 is live and you confirm the volume justifies it.
+---
+
+### Phase 2C — Campaign Builder & Ad Automation
+
+Create named campaigns without code:
+
+- Form: name, source (Meta / TikTok / Google / Email / Organic), budget, start/end date, custom UTMs, custom hero headline, hero image upload, primary CTA color, A/B variant slot.
+- Auto-generates trackable URL: `https://mystrain.healingbuds.co.za/?c={slug}` which expands to full UTM set on landing.
+- Per-campaign view: impressions, clicks, leads, completed surveys, WA opt-ins, CPL, ROAS (when ad-spend pulled).
+- A/B framework: per campaign, define 2–4 variants (different hero copy/image/CTA), traffic auto-split, winner highlighted at statistical significance.
+- One-click duplicate / pause / archive.
+- "Send to ads" buttons (Phase 2C.2):
+  - **Google Ads**: create/edit responsive search ads via Google Ads API (requires Google Ads OAuth + developer token)
+  - **Meta Ads**: create/edit ad sets via Marketing API (requires Meta Business + access token)
+  - **TikTok Ads**: create campaigns via TikTok Marketing API
+  - Each platform: edit headlines, descriptions, destination URL (auto-uses campaign trackable URL), budget, status (active/paused)
+
+---
+
+### Phase 2D — Analytics, Reports & Exports
+
+**Pixels & tracking** (auto-fired from funnel based on Settings IDs):
+- Meta Pixel: PageView, ViewContent (per question), Lead (contact submit), CompleteRegistration (success)
+- TikTok Pixel: same event mapping
+- Google Ads conversion + GA4 events
+- Server-side conversion API mirror (Meta CAPI, TikTok Events API, Google Enhanced Conversions) via edge functions for iOS 14+ accuracy
+
+**Reports section**:
+- Funnel report: drop-off per step, completion rate, time-on-step
+- Campaign performance: leads, CPL, ROAS, by-day trend
+- Channel mix: pie + table
+- Strain match distribution
+- WhatsApp engagement: opt-in %, sent, replied, contacted-to-sale
+- Geographic: leads by province (SA map heatmap)
+- Date range picker, compare-to-previous-period
+
+**Exports**:
+- CSV: leads, submissions, campaigns
+- PDF: branded report (weekly/monthly summary)
+- Scheduled email digest: daily/weekly to admin
+- Direct push to Google Sheets connector (replaces fragile Make.com webhook)
+
+**Ad-spend ingestion** (for true CPL/ROAS):
+- Daily edge function pulls spend from Meta/Google/TikTok ad APIs into `ad_spend_daily` table
+- Joined with leads on `utm_campaign` for unified ROI
+
+---
+
+### Phase 2E — WhatsApp Automation (optional, volume-dependent)
+
+- Twilio WhatsApp connector for automated send when `whatsapp_opt_in = true`
+- Approved templates managed from Settings
+- Inbound replies logged to lead timeline (Twilio webhook → edge function)
+- Lead pipeline: New → Contacted → Replied → Booked → Sold → Lost
+
+---
+
+### Database Schema Changes
+
+New columns on `leads` and `survey_submissions`:
+- `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`
+- `referrer`, `landing_page`, `device_type`, `browser`
+- `gclid`, `fbclid`, `ttclid`
+- `campaign_id` (FK)
+- `variant` (A/B slot)
+- Lead pipeline: `status`, `notes`, `last_contacted_at`
+
+New tables:
+- `user_roles` (user_id, role) + `has_role()` security definer fn
+- `campaigns` (slug, name, source, budget, dates, hero_headline, hero_image_url, cta_color, status, ab_parent_id)
+- `campaign_variants` (campaign_id, variant_label, traffic_weight, hero_headline, hero_image_url, cta_color)
+- `campaign_metrics_daily` (campaign_id, date, impressions, clicks, leads, completions, spend, source)
+- `ad_spend_daily` (date, source, campaign_id_external, campaign_id, spend, impressions, clicks)
+- `whatsapp_templates` (name, body, variables, is_default)
+- `email_templates` (key, subject, html_body)
+- `app_settings` (key, value) — singleton row for WA number, pixel IDs, channel priority, webhook URL
+- `lead_events` (lead_id, event_type, payload, created_at) — timeline log
+
+---
 
 ### Technical Details
 
-- **Library**: `react-phone-number-input` (lightweight, ~15KB, works with E.164)
-- **DB migration**: add `whatsapp_e164 text`, `whatsapp_opt_in boolean default false`, `contacted boolean default false`, `contacted_at timestamptz`, `whatsapp_sent_at timestamptz`, `whatsapp_status text` to `leads` table
-- **RLS**: extend existing policies to allow authenticated admin to UPDATE the `contacted` and `contacted_at` fields
-- **Admin dashboard**: add WhatsApp icon button (green) per row + filter "Show uncontacted only"
-- **Click-to-chat URL format**: `https://wa.me/27821234567?text=Hi%20{name}%2C%20your%20Healing%20Buds%20match...`
-- **Phase 2 connector choice**: Twilio WhatsApp (simpler, already in Lovable connectors) vs Meta Cloud API (cheaper at scale, more setup)
+- Hostname split via `window.location.hostname` in `App.tsx` mounting different `Routes` trees. Shared components reused.
+- Admin auth via Lovable Cloud auth (email + Google), role check via `has_role(auth.uid(), 'admin')`. RLS on all admin tables: SELECT/UPDATE only for admins, INSERT for service role.
+- UTM capture: `useUtmTracking()` hook reads `URLSearchParams` on mount, persists to sessionStorage, attaches to all submissions.
+- Pixels: dynamic injection from `app_settings`; conditional on production hostnames only.
+- Server-side conversion APIs: 3 edge functions (`meta-capi`, `tiktok-events`, `google-conversions`) called from `submit-results`.
+- Ad-platform connectors: each requires OAuth setup; user supplies credentials in Settings or via Lovable Cloud secrets.
+- Reports: built with existing chart libs; PDF export via `pdf-lib` or HTML→PDF in edge function.
+- Google Sheets connector replaces Make.com webhook for primary sync; Make.com kept as fallback toggle.
 
+---
+
+### Implementation Order (recommended)
+
+1. **2A** — funnel reorder, UTM capture, social proof, WA-first opt-in, progress save (1 session)
+2. **Domain split** — sosuit.healingbuds.co.za + admin role gating + auth (1 session)
+3. **2B settings** — editable templates, WA number, pixel IDs, channel priority (1 session)
+4. **2C campaigns** — campaign builder + trackable URLs + dynamic hero (1 session)
+5. **Pixels + GA4** — Meta/TikTok/Google client + server-side events (1 session)
+6. **2D reports** — funnel/campaign/channel reports + CSV/PDF export + scheduled digest (2 sessions)
+7. **Ad APIs** — Meta/Google/TikTok create-ad-from-Lovable + spend ingestion (2 sessions, per platform)
+8. **2E WhatsApp automation** — Twilio + pipeline + inbound replies (1 session)
+9. **A/B testing framework** (1 session)
+
+Total: ~11 focused sessions to a complete platform. Each phase ships independently and adds value.
+
+---
+
+### Decisions Needed Before Build
+
+- Confirm sosuit subdomain DNS will be added (or use a different subdomain).
+- Confirm priority order — recommend 2A + Domain Split + 2B first (highest ROI, unlocks everything else).
+- Which ad platforms first: Meta, Google, TikTok, or all three?
+- WhatsApp automation now (Twilio) or later?
+- Pixel IDs: do you have Meta Pixel / TikTok Pixel / GA4 / Google Ads conversion IDs ready, or set up later in Settings?

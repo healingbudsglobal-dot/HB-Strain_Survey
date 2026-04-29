@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
 import heroFlower from "@/assets/hero-flower.jpg";
+import SocialProofBar from "@/components/SocialProofBar";
 import {
   Select,
   SelectContent,
@@ -208,10 +209,13 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         </p>
       </motion.form>
 
+      {/* Social proof — live counter + rotating testimonials */}
+      <SocialProofBar />
+
       {/* POPIA */}
       <motion.div
         variants={itemVariants}
-        className="mt-5 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.04)] backdrop-blur-sm px-4 py-2 text-xs text-muted-foreground"
+        className="mt-3 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.04)] backdrop-blur-sm px-4 py-2 text-xs text-muted-foreground"
       >
         <Shield className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
         <span>POPIA Compliant · Secure medical data</span>

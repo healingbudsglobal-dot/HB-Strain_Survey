@@ -12,6 +12,7 @@ import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
 import { sendOtpEmail, submitResults } from "@/lib/webhook";
 import { useToast } from "@/hooks/use-toast";
+import { useUtmTracking, utmToPayload } from "@/hooks/useUtmTracking";
 
 type Screen = "squeeze" | "otp" | "survey" | "contact" | "loading" | "success";
 
@@ -39,6 +40,7 @@ const Index = () => {
   const [surveyAnswers, setSurveyAnswers] = useState<Record<string, string>>({});
   const [strainResult, setStrainResult] = useState<StrainMatch | null>(null);
   const { toast } = useToast();
+  const utm = useUtmTracking();
 
   const stepIndex = useMemo(() => {
     const map: Record<Screen, number> = {
@@ -121,6 +123,9 @@ const Index = () => {
         payload[q.id] = surveyAnswers[q.id] || "";
       });
 
+      // Attach UTM / attribution
+      Object.assign(payload, utmToPayload(utm));
+
       const success = await submitResults(payload);
       if (!success) {
         toast({
@@ -132,7 +137,7 @@ const Index = () => {
 
       setTimeout(() => setScreen("success"), 3000);
     },
-    [email, province, strainResult, surveyAnswers]
+    [email, province, strainResult, surveyAnswers, utm, toast]
   );
 
   const handleContactSubmit = useCallback(
