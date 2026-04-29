@@ -330,14 +330,15 @@ Deno.serve(async (req) => {
 
   try {
     const payload = await req.json();
-    const { email } = payload;
-
-    if (!email) {
+    const emailCheck = validateEmailServer(payload.email);
+    if (!emailCheck.valid) {
       return new Response(
-        JSON.stringify({ error: 'email is required' }),
+        JSON.stringify({ error: emailCheck.error }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    const email = emailCheck.email!;
+    payload.email = email;
 
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     if (!RESEND_API_KEY) {
