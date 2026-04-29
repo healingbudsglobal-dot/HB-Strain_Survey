@@ -359,6 +359,24 @@ Deno.serve(async (req) => {
     const surveyAnswers: Record<string, string> = {};
     surveyKeys.forEach(k => { if (payload[k]) surveyAnswers[k] = payload[k]; });
 
+    // Extract UTM / attribution fields
+    const utmFields = {
+      utm_source: payload.utm_source || null,
+      utm_medium: payload.utm_medium || null,
+      utm_campaign: payload.utm_campaign || null,
+      utm_content: payload.utm_content || null,
+      utm_term: payload.utm_term || null,
+      gclid: payload.gclid || null,
+      fbclid: payload.fbclid || null,
+      ttclid: payload.ttclid || null,
+      referrer: payload.referrer || null,
+      landing_page: payload.landing_page || null,
+      device_type: payload.device_type || null,
+      browser: payload.browser || null,
+      campaign_slug: payload.campaign_slug || null,
+      variant: payload.variant || null,
+    };
+
     // 1a. Save lead to database
     try {
       const e164 = typeof payload.whatsapp_e164 === 'string' && /^\+[1-9]\d{6,14}$/.test(payload.whatsapp_e164)
@@ -382,6 +400,7 @@ Deno.serve(async (req) => {
         strain_flavours: payload.strain_flavours || null,
         strain_shop_url: payload.strain_shop_url || null,
         survey_answers: surveyAnswers,
+        ...utmFields,
       });
     } catch (dbErr) {
       console.error('DB insert error (leads):', dbErr);
