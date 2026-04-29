@@ -84,6 +84,22 @@ const AdminLogin = () => {
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>
+
+          {import.meta.env.DEV &&
+            import.meta.env.VITE_DEV_ADMIN_EMAIL &&
+            import.meta.env.VITE_DEV_ADMIN_PASSWORD && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail(import.meta.env.VITE_DEV_ADMIN_EMAIL as string);
+                  setPassword(import.meta.env.VITE_DEV_ADMIN_PASSWORD as string);
+                }}
+                className="w-full rounded-xl border border-dashed border-border bg-background py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                title="Dev only — fills credentials from your local .env"
+              >
+                ⚡ Auto-fill dev login
+              </button>
+            )}
         </form>
       </motion.div>
     </div>
