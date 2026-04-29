@@ -378,13 +378,14 @@ Deno.serve(async (req) => {
     };
 
     // 1a. Save lead to database
+    let leadId: string | null = null;
     try {
       const e164 = typeof payload.whatsapp_e164 === 'string' && /^\+[1-9]\d{6,14}$/.test(payload.whatsapp_e164)
         ? payload.whatsapp_e164
         : null;
       const optIn = payload.whatsapp_opt_in === 'true' || payload.whatsapp_opt_in === true;
 
-      await supabase.from('leads').insert({
+      const { data: leadRow, error: leadErr } = await supabase.from('leads').insert({
         email,
         name: payload.name || null,
         whatsapp: payload.whatsapp || null,
@@ -401,7 +402,47 @@ Deno.serve(async (req) => {
         strain_shop_url: payload.strain_shop_url || null,
         survey_answers: surveyAnswers,
         ...utmFields,
-      });
+      }).select('id').single();
+      if (leadErr) console.error('DB insert error (leads):', leadErr);
+      else leadId = leadRow?.id ?? null;
+
+      // Log survey_completed event for nurture timeline
+      if (leadId) {
+        await supabase.from('lead_events').insert({
+          lead_id: leadId,
+          event_type: 'survey_completed',
+          payload: {
+            matched_strain: payload.matched_strain,
+            compatibility: payload.compatibility,
+            opt_in_whatsapp: optIn && !!e164,
+            province: payload.province,
+            utm_source: utmFields.utm_source ?? null,
+            utm_campaign: utmFields.utm_campaign ?? null,
+          },
+        });
+
+        // Auto-enroll in any active sequence triggered by survey_completed
+        const { data: seqs } = await supabase
+          .from('nurture_sequences')
+          .select('id, steps')
+          .eq('trigger_event', 'survey_completed')
+          .eq('is_active', true);
+        if (seqs && seqs.length > 0) {
+          for (const seq of seqs) {
+            const firstDelay = Array.isArray(seq.steps) && seq.steps[0]?.delay_minutes
+              ? Number(seq.steps[0].delay_minutes) || 0
+              : 0;
+            const nextRun = new Date(Date.now() + firstDelay * 60_000).toISOString();
+            await supabase.from('lead_sequence_state').insert({
+              lead_id: leadId,
+              sequence_id: seq.id,
+              current_step: 0,
+              next_run_at: nextRun,
+              status: 'active',
+            });
+          }
+        }
+      }
     } catch (dbErr) {
       console.error('DB insert error (leads):', dbErr);
     }
