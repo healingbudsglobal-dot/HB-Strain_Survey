@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle } from "lucide-react";
+import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import { renderTemplate, buildWaLink, getLeadVars } from "@/lib/whatsappTemplate";
 
 interface Lead {
   id: string;
@@ -22,29 +23,10 @@ interface Lead {
   survey_answers: Record<string, string> | null;
 }
 
-// Healing Buds WhatsApp Business number (for reference / future API sender)
-const HB_WHATSAPP_BUSINESS = "+351939455949";
+const FALLBACK_TEMPLATE =
+  "Hi {{name}}, this is Healing Buds 🌿\n\nYour Bio-Map strain match is *{{strain}}* ({{compatibility}} compatibility).\n\nReply here for personalised dosing guidance.";
+const FALLBACK_NUMBER = "+351939455949";
 
-const buildWhatsAppLink = (lead: Lead): string | null => {
-  // Prefer validated E.164; fall back to legacy free-text whatsapp field
-  const raw = lead.whatsapp_e164 || lead.whatsapp;
-  if (!raw) return null;
-  // Strip everything except digits — wa.me requires no plus sign
-  const digits = raw.replace(/[^0-9]/g, "");
-  if (digits.length < 8) return null;
-
-  const firstName = (lead.name || "there").split(" ")[0];
-  const strain = lead.matched_strain || "your strain match";
-  const compat = lead.compatibility ? ` (${lead.compatibility} compatibility)` : "";
-  const shopLine = lead.strain_shop_url ? `\n\nView & order: ${lead.strain_shop_url}` : "";
-
-  const message =
-    `Hi ${firstName}, this is Healing Buds 🌿\n\n` +
-    `Your Bio-Map strain match is *${strain}*${compat}.${shopLine}\n\n` +
-    `Reply here if you'd like personalised dosing guidance or have any questions about your match.`;
-
-  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
-};
 
 const AdminDashboard = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -52,7 +34,15 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
   const [showUncontactedOnly, setShowUncontactedOnly] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [senderNumber, setSenderNumber] = useState<string>(FALLBACK_NUMBER);
+  const [defaultTemplate, setDefaultTemplate] = useState<string>(FALLBACK_TEMPLATE);
   const navigate = useNavigate();
+
+  const buildWhatsAppLink = (lead: Lead): string | null => {
+    const recipient = lead.whatsapp_e164 || lead.whatsapp;
+    const message = renderTemplate(defaultTemplate, getLeadVars(lead));
+    return buildWaLink(recipient, message);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -62,6 +52,7 @@ const AdminDashboard = () => {
         return;
       }
       fetchLeads();
+      loadConfig();
     };
     checkAuth();
 
@@ -82,6 +73,15 @@ const AdminDashboard = () => {
       setLeads(data as Lead[]);
     }
     setLoading(false);
+  };
+
+  const loadConfig = async () => {
+    const [{ data: settings }, { data: tmpl }] = await Promise.all([
+      supabase.from("app_settings").select("key, value").eq("key", "whatsapp_business_number").maybeSingle(),
+      supabase.from("whatsapp_templates").select("body").eq("is_default", true).maybeSingle(),
+    ]);
+    if (settings?.value) setSenderNumber(String(settings.value));
+    if (tmpl?.body) setDefaultTemplate(tmpl.body);
   };
 
   const handleLogout = async () => {
@@ -173,8 +173,16 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden sm:inline text-[11px] text-muted-foreground">
-              Sender: <span className="text-foreground font-mono">{HB_WHATSAPP_BUSINESS}</span>
+              Sender: <span className="text-foreground font-mono">{senderNumber}</span>
             </span>
+            <Link
+              to="/admin/settings"
+              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              title="Settings"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Settings</span>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
@@ -344,7 +352,7 @@ const AdminDashboard = () => {
                           <button
                             onClick={(e) => openWhatsApp(lead, e)}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110 transition-all"
-                            title={`Send WhatsApp from ${HB_WHATSAPP_BUSINESS}`}
+                            title={`Send WhatsApp from ${senderNumber}`}
                           >
                             <MessageCircle className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">WhatsApp</span>
