@@ -352,7 +352,7 @@ const AdminDashboard = () => {
                           <button
                             onClick={(e) => openWhatsApp(lead, e)}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white hover:brightness-110 transition-all"
-                            title={`Send WhatsApp from ${HB_WHATSAPP_BUSINESS}`}
+                            title={`Send WhatsApp from ${senderNumber}`}
                           >
                             <MessageCircle className="h-3.5 w-3.5" />
                             <span className="hidden sm:inline">WhatsApp</span>
