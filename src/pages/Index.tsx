@@ -137,7 +137,7 @@ const Index = () => {
 
       setTimeout(() => setScreen("success"), 3000);
     },
-    [email, province, strainResult, surveyAnswers]
+    [email, province, strainResult, surveyAnswers, utm, toast]
   );
 
   const handleContactSubmit = useCallback(
