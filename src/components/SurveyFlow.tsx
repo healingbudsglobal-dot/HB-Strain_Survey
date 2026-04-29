@@ -87,6 +87,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
         setMultiSelected(new Set());
       }
     } else {
+      clear();
       onComplete(newAnswers);
     }
   };
