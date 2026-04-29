@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, User, Lock } from "lucide-react";
+import { ArrowRight, Shield, User, MessageCircle, Mail } from "lucide-react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
@@ -29,6 +29,8 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
   const [optIn, setOptIn] = useState(true);
   const [error, setError] = useState("");
 
+  const hasValidWa = !!whatsapp && isValidPhoneNumber(whatsapp);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -41,7 +43,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
     }
     setError("");
     // Only pass the number if user opted in AND it's valid
-    const finalNumber = whatsapp && optIn ? whatsapp : undefined;
+    const finalNumber = hasValidWa && optIn ? whatsapp : undefined;
     onSubmit(name.trim(), finalNumber, !!finalNumber);
   };
 
