@@ -126,12 +126,53 @@ const Index = () => {
       // Attach UTM / attribution
       Object.assign(payload, utmToPayload(utm));
 
-      const success = await submitResults(payload);
-      if (!success) {
+      // Build the 15-answer map (one entry per survey question, in order)
+      const answersMap: Record<string, string> = {};
+      surveyQuestions.forEach((q) => {
+        answersMap[q.id] = surveyAnswers[q.id] || "";
+      });
+
+      const [resultsOk, webhookRes] = await Promise.all([
+        submitResults(payload),
+        postSurveyAnswersWebhook(email, answersMap),
+      ]);
+
+      if (!resultsOk) {
         toast({
           title: "Results delivery issue",
           description: "Your results were sent via our backup system. Check your inbox shortly.",
           variant: "destructive",
+        });
+      }
+
+      if (!webhookRes.ok) {
+        toast({
+          title: "We couldn't save your answers",
+          description:
+            webhookRes.status === 0
+              ? "Network hiccup. Please check your connection and tap Retry."
+              : `Server returned ${webhookRes.status}. Please tap Retry in a moment.`,
+          variant: "destructive",
+          action: (
+            <ToastAction
+              altText="Retry sending answers"
+              onClick={() => {
+                postSurveyAnswersWebhook(email, answersMap).then((r) => {
+                  if (r.ok) {
+                    toast({ title: "Answers sent", description: "Thanks — we got them this time." });
+                  } else {
+                    toast({
+                      title: "Still having trouble",
+                      description: "Please try again shortly or contact support.",
+                      variant: "destructive",
+                    });
+                  }
+                });
+              }}
+            >
+              Retry
+            </ToastAction>
+          ),
         });
       }
 
