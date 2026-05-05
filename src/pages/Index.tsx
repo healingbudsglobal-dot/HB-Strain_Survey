@@ -10,7 +10,7 @@ import AmbientParticles from "@/components/AmbientParticles";
 import StepProgress from "@/components/StepProgress";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
-import { sendOtpEmail, submitResults } from "@/lib/webhook";
+import { sendOtpEmail, submitResults, postSurveyAnswersWebhook } from "@/lib/webhook";
 import { useToast } from "@/hooks/use-toast";
 import { useUtmTracking, utmToPayload } from "@/hooks/useUtmTracking";
 
