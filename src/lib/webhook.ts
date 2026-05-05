@@ -19,6 +19,33 @@ export async function sendWebhook(data: Record<string, unknown>): Promise<void> 
   }
 }
 
+/**
+ * Post the user's email plus all 15 survey answers directly to the Make.com webhook
+ * as a JSON POST. Returns { ok, status } so callers can show a retry message on non-200.
+ */
+export async function postSurveyAnswersWebhook(
+  email: string,
+  answers: Record<string, string>
+): Promise<{ ok: boolean; status: number }> {
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "survey_answers",
+        timestamp: new Date().toISOString(),
+        source: "healing-buds-biomap",
+        email,
+        survey_answers: answers,
+      }),
+    });
+    return { ok: res.ok, status: res.status };
+  } catch (err) {
+    console.error("Survey webhook error:", err);
+    return { ok: false, status: 0 };
+  }
+}
+
 /** Send OTP verification email via Resend (edge function). Returns true on success. */
 export async function sendOtpEmail(email: string, otpCode: string): Promise<boolean> {
   try {
