@@ -161,15 +161,21 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <div className={`relative rounded-2xl transition-all duration-300 ${focused ? 'shadow-[var(--shadow-glow-gold)]' : ''}`}>
           <input
             type="email"
-            placeholder="Enter your email address"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="name@domain.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all text-[16px]"
             required
+            aria-describedby="email-hint"
           />
         </div>
+        <p id="email-hint" className="-mt-1 px-1 text-[11px] text-muted-foreground">
+          Use a real address (e.g. <span className="font-mono text-foreground/80">name@domain.com</span>) — we'll send your match here.
+        </p>
 
         <Select value={province} onValueChange={setProvince}>
           <SelectTrigger className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all h-auto [&>span]:text-left">
