@@ -225,10 +225,25 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <p className="text-[11px] text-muted-foreground mt-0.5 text-center">
           2 min · preference-based · 100% private · POPIA-compliant
         </p>
-        <p className="text-[10px] text-muted-foreground/70 text-center leading-snug px-2">
+        <p className="text-[11px] text-muted-foreground text-center leading-snug px-2">
           By tapping above you confirm you are 18+, a resident of South Africa, and agree to our{" "}
-          <a href="/legal" className="underline underline-offset-2 hover:text-foreground/80">Terms &amp; Privacy Notice</a>.
-          Nothing here diagnoses, treats, or cures any condition.
+          <a
+            href="/legal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[hsl(var(--brand-gold))] underline underline-offset-2 decoration-[hsl(var(--brand-gold)_/_0.6)] hover:text-[hsl(var(--accent-green))] hover:decoration-[hsl(var(--accent-green))]"
+          >
+            Terms &amp; Privacy Notice
+          </a>.
+          <br />
+          <a
+            href="/legal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-muted-foreground/80 underline underline-offset-2 hover:text-foreground/80"
+          >
+            Read the full Terms &amp; Privacy →
+          </a>
         </p>
       </motion.form>
 
