@@ -139,8 +139,18 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       >
         Discover Your
         <br />
-        <span className="text-[hsl(var(--brand-gold))]">Perfect Match</span>
+        <span className="text-[hsl(var(--brand-gold))] italic font-serif tracking-tight">Perfect Match</span>
       </motion.h1>
+
+      {/* Editorial divider — Aeriz / Garden Party inspiration */}
+      <motion.div
+        variants={itemVariants}
+        className="mb-5 flex items-center gap-3"
+      >
+        <span className="h-px w-8 bg-[hsl(var(--brand-gold)_/_0.6)]" />
+        <span className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Curated · Botanical</span>
+        <span className="h-px w-8 bg-[hsl(var(--brand-gold)_/_0.6)]" />
+      </motion.div>
 
       <motion.p
         variants={itemVariants}
@@ -149,15 +159,15 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         A quick lifestyle quiz to help you explore botanical profiles tailored to your preferences.
       </motion.p>
 
-      {/* Form — glass card with stronger blur over flower */}
+      {/* Form — refined editorial glass card */}
       <motion.form
         variants={itemVariants}
         onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-3 rounded-2xl p-5 relative overflow-hidden border border-[hsl(170_8%_25%_/_0.5)] bg-[hsl(175_6%_11%_/_0.65)] backdrop-blur-2xl"
-        style={{ boxShadow: "var(--shadow-elegant), 0 0 80px -20px hsl(var(--accent-green) / 0.08)" }}
+        className="flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border border-white/[0.06] bg-[hsl(175_6%_11%_/_0.55)] backdrop-blur-2xl"
+        style={{ boxShadow: "var(--shadow-elegant), 0 0 100px -25px hsl(var(--accent-green) / 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.04)" }}
       >
-        {/* Green-to-gold shimmer line */}
-        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(var(--accent-green)), hsl(var(--brand-gold)))' }} />
+        {/* Green-to-gold shimmer line — fades at edges */}
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent-green)), hsl(var(--brand-gold)), transparent)' }} />
 
         <div className={`relative rounded-2xl transition-all duration-300 ${focused ? 'shadow-[var(--shadow-glow-gold)]' : ''}`}>
           <input
