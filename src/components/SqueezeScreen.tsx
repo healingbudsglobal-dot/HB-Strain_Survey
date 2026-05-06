@@ -19,7 +19,7 @@ const PROVINCES = [
 ];
 
 interface SqueezeScreenProps {
-  onSubmit: (email: string, province: string) => void;
+  onSubmit: (email: string, province: string, consent: { given: boolean; timestamp: string }) => void;
 }
 
 const containerVariants = {
@@ -58,7 +58,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       return;
     }
     setError("");
-    onSubmit(trimmed, province);
+    onSubmit(trimmed, province, { given: true, timestamp: new Date().toISOString() });
   };
 
   return (
