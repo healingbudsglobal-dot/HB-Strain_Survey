@@ -68,32 +68,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center"
     >
-      {/* Hero flower — TRUE full-bleed via fixed positioning, immune to parent width */}
-      <motion.div
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
-      >
-        <motion.img
-          src={heroFlower}
-          alt=""
-          className="absolute top-1/2 left-1/2 w-[120vw] h-[120vh] max-w-none object-cover"
-          style={{
-            transform: "translate(-50%, -50%)",
-            filter: "saturate(1.15) contrast(1.05) brightness(1.05) hue-rotate(-8deg)",
-          }}
-          initial={{ scale: 1.1, x: "-50%", y: "-50%" }}
-          animate={{ scale: 1.0, x: "-50%", y: "-50%" }}
-          transition={{ duration: 24, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-        />
-        {/* Brand-cohesive deep teal tint — pulls pink/red toward forest */}
-        <div className="absolute inset-0 bg-[hsl(178_48%_15%_/_0.45)]" style={{ mixBlendMode: "multiply" }} />
-        {/* Soft top + bottom legibility gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(180_8%_7%_/_0.55)] via-transparent to-[hsl(180_8%_7%_/_0.85)]" />
-        {/* Subtle accent-green wash */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--accent-green)_/_0.08),transparent_70%)]" />
-      </motion.div>
+      {/* Hero backdrop now lives at page root (Index.tsx) for true full-viewport coverage */}
 
       {/* Subtle green radial spotlight */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,hsl(var(--accent-green)_/_0.06)_0%,transparent_70%)]" />
