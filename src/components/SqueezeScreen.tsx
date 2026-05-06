@@ -266,17 +266,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <p className="text-[10px] text-muted-foreground/70 text-center leading-snug px-2">
           For adults 18+ resident in South Africa. This is a lifestyle preference matcher — it does not diagnose, treat or cure any condition, and no cannabis is sold or supplied through this site.
         </p>
-        <p className="text-[11px] text-muted-foreground text-center leading-snug px-2">
-          By tapping above you confirm you are 18+, a resident of South Africa, and agree to our{" "}
-          <a
-            href="/legal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-[hsl(var(--brand-gold))] underline underline-offset-2 decoration-[hsl(var(--brand-gold)_/_0.6)] hover:text-[hsl(var(--accent-green))] hover:decoration-[hsl(var(--accent-green))]"
-          >
-            Terms &amp; Privacy Notice
-          </a>.
-          <br />
+        <p className="text-center">
           <a
             href="/legal"
             target="_blank"
