@@ -217,11 +217,44 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           </p>
         </motion.div>
 
+        {/* Required consent checkbox */}
+        <motion.label
+          variants={itemVariants}
+          htmlFor="consent-checkbox"
+          className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-[11px] leading-snug cursor-pointer transition-colors ${
+            agreed
+              ? "border-[hsl(var(--brand-gold)_/_0.5)] bg-[hsl(var(--brand-gold)_/_0.06)]"
+              : "border-border bg-[hsl(var(--surface-elevated)_/_0.5)] hover:border-[hsl(var(--brand-gold)_/_0.3)]"
+          }`}
+        >
+          <input
+            id="consent-checkbox"
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-[hsl(var(--brand-gold))] cursor-pointer"
+            required
+            aria-required="true"
+          />
+          <span className="text-muted-foreground">
+            I confirm I'm <span className="font-semibold text-foreground/90">18+ and in South Africa</span>, and I agree to the{" "}
+            <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(var(--brand-gold))] underline underline-offset-2">
+              Terms, Privacy Notice &amp; disclaimer
+            </a>.
+          </span>
+        </motion.label>
+
+        {/* Ad-policy-safe micro-disclaimer right next to CTA */}
+        <p className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/80">
+          Lifestyle preference tool · Not medical advice
+        </p>
+
         <motion.button
           type="submit"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          className="group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px]"
+          disabled={!agreed}
+          whileHover={agreed ? { scale: 1.02 } : undefined}
+          whileTap={agreed ? { scale: 0.97 } : undefined}
+          className="group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px] disabled:opacity-50 disabled:cursor-not-allowed disabled:animate-none disabled:hover:brightness-100"
         >
           Reveal My Match
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -229,6 +262,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
 
         <p className="text-[11px] text-muted-foreground mt-0.5 text-center">
           2 min · preference-based · 100% private · POPIA-compliant
+        </p>
+        <p className="text-[10px] text-muted-foreground/70 text-center leading-snug px-2">
+          For adults 18+ resident in South Africa. This is a lifestyle preference matcher — it does not diagnose, treat or cure any condition, and no cannabis is sold or supplied through this site.
         </p>
         <p className="text-[11px] text-muted-foreground text-center leading-snug px-2">
           By tapping above you confirm you are 18+, a resident of South Africa, and agree to our{" "}
