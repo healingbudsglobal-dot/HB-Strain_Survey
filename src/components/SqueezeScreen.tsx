@@ -288,8 +288,6 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         </p>
       </motion.form>
 
-      {/* Social proof — live counter + rotating testimonials */}
-      <SocialProofBar />
 
       {/* POPIA */}
       <motion.div
