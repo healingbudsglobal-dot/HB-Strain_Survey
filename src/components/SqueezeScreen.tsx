@@ -39,6 +39,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [province, setProvince] = useState("");
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +51,10 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
     }
     if (!province) {
       setError("Please select your province");
+      return;
+    }
+    if (!agreed) {
+      setError("Please confirm you're 18+ and agree to the Terms, Privacy Notice & disclaimer");
       return;
     }
     setError("");
