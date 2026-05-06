@@ -8,6 +8,7 @@ import SuccessScreen from "@/components/SuccessScreen";
 import OtpVerification from "@/components/OtpVerification";
 import AmbientParticles from "@/components/AmbientParticles";
 import StepProgress from "@/components/StepProgress";
+import HeroBackdrop from "@/components/HeroBackdrop";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
 import { sendOtpEmail, submitResults, postSurveyAnswersWebhook } from "@/lib/webhook";
@@ -195,6 +196,7 @@ const Index = () => {
 
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      {screen === "squeeze" && <HeroBackdrop />}
       <AmbientParticles />
 
       {/* Step Progress - fixed at top, hidden on squeeze screen */}
