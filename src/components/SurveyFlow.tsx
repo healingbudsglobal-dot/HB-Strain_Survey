@@ -285,7 +285,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                   const isSelected = isMulti
                     ? multiSelected.has(option.label)
                     : selectedOption === option.label;
-                  const iconColorClass = getIconColor(question.id, option.label);
+                  const iconColorClass = getIconColor(question.id, option.label, i);
                   return (
                     <motion.button
                       key={option.label}
