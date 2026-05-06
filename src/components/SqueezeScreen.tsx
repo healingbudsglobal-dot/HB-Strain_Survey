@@ -224,7 +224,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         className="mt-3 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.04)] backdrop-blur-sm px-4 py-2 text-xs text-muted-foreground"
       >
         <Shield className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-        <span>POPIA Compliant · Secure medical data</span>
+        <span>POPIA Compliant · Your data stays private</span>
       </motion.div>
     </motion.div>
   );
