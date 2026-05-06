@@ -3,7 +3,7 @@ import { ArrowRight, Dna, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
-import heroFlower from "@/assets/hero-flower.jpg";
+
 
 import {
   Select,
