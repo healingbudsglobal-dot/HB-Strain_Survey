@@ -123,12 +123,12 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       >
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <FlaskConical className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-          EU GMP Certified
+          Quality Assured
         </span>
         <span className="h-3 w-px bg-border" />
         <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Microscope className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-          Lab Tested
+          Independently Tested
         </span>
       </motion.div>
 
@@ -136,16 +136,16 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         variants={itemVariants}
         className="font-display text-3xl font-extrabold leading-[1.1] tracking-[0.02em] text-foreground sm:text-4xl md:text-5xl mb-2 drop-shadow-md"
       >
-        Find Your
+        Discover Your
         <br />
-        <span className="text-[hsl(var(--brand-gold))]">Perfect Strain</span>
+        <span className="text-[hsl(var(--brand-gold))]">Perfect Match</span>
       </motion.h1>
 
       <motion.p
         variants={itemVariants}
         className="mb-7 max-w-xs text-sm leading-relaxed text-muted-foreground"
       >
-        Take our quick science-backed quiz and we'll match you to the cannabis strain your body needs.
+        A quick lifestyle quiz to help you explore botanical profiles tailored to your preferences.
       </motion.p>
 
       {/* Form — glass card with stronger blur over flower */}
