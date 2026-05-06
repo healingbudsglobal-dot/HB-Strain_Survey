@@ -13,11 +13,11 @@ export interface SurveyQuestion {
 }
 
 export const surveyQuestions: SurveyQuestion[] = [
-  // ─── Section 1: Your Cannabis Background ───
+  // ─── Section 1: Your Background ───
   {
     id: "exp_level",
-    section: "Your Cannabis Background",
-    question: "How familiar are you with cannabis?",
+    section: "Your Background",
+    question: "How familiar are you with botanical wellness?",
     subtitle: "So we can find the right strength for you",
     type: "single",
     options: [
@@ -89,17 +89,17 @@ export const surveyQuestions: SurveyQuestion[] = [
   {
     id: "specific_benefit",
     section: "Your Ideal Experience",
-    question: "Which specific benefit is most important to you right now?",
+    question: "Which lifestyle outcome matters most to you right now?",
     subtitle: "We'll weight this heavily in your match",
     type: "single",
     options: [
-      { label: "Pain management", icon: "activity" },
-      { label: "Anxiety/Stress relief", icon: "brain" },
-      { label: "Sleep aid", icon: "moon" },
-      { label: "Focus/ADHD support", icon: "target" },
-      { label: "Creativity boost", icon: "palette" },
-      { label: "General wellness", icon: "heart-pulse" },
-      { label: "Social anxiety relief", icon: "users" },
+      { label: "Physical comfort & ease", icon: "activity" },
+      { label: "Calm & unwind from a busy day", icon: "brain" },
+      { label: "Restful nights", icon: "moon" },
+      { label: "Focus & flow state", icon: "target" },
+      { label: "Creative spark", icon: "palette" },
+      { label: "Everyday balance", icon: "heart-pulse" },
+      { label: "Confidence in social settings", icon: "users" },
     ],
   },
   {
@@ -124,15 +124,15 @@ export const surveyQuestions: SurveyQuestion[] = [
   {
     id: "thc_reaction",
     section: "Your Body & Preferences",
-    question: "How sensitive are you to THC?",
+    question: "How does your body usually respond to stronger profiles?",
     subtitle: "We'll use this to keep your experience comfortable",
     type: "single",
     options: [
-      { label: "I am very sensitive (can feel 2.5mg)", icon: "alert-triangle" },
-      { label: "I have average tolerance", icon: "minus" },
-      { label: "I need higher doses for effects", icon: "trending-up" },
-      { label: "I sometimes feel anxious/paranoid", icon: "shield-alert" },
-      { label: "I prefer CBD-dominant or 1:1 ratios", icon: "scale" },
+      { label: "Very sensitive – a tiny amount goes a long way", icon: "alert-triangle" },
+      { label: "Average – standard profiles suit me", icon: "minus" },
+      { label: "Higher tolerance – I prefer richer profiles", icon: "trending-up" },
+      { label: "I can feel a bit on-edge if it's too strong", icon: "shield-alert" },
+      { label: "I lean toward gentler, balanced ratios", icon: "scale" },
     ],
   },
   {
@@ -171,14 +171,14 @@ export const surveyQuestions: SurveyQuestion[] = [
   {
     id: "recovery_support",
     section: "Lifestyle & Context",
-    question: "Do you need recovery or anti-inflammatory support?",
-    subtitle: "Optional — helps us explore therapeutic pairings",
+    question: "Is post-activity recovery part of your routine?",
+    subtitle: "Optional — helps us explore complementary profiles",
     type: "single",
     options: [
-      { label: "Yes - chronic pain/inflammation", icon: "activity" },
-      { label: "Yes - post-workout recovery", icon: "dumbbell" },
-      { label: "Yes - general aches", icon: "bone" },
-      { label: "No - not a priority", icon: "minus" },
+      { label: "Yes – ongoing physical recovery", icon: "activity" },
+      { label: "Yes – post-workout cooldown", icon: "dumbbell" },
+      { label: "Yes – everyday tension & stiffness", icon: "bone" },
+      { label: "Not a priority right now", icon: "minus" },
     ],
   },
   {
