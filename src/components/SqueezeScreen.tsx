@@ -58,7 +58,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       return;
     }
     setError("");
-    onSubmit(trimmed, province);
+    onSubmit(trimmed, province, { given: true, timestamp: new Date().toISOString() });
   };
 
   return (
