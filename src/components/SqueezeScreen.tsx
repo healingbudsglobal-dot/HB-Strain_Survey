@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
 import heroFlower from "@/assets/hero-flower.jpg";
-import SocialProofBar from "@/components/SocialProofBar";
+
 import {
   Select,
   SelectContent,
