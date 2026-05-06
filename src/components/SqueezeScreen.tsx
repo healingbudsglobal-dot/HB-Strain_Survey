@@ -66,7 +66,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="relative z-10 flex flex-col items-center justify-center px-5 text-center"
+      className="relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-6 py-10 text-center sm:px-8"
     >
       {/* Hero backdrop now lives at page root (Index.tsx) for true full-viewport coverage */}
 
@@ -99,28 +99,18 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
 
       <motion.h1
         variants={itemVariants}
-        className="font-display text-3xl font-extrabold leading-[1.1] tracking-[0.02em] text-foreground sm:text-4xl md:text-5xl mb-2 drop-shadow-md"
+        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl md:text-6xl"
       >
-        Discover Your
+        Discover your
         <br />
-        <span className="text-[hsl(var(--brand-gold))] italic font-serif tracking-tight">Perfect Match</span>
+        <span className="text-[hsl(var(--accent-green))]">perfect match.</span>
       </motion.h1>
-
-      {/* Editorial divider — Aeriz / Garden Party inspiration */}
-      <motion.div
-        variants={itemVariants}
-        className="mb-5 flex items-center gap-3"
-      >
-        <span className="h-px w-8 bg-[hsl(var(--brand-gold)_/_0.6)]" />
-        <span className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground">Curated · Botanical</span>
-        <span className="h-px w-8 bg-[hsl(var(--brand-gold)_/_0.6)]" />
-      </motion.div>
 
       <motion.p
         variants={itemVariants}
-        className="mb-7 max-w-xs text-sm leading-relaxed text-muted-foreground"
+        className="mb-8 max-w-[22rem] text-[15px] leading-relaxed text-foreground/70 sm:text-base"
       >
-        A quick lifestyle quiz to help you explore botanical profiles tailored to your preferences.
+        A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
       {/* Form — refined editorial glass card */}
