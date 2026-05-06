@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Shield, FlaskConical, Microscope, Dna, Sparkles } from "lucide-react";
+import { ArrowRight, Dna, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
@@ -121,21 +121,6 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.08)] rounded-full scale-[2.5]" />
       </motion.div>
 
-      {/* Trust badges */}
-      <motion.div
-        variants={itemVariants}
-        className="mb-5 inline-flex items-center gap-4 rounded-full border border-[hsl(170_8%_20%_/_0.6)] bg-[hsl(var(--surface-elevated)_/_0.7)] backdrop-blur-xl px-5 py-2 shadow-sm"
-      >
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-          <FlaskConical className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-          Quality Assured
-        </span>
-        <span className="h-3 w-px bg-border" />
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-          <Microscope className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-          Independently Tested
-        </span>
-      </motion.div>
 
       <motion.h1
         variants={itemVariants}
