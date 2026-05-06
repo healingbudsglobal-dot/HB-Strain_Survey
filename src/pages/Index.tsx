@@ -196,6 +196,7 @@ const Index = () => {
 
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      {screen === "squeeze" && <HeroBackdrop />}
       <AmbientParticles />
 
       {/* Step Progress - fixed at top, hidden on squeeze screen */}
