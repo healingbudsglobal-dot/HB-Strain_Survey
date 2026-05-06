@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Shield, FlaskConical, Microscope, Dna, Sparkles } from "lucide-react";
+import { ArrowRight, Dna, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
