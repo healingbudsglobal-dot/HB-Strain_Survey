@@ -200,18 +200,35 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           </motion.p>
         )}
 
+        {/* Lifestyle / private-purposes disclaimer — sits ABOVE the CTA */}
+        <motion.div
+          variants={itemVariants}
+          className="rounded-xl border border-[hsl(var(--accent-green)_/_0.18)] bg-[hsl(var(--accent-green)_/_0.05)] px-3 py-2.5 text-[11px] leading-snug text-muted-foreground text-left"
+        >
+          <p className="font-semibold text-foreground/90 mb-0.5">Adults 18+ · Lifestyle preference quiz</p>
+          <p>
+            For private personal use under the <span className="text-foreground/80">Cannabis for Private Purposes Act 7 of 2024 (RSA)</span>.
+            Not medical advice — we simply match your taste &amp; lifestyle preferences. No sale or supply is made through this site.
+          </p>
+        </motion.div>
+
         <motion.button
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           className="group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px]"
         >
-          Find My Strain
+          Reveal My Match
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </motion.button>
 
         <p className="text-[11px] text-muted-foreground mt-0.5 text-center">
-          2 min · science-backed · 100% private
+          2 min · preference-based · 100% private · POPIA-compliant
+        </p>
+        <p className="text-[10px] text-muted-foreground/70 text-center leading-snug px-2">
+          By tapping above you confirm you are 18+, a resident of South Africa, and agree to our{" "}
+          <a href="/legal" className="underline underline-offset-2 hover:text-foreground/80">Terms &amp; Privacy Notice</a>.
+          Nothing here diagnoses, treats, or cures any condition.
         </p>
       </motion.form>
 
