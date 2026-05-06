@@ -19,13 +19,20 @@ const SECTION_META: Record<string, { emoji: string; subtitle: string }> = {
   "Lifestyle & Context": { emoji: "⚡", subtitle: "Fine-tuning your match" },
 };
 
-// Color mapping for icon backgrounds based on option intent
-const getIconColor = (_questionId: string, optionLabel: string): string => {
-  const calmOptions = ["Relaxed & Stress-Free", "Deep Sleep & Sedation", "Heavy body sensations", "Full-body immersion", "Gentle body relaxation", "Pain management", "Anxiety/Stress relief", "Sleep aid", "Social anxiety relief", "Relaxing alone", "Meditation/Yoga", "Evening", "Night", "Quiet/private space", "I sometimes feel anxious/paranoid", "I am very sensitive (can feel 2.5mg)", "I prefer CBD-dominant or 1:1 ratios", "Sweet/Floral (Linalool)", "Yes - chronic pain/inflammation", "Yes - general aches", "Very important - low odor preferred", "Paranoia/Anxiety", "Sleepiness", "Memory fog"];
-  const activeOptions = ["Energized & Productive", "Creative & Inspired", "Focused & Clear", "Social & Talkative", "Light head change only", "Focus/ADHD support", "Creativity boost", "Work/Study", "Creative projects", "Physical activity", "Socializing with friends", "Morning", "Afternoon", "Social setting", "Outdoors/nature", "Active/busy environment", "I need higher doses for effects", "Citrus/Zesty (Limonene)", "Pine/Fresh (Pinene)", "Gassy/Diesel", "Yes - post-workout recovery", "Daily consumer", "Experienced (few times a week)", "Maximum intensity", "Strong pronounced effect", "Racing thoughts"];
-  if (calmOptions.includes(optionLabel)) return "bg-[hsl(var(--deep-teal)_/_0.2)] text-[hsl(var(--deep-teal))]";
-  if (activeOptions.includes(optionLabel)) return "bg-[hsl(var(--accent-green)_/_0.15)] text-[hsl(var(--accent-green))]";
-  return "bg-[hsl(var(--primary)_/_0.12)] text-primary";
+// Vibrant, bright wellness-style icon palette (rotates by index for visual energy)
+const ICON_PALETTES = [
+  "bg-gradient-to-br from-[hsl(40_95%_70%)] to-[hsl(35_95%_60%)] text-white shadow-md shadow-[hsl(40_85%_55%/0.35)]",
+  "bg-gradient-to-br from-[hsl(164_70%_60%)] to-[hsl(178_60%_40%)] text-white shadow-md shadow-[hsl(164_48%_53%/0.35)]",
+  "bg-gradient-to-br from-[hsl(84_75%_55%)] to-[hsl(140_60%_45%)] text-white shadow-md shadow-[hsl(84_81%_44%/0.3)]",
+  "bg-gradient-to-br from-[hsl(20_90%_65%)] to-[hsl(15_85%_55%)] text-white shadow-md shadow-[hsl(15_85%_55%/0.3)]",
+  "bg-gradient-to-br from-[hsl(280_60%_70%)] to-[hsl(260_55%_55%)] text-white shadow-md shadow-[hsl(270_50%_55%/0.25)]",
+  "bg-gradient-to-br from-[hsl(195_75%_60%)] to-[hsl(210_70%_50%)] text-white shadow-md shadow-[hsl(200_70%_50%/0.3)]",
+  "bg-gradient-to-br from-[hsl(330_75%_70%)] to-[hsl(340_70%_55%)] text-white shadow-md shadow-[hsl(335_70%_60%/0.3)]",
+  "bg-gradient-to-br from-[hsl(50_95%_60%)] to-[hsl(45_90%_50%)] text-white shadow-md shadow-[hsl(48_90%_55%/0.3)]",
+];
+
+const getIconColor = (_questionId: string, _optionLabel: string, index: number): string => {
+  return ICON_PALETTES[index % ICON_PALETTES.length];
 };
 
 const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
