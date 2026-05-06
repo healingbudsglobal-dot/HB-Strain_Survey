@@ -81,16 +81,14 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className="absolute top-1/2 left-1/2 w-[140%] max-w-none h-auto min-h-full object-cover"
           style={{
             transform: "translate(-50%, -50%)",
-            filter: "saturate(1.35) contrast(1.08) brightness(1.1)",
+            filter: "saturate(1.5) contrast(1.12) brightness(1.35)",
           }}
           initial={{ scale: 1.15, x: "-50%", y: "-50%" }}
           animate={{ scale: 1.05, x: "-50%", y: "-50%" }}
           transition={{ duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
         />
-        {/* Soft bottom legibility gradient — keeps the bud in full color up top */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[hsl(180_8%_7%_/_0.75)]" />
-        {/* Whisper-soft brand tint for cohesion */}
-        <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.08)]" style={{ mixBlendMode: "multiply" }} />
+        {/* Light bottom-only legibility fade — keeps the bud bright and visible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[hsl(180_8%_7%_/_0.55)]" />
       </motion.div>
 
       {/* Subtle green radial spotlight */}
