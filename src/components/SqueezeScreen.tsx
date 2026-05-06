@@ -215,19 +215,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           </motion.p>
         )}
 
-        {/* Lifestyle / private-purposes disclaimer — sits ABOVE the CTA */}
-        <motion.div
-          variants={itemVariants}
-          className="rounded-xl border border-[hsl(var(--accent-green)_/_0.18)] bg-[hsl(var(--accent-green)_/_0.05)] px-3 py-2.5 text-[11px] leading-snug text-muted-foreground text-left"
-        >
-          <p className="font-semibold text-foreground/90 mb-0.5">Adults 18+ · Lifestyle preference quiz</p>
-          <p>
-            For private personal use under the <span className="text-foreground/80">Cannabis for Private Purposes Act 7 of 2024 (RSA)</span>.
-            Not medical advice — we simply match your taste &amp; lifestyle preferences. No sale or supply is made through this site.
-          </p>
-        </motion.div>
-
-        {/* Required consent checkbox */}
+        {/* Single consolidated consent — friendly, not scary */}
         <motion.label
           variants={itemVariants}
           htmlFor="consent-checkbox"
@@ -247,17 +235,12 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             aria-required="true"
           />
           <span className="text-muted-foreground">
-            I confirm I'm <span className="font-semibold text-foreground/90">18+ and in South Africa</span>, and I agree to the{" "}
+            I'm <span className="font-semibold text-foreground/90">18+ in South Africa</span> and agree to the{" "}
             <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(var(--brand-gold))] underline underline-offset-2">
-              Terms, Privacy Notice &amp; disclaimer
+              Terms &amp; Privacy
             </a>.
           </span>
         </motion.label>
-
-        {/* Ad-policy-safe micro-disclaimer right next to CTA */}
-        <p className="text-center text-[10px] uppercase tracking-wider text-muted-foreground/80">
-          Lifestyle preference tool · Not medical advice
-        </p>
 
         <motion.button
           type="submit"
@@ -270,33 +253,10 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </motion.button>
 
-        <p className="text-[11px] text-muted-foreground mt-0.5 text-center">
-          2 min · preference-based · 100% private · POPIA-compliant
-        </p>
-        <p className="text-[10px] text-muted-foreground/70 text-center leading-snug px-2">
-          For adults 18+ resident in South Africa. This is a lifestyle preference matcher — it does not diagnose, treat or cure any condition, and no cannabis is sold or supplied through this site.
-        </p>
-        <p className="text-center">
-          <a
-            href="/legal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-muted-foreground/80 underline underline-offset-2 hover:text-foreground/80"
-          >
-            Read the full Terms &amp; Privacy →
-          </a>
+        <p className="text-[11px] text-muted-foreground/80 mt-0.5 text-center">
+          2 min · 100% private · lifestyle preference tool
         </p>
       </motion.form>
-
-
-      {/* POPIA */}
-      <motion.div
-        variants={itemVariants}
-        className="mt-3 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.04)] backdrop-blur-sm px-4 py-2 text-xs text-muted-foreground"
-      >
-        <Shield className="h-3.5 w-3.5 text-[hsl(var(--accent-green))]" />
-        <span>POPIA Compliant · Your data stays private</span>
-      </motion.div>
     </motion.div>
   );
 };
