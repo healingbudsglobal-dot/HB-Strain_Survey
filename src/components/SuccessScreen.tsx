@@ -216,9 +216,9 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.85 }}
               >
-                <span className="text-lg font-bold text-foreground">{strain.price}</span>
+                <span className="text-xs text-muted-foreground italic">Pricing on private enquiry</span>
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  Limited availability
+                  Members only
                 </span>
               </motion.div>
             </div>
