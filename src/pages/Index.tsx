@@ -8,6 +8,7 @@ import SuccessScreen from "@/components/SuccessScreen";
 import OtpVerification from "@/components/OtpVerification";
 import AmbientParticles from "@/components/AmbientParticles";
 import StepProgress from "@/components/StepProgress";
+import HeroBackdrop from "@/components/HeroBackdrop";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
 import { sendOtpEmail, submitResults, postSurveyAnswersWebhook } from "@/lib/webhook";
