@@ -210,14 +210,13 @@ const Index = () => {
         </motion.div>
       )}
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={screen}
-          variants={screenVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={screenTransition}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
           className="flex w-full items-center justify-center pt-20"
         >
           {screen === "squeeze" && <SqueezeScreen onSubmit={handleEmailSubmit} />}
