@@ -36,10 +36,12 @@ const itemVariants = {
 
 // Liquid form-up: droplets scatter, then merge into the card shape under an SVG goo filter
 const formVariants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, scale: 0.96, filter: "blur(8px)" },
   visible: {
     opacity: 1,
-    transition: { duration: 0.4, delay: 0.45, ease: [0.16, 1, 0.3, 1] as const },
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, delay: 1.5, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
