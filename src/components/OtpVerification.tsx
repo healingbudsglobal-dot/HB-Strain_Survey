@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import { Shield, RotateCw, Mail, CheckCircle2 } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Shield, RotateCw, Mail, CheckCircle2, Clock } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { verifyOtp } from "@/lib/webhook";
 import { markOtpReady } from "@/lib/perf";
+
+const LOCKOUT_SECONDS = 60;
 
 interface OtpVerificationProps {
   email: string;
