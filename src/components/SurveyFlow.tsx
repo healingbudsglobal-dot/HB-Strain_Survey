@@ -174,8 +174,43 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
   return (
     <div className="relative z-10 flex w-full max-w-lg flex-col px-5" style={{ perspective: "1200px" }}>
 
-      {/* Header — logo + step counter */}
-      <div className="mb-6 flex items-center justify-between pt-4">
+      {/* Ambient emerald orbs — matching home screen drama */}
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,hsl(var(--accent-green)_/_0.08)_0%,transparent_65%)]" />
+      <motion.div
+        className="pointer-events-none absolute -top-6 -right-4 opacity-[0.08]"
+        animate={{ y: [0, -12, 0], rotate: [0, 6, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden
+      >
+        <Dna className="h-20 w-20 text-[hsl(var(--accent-green))]" />
+      </motion.div>
+      <motion.div
+        className="pointer-events-none absolute bottom-10 -left-3 opacity-[0.07]"
+        animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        aria-hidden
+      >
+        <Sparkles className="h-14 w-14 text-[hsl(var(--accent-green))]" />
+      </motion.div>
+
+      {/* Shared keyframes */}
+      <style>{`
+        @keyframes auroraShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        @keyframes sheenSweep {
+          0% { transform: translateX(-120%) skewX(-20deg); }
+          100% { transform: translateX(220%) skewX(-20deg); }
+        }
+        @keyframes orbFloat {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(8px,-12px) scale(1.05); }
+        }
+      `}</style>
+
+      {/* Header — logo + animated progress rail + step counter */}
+      <div className="mb-5 flex items-center justify-between pt-4">
         <img
           src={hbLogoWhite}
           alt="Healing Buds"
@@ -185,11 +220,27 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
           key={currentIndex}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-xs font-medium text-muted-foreground tabular-nums"
+          className="text-xs font-semibold text-[hsl(var(--accent-green))] tabular-nums tracking-wider"
         >
-          {currentIndex + 1}
-          <span className="text-muted-foreground/40"> / {surveyQuestions.length}</span>
+          {String(currentIndex + 1).padStart(2, '0')}
+          <span className="text-muted-foreground/40"> / {String(surveyQuestions.length).padStart(2, '0')}</span>
         </motion.span>
+      </div>
+
+      {/* Slim aurora progress bar */}
+      <div className="relative mb-6 h-[3px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{
+            backgroundImage: "linear-gradient(90deg, hsl(164 70% 60%), hsl(180 70% 75%), hsl(164 70% 60%))",
+            backgroundSize: "200% 100%",
+            animation: "auroraShift 4s ease-in-out infinite",
+            boxShadow: "0 0 12px hsl(164 80% 55% / 0.6)",
+          }}
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        />
       </div>
 
       {/* Section title card */}
