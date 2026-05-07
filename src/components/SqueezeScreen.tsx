@@ -82,45 +82,75 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <Dna className="h-24 w-24 text-[hsl(var(--accent-green))]" />
       </motion.div>
       <motion.div
-        className="pointer-events-none absolute bottom-[15%] left-[6%] opacity-[0.05]"
+        className="pointer-events-none absolute bottom-[15%] left-[6%] opacity-[0.06]"
         animate={{ y: [0, 12, 0], rotate: [0, -6, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       >
-        <Sparkles className="h-16 w-16 text-[hsl(var(--brand-gold))]" />
+        <Sparkles className="h-16 w-16 text-[hsl(var(--accent-green))]" />
       </motion.div>
 
       {/* Logo */}
       <motion.div variants={itemVariants} className="mb-8 relative">
         <img src={hbLogoWhite} alt="Healing Buds" className="h-16 w-auto sm:h-20" />
-        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.12)] rounded-full scale-[2]" />
+        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.18)] rounded-full scale-[2]" />
       </motion.div>
-
 
       <motion.h1
         variants={itemVariants}
-        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-5xl md:text-6xl"
+        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-foreground sm:text-5xl md:text-6xl"
+        style={{ textShadow: "0 2px 24px hsl(180 50% 2% / 0.6)" }}
       >
         Discover your
         <br />
-        <span className="text-[hsl(var(--accent-green))]">perfect match.</span>
+        <span
+          className="relative inline-block bg-clip-text text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(110deg, hsl(164 60% 70%) 0%, hsl(164 80% 55%) 35%, hsl(180 70% 80%) 50%, hsl(164 80% 55%) 65%, hsl(164 60% 70%) 100%)",
+            backgroundSize: "200% 100%",
+            animation: "auroraShift 6s ease-in-out infinite",
+            WebkitBackgroundClip: "text",
+            filter: "drop-shadow(0 0 24px hsl(164 80% 55% / 0.35))",
+          }}
+        >
+          perfect match.
+        </span>
+        <style>{`
+          @keyframes auroraShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+          @keyframes sheenSweep {
+            0% { transform: translateX(-120%) skewX(-20deg); }
+            100% { transform: translateX(220%) skewX(-20deg); }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            [data-aurora], [data-sheen] { animation: none !important; }
+          }
+        `}</style>
       </motion.h1>
 
       <motion.p
         variants={itemVariants}
-        className="mb-8 max-w-[22rem] text-[15px] leading-relaxed text-foreground/70 sm:text-base"
+        className="mb-8 max-w-[22rem] text-[15px] leading-relaxed text-foreground/85 sm:text-base"
       >
         A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
-      {/* Form — solid dark plate anchors content over cinematic bg */}
+      {/* Form — solid dark plate with emerald focus halo */}
       <motion.form
         variants={itemVariants}
         onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl"
-        style={{ boxShadow: "0 30px 80px -20px hsl(180 30% 2% / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.05)" }}
+        className={`flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl transition-all duration-500 ${
+          focused ? "border-[hsl(var(--accent-green)_/_0.4)]" : "border-white/[0.08]"
+        }`}
+        style={{
+          boxShadow: focused
+            ? "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.15), 0 0 40px -8px hsl(164 80% 55% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.06)"
+            : "0 30px 80px -20px hsl(180 30% 2% / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+        }}
       >
-
-        <div className={`relative rounded-2xl transition-all duration-300 ${focused ? 'shadow-[var(--shadow-glow-gold)]' : ''}`}>
+        <div className="relative rounded-2xl">
           <input
             type="email"
             inputMode="email"
@@ -130,7 +160,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all text-[16px]"
+            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all text-[16px]"
             required
             aria-describedby="email-hint"
           />
@@ -140,7 +170,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         </p>
 
         <Select value={province} onValueChange={setProvince}>
-          <SelectTrigger className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all h-auto [&>span]:text-left">
+          <SelectTrigger className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all h-auto [&>span]:text-left">
             <SelectValue placeholder="Select your province" />
           </SelectTrigger>
           <SelectContent className="z-50 rounded-xl border border-border bg-card text-card-foreground shadow-lg">
@@ -162,14 +192,14 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           </motion.p>
         )}
 
-        {/* Single consolidated consent — friendly, not scary */}
+        {/* Single consolidated consent — emerald accent for cohesion */}
         <motion.label
           variants={itemVariants}
           htmlFor="consent-checkbox"
           className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-[11px] leading-snug cursor-pointer transition-colors ${
             agreed
-              ? "border-[hsl(var(--brand-gold)_/_0.5)] bg-[hsl(var(--brand-gold)_/_0.06)]"
-              : "border-border bg-[hsl(var(--surface-elevated)_/_0.5)] hover:border-[hsl(var(--brand-gold)_/_0.3)]"
+              ? "border-[hsl(var(--accent-green)_/_0.5)] bg-[hsl(var(--accent-green)_/_0.07)]"
+              : "border-border bg-[hsl(var(--surface-elevated)_/_0.5)] hover:border-[hsl(var(--accent-green)_/_0.3)]"
           }`}
         >
           <input
@@ -177,13 +207,13 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-[hsl(var(--brand-gold))] cursor-pointer"
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-[hsl(var(--accent-green))] cursor-pointer"
             required
             aria-required="true"
           />
-          <span className="text-muted-foreground">
-            I'm <span className="font-semibold text-foreground/90">18+ in South Africa</span> and agree to the{" "}
-            <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(var(--brand-gold))] underline underline-offset-2">
+          <span className="text-foreground/75">
+            I'm <span className="font-semibold text-foreground/95">18+ in South Africa</span> and agree to the{" "}
+            <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(var(--accent-green))] underline underline-offset-2">
               Terms &amp; Privacy
             </a>.
           </span>
@@ -194,10 +224,25 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           disabled={!agreed}
           whileHover={agreed ? { scale: 1.01 } : undefined}
           whileTap={agreed ? { scale: 0.98 } : undefined}
-          className="group w-full rounded-2xl py-4 font-display font-semibold text-[hsl(180_20%_8%)] text-base transition-all flex items-center justify-center gap-2 min-h-[54px] bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green)_/_0.92)] disabled:opacity-40 disabled:cursor-not-allowed"
+          className="group relative w-full overflow-hidden rounded-2xl py-4 font-display font-semibold text-[hsl(180_25%_6%)] text-base transition-all flex items-center justify-center gap-2 min-h-[54px] disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, hsl(164 70% 62%) 0%, hsl(164 60% 48%) 50%, hsl(170 65% 42%) 100%)",
+            boxShadow:
+              "0 12px 32px -8px hsl(164 80% 35% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.25), inset 0 -1px 0 hsl(180 50% 5% / 0.25)",
+          }}
         >
-          Reveal My Match
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          {/* Sheen sweep — runs once on mount, again on hover */}
+          {agreed && (
+            <span
+              data-sheen
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
+            />
+          )}
+          <span className="relative z-10">Reveal My Match</span>
+          <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
         </motion.button>
 
         <p className="text-[11px] text-muted-foreground/80 mt-0.5 text-center">
