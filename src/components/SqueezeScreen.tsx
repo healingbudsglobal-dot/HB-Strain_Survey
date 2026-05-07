@@ -578,25 +578,56 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
                 const rect = btn.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                const ripple = document.createElement("span");
-                ripple.className = "cta-ripple";
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                btn.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 700);
-                const burst = document.createElement("span");
-                burst.className = "cta-burst-layer";
-                for (let i = 0; i < 10; i++) {
-                  const p = document.createElement("span");
-                  const angle = (i / 10) * Math.PI * 2;
-                  const dist = 38 + Math.random() * 22;
-                  p.className = "cta-particle";
-                  p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`);
-                  p.style.setProperty("--ty", `${Math.sin(angle) * dist}px`);
-                  burst.appendChild(p);
+
+                // Hot ignition flash from click point
+                const flash = document.createElement("span");
+                flash.className = "cta-ignite";
+                flash.style.left = `${x}px`;
+                flash.style.top = `${y}px`;
+                btn.appendChild(flash);
+                setTimeout(() => flash.remove(), 600);
+
+                // Fizzling match-head sparks — amber/neon trichome energy
+                const fizzle = document.createElement("span");
+                fizzle.className = "cta-fizzle-layer";
+                fizzle.style.left = `${x}px`;
+                fizzle.style.top = `${y}px`;
+                const SPARK_COUNT = 28;
+                for (let i = 0; i < SPARK_COUNT; i++) {
+                  const s = document.createElement("span");
+                  s.className = "cta-spark";
+                  // Bias upward arc like a struck match
+                  const angle = (-Math.PI / 2) + (Math.random() - 0.5) * Math.PI * 1.1;
+                  const speed = 60 + Math.random() * 90;
+                  const tx = Math.cos(angle) * speed;
+                  const ty = Math.sin(angle) * speed;
+                  // Gravity pulls them down at the end
+                  const fy = ty + 50 + Math.random() * 40;
+                  const dur = 600 + Math.random() * 500;
+                  const size = 2 + Math.random() * 3;
+                  // Color shift: hot white -> amber -> trichome mint flick
+                  const hue = Math.random() < 0.7
+                    ? 38 + Math.random() * 12          // amber
+                    : 158 + Math.random() * 14;         // mint flick
+                  s.style.setProperty("--tx", `${tx}px`);
+                  s.style.setProperty("--ty", `${ty}px`);
+                  s.style.setProperty("--fy", `${fy}px`);
+                  s.style.setProperty("--dur", `${dur}ms`);
+                  s.style.setProperty("--size", `${size}px`);
+                  s.style.setProperty("--hue", `${hue}`);
+                  s.style.animationDelay = `${Math.random() * 80}ms`;
+                  fizzle.appendChild(s);
                 }
-                btn.appendChild(burst);
-                setTimeout(() => burst.remove(), 800);
+                // Smoldering ember plume above ignition
+                for (let i = 0; i < 4; i++) {
+                  const e2 = document.createElement("span");
+                  e2.className = "cta-ember";
+                  e2.style.setProperty("--ex", `${(Math.random() - 0.5) * 30}px`);
+                  e2.style.animationDelay = `${i * 80}ms`;
+                  fizzle.appendChild(e2);
+                }
+                btn.appendChild(fizzle);
+                setTimeout(() => fizzle.remove(), 1400);
               }}
               className="group relative w-full overflow-hidden rounded-[22px] py-5 font-display font-bold text-[18px] tracking-[-0.01em] transition-[background,box-shadow] duration-150 flex items-center justify-center gap-2.5 min-h-[64px] disabled:cursor-not-allowed will-change-transform"
               style={{
