@@ -152,19 +152,54 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
-      {/* Form — solid dark plate with emerald focus halo */}
+      {/* Form — wet glass card with chromatic resin blobs */}
       <motion.form
         variants={itemVariants}
         onSubmit={handleSubmit}
-        className={`flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl transition-all duration-500 ${
-          focused ? "border-[hsl(var(--accent-green)_/_0.4)]" : "border-white/[0.08]"
+        className={`relative flex w-full max-w-sm flex-col gap-3 overflow-hidden rounded-[28px] p-5 border transition-all duration-500 ${
+          focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
         }`}
         style={{
+          background:
+            "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
+          backdropFilter: "blur(24px) saturate(160%)",
+          WebkitBackdropFilter: "blur(24px) saturate(160%)",
           boxShadow: focused
-            ? "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.15), 0 0 40px -8px hsl(164 80% 55% / 0.35), inset 0 1px 0 hsl(0 0% 100% / 0.06)"
-            : "0 30px 80px -20px hsl(180 30% 2% / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+            ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
+            : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
         }}
       >
+        {/* Chromatic blobs — soft mint + amber resin glow inside the glass */}
+        <div
+          aria-hidden
+          data-drift
+          className="pointer-events-none absolute -top-16 -left-12 h-44 w-44 rounded-full opacity-60 mix-blend-screen"
+          style={{
+            background: "radial-gradient(circle, hsl(164 85% 55% / 0.45) 0%, transparent 65%)",
+            filter: "blur(28px)",
+            animation: "glassDrift 14s ease-in-out infinite",
+          }}
+        />
+        <div
+          aria-hidden
+          data-drift
+          className="pointer-events-none absolute -bottom-20 -right-10 h-52 w-52 rounded-full opacity-50 mix-blend-screen"
+          style={{
+            background: "radial-gradient(circle, hsl(38 90% 60% / 0.35) 0%, transparent 65%)",
+            filter: "blur(32px)",
+            animation: "glassDrift 18s ease-in-out infinite reverse",
+          }}
+        />
+        {/* Top sheen — wet highlight */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent)",
+          }}
+        />
+
         <div className="relative rounded-2xl">
           <input
             type="email"
@@ -175,17 +210,21 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all text-[16px]"
+            className="w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all text-[16px] backdrop-blur-md"
+            style={{ boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 5% / 0.4)" }}
             required
             aria-describedby="email-hint"
           />
         </div>
-        <p id="email-hint" className="-mt-1 px-1 text-[11px] text-muted-foreground">
+        <p id="email-hint" className="-mt-1 px-1 text-[11px] text-muted-foreground relative">
           Use a real address (e.g. <span className="font-mono text-foreground/80">name@domain.com</span>) — we'll send your match here.
         </p>
 
         <Select value={province} onValueChange={setProvince}>
-          <SelectTrigger className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated)_/_0.8)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all h-auto [&>span]:text-left">
+          <SelectTrigger
+            className="w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all h-auto [&>span]:text-left backdrop-blur-md"
+            style={{ boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 5% / 0.4)" }}
+          >
             <SelectValue placeholder="Select your province" />
           </SelectTrigger>
           <SelectContent className="z-50 rounded-xl border border-border bg-card text-card-foreground shadow-lg">
