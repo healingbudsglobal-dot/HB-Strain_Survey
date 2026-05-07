@@ -16,7 +16,7 @@ interface SuccessScreenProps {
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
 };
 
 const itemVariants = {
