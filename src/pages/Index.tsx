@@ -188,20 +188,23 @@ const Index = () => {
     handleSendResults();
   }, [handleSendResults]);
 
+  // Calm the screen on results — animated ambients caused strobing on mobile
+  const isResults = screen === "success" || screen === "loading";
+
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
-      <BudAmbient />
-      <NeuronAmbient />
+      <BudAmbient intensity={isResults ? 0.5 : 1} />
+      {!isResults && <NeuronAmbient />}
       {screen === "squeeze" && <HeroBackdrop />}
-      <AmbientParticles />
+      {!isResults && <AmbientParticles />}
 
       {/* Step Progress - fixed at top, hidden on squeeze screen */}
       {screen !== "squeeze" && (
         <motion.div
-          className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 backdrop-blur-md bg-[hsl(180_8%_7%_/_0.5)]"
+          className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 bg-[hsl(180_8%_7%_/_0.85)] border-b border-border/40"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
         >
           <StepProgress currentStep={stepIndex} />
         </motion.div>
