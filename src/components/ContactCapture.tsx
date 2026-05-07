@@ -209,6 +209,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
               value={whatsapp}
               onChange={setWhatsapp}
               className="text-foreground"
+              numberInputProps={{ id: "contact-whatsapp", name: "whatsapp", autoComplete: "tel" }}
             />
           </div>
         </div>
