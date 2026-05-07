@@ -391,7 +391,23 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <p className="text-[11px] text-muted-foreground/80 mt-0.5 text-center">
           2 min · 100% private · lifestyle preference tool
         </p>
-      </motion.form>
+        </motion.form>
+      </div>
+      <style>{`
+        @keyframes liquidBreathe {
+          0%, 100% { border-radius: 28px 28px 28px 28px / 28px 28px 28px 28px; }
+          25%      { border-radius: 32px 26px 30px 28px / 26px 30px 28px 32px; }
+          50%      { border-radius: 28px 32px 26px 30px / 30px 28px 32px 26px; }
+          75%      { border-radius: 26px 28px 32px 26px / 32px 26px 30px 28px; }
+        }
+        @keyframes liquidRipple {
+          0%   { width: 8px; height: 8px; opacity: 0.7; }
+          100% { width: 480px; height: 480px; opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="liquidBreathe"], [style*="liquidRipple"] { animation: none !important; }
+        }
+      `}</style>
     </motion.div>
   );
 };
