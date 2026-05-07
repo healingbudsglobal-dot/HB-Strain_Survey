@@ -82,7 +82,7 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
       </div>
 
       <motion.div variants={itemVariants} className="mb-6">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-10 w-auto" />
+        <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
       </motion.div>
 
       {/* Animated mail icon with gentle breathing pulse */}
@@ -151,18 +151,22 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
 
       <motion.div
         variants={itemVariants}
-        className="rounded-2xl border border-[hsl(var(--accent-green)_/_0.15)] bg-[hsl(175_6%_12%_/_0.6)] backdrop-blur-xl p-6 w-full relative overflow-hidden"
-        style={{ boxShadow: "var(--shadow-elegant)" }}
+        className="rounded-2xl border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl p-6 w-full relative overflow-hidden"
+        style={{
+          boxShadow:
+            "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.1), 0 0 40px -10px hsl(164 80% 55% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+        }}
       >
-        {/* Subtle green shimmer line at top */}
-        <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden">
-          <motion.div
-            className="h-full w-[200%]"
-            style={{ background: "linear-gradient(90deg, transparent, hsl(var(--accent-green)), hsl(var(--primary-green)), transparent)" }}
-            animate={{ x: ["-50%", "0%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          />
-        </div>
+        {/* Aurora accent line at top */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] opacity-80"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(164 70% 60%), hsl(180 70% 75%), hsl(164 70% 60%), transparent)",
+            backgroundSize: "200% 100%",
+            animation: "auroraShift 6s ease-in-out infinite",
+          }}
+        />
 
         {/* Inner glow */}
         <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_top,hsl(var(--accent-green)_/_0.06)_0%,transparent_60%)]" />
