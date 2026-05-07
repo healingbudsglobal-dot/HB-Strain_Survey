@@ -47,6 +47,9 @@ const formVariants = {
 };
 
 const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
+  const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const disableAurora = reduceMotion || isMobile;
   const [email, setEmail] = useState("");
   const [province, setProvince] = useState("");
   const [error, setError] = useState("");
