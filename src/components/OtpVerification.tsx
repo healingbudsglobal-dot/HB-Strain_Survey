@@ -92,41 +92,16 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
 
       {/* Animated mail icon with gentle breathing pulse */}
       <motion.div variants={itemVariants} className="mb-3 flex flex-col items-center gap-3">
-        <motion.div
-          className="relative flex items-center justify-center h-14 w-14 rounded-2xl border border-[hsl(var(--accent-green)_/_0.25)] bg-[hsl(var(--accent-green)_/_0.08)] backdrop-blur-sm"
-          animate={verified
-            ? { scale: [1, 1.2, 1], borderColor: "hsl(164 48% 53% / 0.6)" }
-            : { scale: [1, 1.05, 1] }
-          }
-          transition={verified
-            ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-            : { duration: 3, repeat: Infinity, ease: "easeInOut" }
-          }
+        <div
+          className={`relative flex items-center justify-center h-14 w-14 rounded-2xl border bg-[hsl(var(--accent-green)_/_0.08)] transition-colors duration-300 ${verified ? "border-[hsl(var(--accent-green)_/_0.6)]" : "border-[hsl(var(--accent-green)_/_0.25)]"}`}
         >
-          <div className="absolute inset-0 rounded-2xl bg-[hsl(var(--accent-green)_/_0.1)] blur-md" />
-          <AnimatePresence mode="wait">
-            {verified ? (
-              <motion.div
-                key="check"
-                initial={{ scale: 0, rotate: -90, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="relative z-10"
-              >
-                <CheckCircle2 className="h-7 w-7 text-[hsl(var(--accent-green))]" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="mail"
-                exit={{ scale: 0, rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="relative z-10"
-              >
-                <Mail className="h-6 w-6 text-[hsl(var(--accent-green))]" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+          {verified ? (
+            <CheckCircle2 className="h-7 w-7 text-[hsl(var(--accent-green))]" />
+          ) : (
+            <Mail className="h-6 w-6 text-[hsl(var(--accent-green))]" />
+          )}
+        </div>
+
         <AnimatePresence mode="wait">
           <motion.h2
             key={verified ? "verified" : "verify"}
