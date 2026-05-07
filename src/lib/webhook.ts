@@ -46,21 +46,36 @@ export async function postSurveyAnswersWebhook(
   }
 }
 
-/** Send OTP verification email via Resend (edge function). Returns true on success. */
-export async function sendOtpEmail(email: string, otpCode: string): Promise<boolean> {
+/** Request a server-issued OTP. The code is generated and stored only on the server. */
+export async function sendOtpEmail(email: string): Promise<boolean> {
   try {
     const { error } = await supabase.functions.invoke("send-otp-email", {
-      body: { email, otp_code: otpCode },
+      body: { email },
     });
     if (error) {
       console.error("OTP email error:", error);
-      await sendWebhook({ email, otp_code: otpCode, type: "otp_verification" });
       return false;
     }
     return true;
   } catch (err) {
-    console.error("OTP email failed, falling back to webhook:", err);
-    await sendWebhook({ email, otp_code: otpCode, type: "otp_verification" });
+    console.error("OTP email failed:", err);
+    return false;
+  }
+}
+
+/** Verify a 6-digit OTP server-side. Returns true only if the server confirms. */
+export async function verifyOtp(email: string, code: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.functions.invoke("verify-otp", {
+      body: { email, code },
+    });
+    if (error) {
+      console.error("OTP verify error:", error);
+      return false;
+    }
+    return Boolean((data as { ok?: boolean } | null)?.ok);
+  } catch (err) {
+    console.error("OTP verify failed:", err);
     return false;
   }
 }
