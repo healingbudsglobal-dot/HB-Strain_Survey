@@ -97,20 +97,31 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
 
       <motion.h1
         variants={itemVariants}
-        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.04] tracking-[-0.025em] text-foreground sm:text-5xl md:text-6xl"
-        style={{ textShadow: "0 2px 24px hsl(180 50% 2% / 0.6)" }}
+        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-5xl md:text-6xl"
       >
-        Discover your
+        <span
+          className="relative inline-block bg-clip-text text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
+            WebkitBackgroundClip: "text",
+            filter:
+              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+          }}
+        >
+          Discover your
+        </span>
         <br />
         <span
           className="relative inline-block bg-clip-text text-transparent"
           style={{
             backgroundImage:
-              "linear-gradient(110deg, hsl(164 60% 70%) 0%, hsl(164 80% 55%) 35%, hsl(180 70% 80%) 50%, hsl(164 80% 55%) 65%, hsl(164 60% 70%) 100%)",
+              "linear-gradient(110deg, hsl(164 55% 72%) 0%, hsl(164 85% 58%) 35%, hsl(180 75% 82%) 50%, hsl(164 85% 58%) 65%, hsl(164 55% 72%) 100%)",
             backgroundSize: "200% 100%",
             animation: "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
-            filter: "drop-shadow(0 0 24px hsl(164 80% 55% / 0.35))",
+            filter:
+              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.5)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.45))",
           }}
         >
           perfect match.
@@ -124,8 +135,12 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             0% { transform: translateX(-120%) skewX(-20deg); }
             100% { transform: translateX(220%) skewX(-20deg); }
           }
+          @keyframes glassDrift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(8px, -6px) scale(1.04); }
+          }
           @media (prefers-reduced-motion: reduce) {
-            [data-aurora], [data-sheen] { animation: none !important; }
+            [data-aurora], [data-sheen], [data-drift] { animation: none !important; }
           }
         `}</style>
       </motion.h1>
