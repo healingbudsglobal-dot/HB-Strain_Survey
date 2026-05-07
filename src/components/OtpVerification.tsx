@@ -114,6 +114,8 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
             {verified ? "Verified!" : "Verify Your Email"}
           </span>
         </h2>
+      </motion.div>
+
 
 
       <motion.p variants={itemVariants} className="mb-1.5 text-sm text-muted-foreground leading-relaxed max-w-xs">
