@@ -52,14 +52,12 @@ const Index = () => {
   const handleEmailSubmit = useCallback(async (submittedEmail: string, submittedProvince: string) => {
     setEmail(submittedEmail);
     setProvince(submittedProvince);
-    const code = generateOtp();
-    setOtpCode(code);
     setScreen("otp");
-    const success = await sendOtpEmail(submittedEmail, code);
+    const success = await sendOtpEmail(submittedEmail);
     if (!success) {
       toast({
         title: "Email delivery issue",
-        description: "Your verification code was sent via our backup system. Please check your inbox and spam folder.",
+        description: "We couldn't send your verification code. Please check your email and try again.",
         variant: "destructive",
       });
     }
@@ -74,9 +72,7 @@ const Index = () => {
   }, []);
 
   const handleOtpResend = useCallback(async () => {
-    const code = generateOtp();
-    setOtpCode(code);
-    const success = await sendOtpEmail(email, code);
+    const success = await sendOtpEmail(email);
     if (!success) {
       toast({
         title: "Email delivery issue",
@@ -225,7 +221,7 @@ const Index = () => {
           {screen === "otp" && (
             <OtpVerification
               email={email}
-              otpCode={otpCode}
+              
               onVerified={handleOtpVerified}
               onResend={handleOtpResend}
               onBack={handleOtpBack}
