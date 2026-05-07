@@ -67,14 +67,27 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       </div>
 
       <motion.div variants={itemVariants} className="mb-6">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-10 w-auto" />
+        <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
       </motion.div>
 
       <motion.h2
         variants={itemVariants}
         className="font-display text-2xl font-bold tracking-[0.02em] text-foreground sm:text-3xl mb-2"
       >
-        Your Strain Match Is <span className="text-[hsl(var(--brand-gold))]">Ready</span>
+        Your Strain Match Is{" "}
+        <span
+          className="bg-clip-text text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(110deg, hsl(164 60% 70%), hsl(164 80% 55%), hsl(180 70% 80%), hsl(164 80% 55%), hsl(164 60% 70%))",
+            backgroundSize: "200% 100%",
+            animation: "auroraShift 6s ease-in-out infinite",
+            WebkitBackgroundClip: "text",
+            filter: "drop-shadow(0 0 18px hsl(164 80% 55% / 0.35))",
+          }}
+        >
+          Ready
+        </span>
       </motion.h2>
 
       {strainName && (
@@ -117,9 +130,21 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       <motion.form
         variants={itemVariants}
         onSubmit={handleSubmit}
-        className="flex w-full flex-col gap-3 glass-card-elevated rounded-2xl p-5 relative overflow-hidden"
+        className="flex w-full flex-col gap-3 rounded-2xl p-5 relative overflow-hidden border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl"
+        style={{
+          boxShadow:
+            "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.08), 0 0 40px -10px hsl(164 80% 55% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+        }}
       >
-        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(var(--accent-green)), hsl(var(--brand-gold)))' }} />
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] opacity-80"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(164 70% 60%), hsl(180 70% 75%), hsl(164 70% 60%), transparent)",
+            backgroundSize: "200% 100%",
+            animation: "auroraShift 6s ease-in-out infinite",
+          }}
+        />
 
         <div className="relative">
           <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
@@ -128,7 +153,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
             placeholder="Your first name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated))] pl-11 pr-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--brand-gold)_/_0.4)] focus:border-[hsl(var(--brand-gold)_/_0.5)] transition-all text-[16px]"
+            className="w-full rounded-2xl border border-border bg-[hsl(var(--surface-elevated))] pl-11 pr-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all text-[16px]"
           />
         </div>
 
@@ -187,21 +212,39 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
-          className={`group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px] ${
-            hasValidWa && optIn
-              ? 'bg-[#25D366] shadow-[0_8px_24px_-6px_rgba(37,211,102,0.4)]'
-              : 'gradient-accent'
+          className={`group relative overflow-hidden w-full rounded-2xl py-4 font-display font-bold text-base transition-all flex items-center justify-center gap-2 min-h-[52px] ${
+            hasValidWa && optIn ? 'text-white' : 'text-[hsl(180_25%_6%)]'
           }`}
+          style={
+            hasValidWa && optIn
+              ? {
+                  backgroundImage:
+                    "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                  boxShadow:
+                    "0 12px 32px -8px rgba(37,211,102,0.5), inset 0 1px 0 hsl(0 0% 100% / 0.25)",
+                }
+              : {
+                  backgroundImage:
+                    "linear-gradient(135deg, hsl(164 70% 62%) 0%, hsl(164 60% 48%) 50%, hsl(170 65% 42%) 100%)",
+                  boxShadow:
+                    "0 12px 32px -8px hsl(164 80% 35% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.25)",
+                }
+          }
         >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+            style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
+          />
           {hasValidWa && optIn ? (
             <>
-              <MessageCircle className="h-5 w-5" />
-              Send My Match on WhatsApp
+              <MessageCircle className="relative z-10 h-5 w-5" />
+              <span className="relative z-10">Send My Match on WhatsApp</span>
             </>
           ) : (
             <>
-              Reveal My Match
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <span className="relative z-10">Reveal My Match</span>
+              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </>
           )}
         </motion.button>
