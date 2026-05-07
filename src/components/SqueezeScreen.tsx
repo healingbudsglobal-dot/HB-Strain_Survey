@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
@@ -51,31 +51,6 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const [agreed, setAgreed] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const anyFieldActive = focused || email.length > 0 || province.length > 0;
-
-  // Pause + dim the ambient neuron loop when the user is engaging with the form,
-  // and gently resume when they look away. Also pause when tab is hidden.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (anyFieldActive) {
-      try { v.pause(); } catch {}
-    } else {
-      v.play().catch(() => {});
-    }
-  }, [anyFieldActive]);
-
-  useEffect(() => {
-    const onVis = () => {
-      const v = videoRef.current;
-      if (!v) return;
-      if (document.hidden) v.pause();
-      else if (!anyFieldActive) v.play().catch(() => {});
-    };
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, [anyFieldActive]);
   const emailValid = validateEmail(email.trim()).valid;
   const emailFilled = email.length > 0;
 
@@ -478,40 +453,6 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent)",
           }}
         />
-
-        {/* ====== AMBIENT NEURON FOOTAGE — subtle bio-energy living behind the form ====== */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]"
-          style={{
-            maskImage:
-              "radial-gradient(ellipse 70% 90% at 50% 40%, black 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 70% 90% at 50% 40%, black 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
-          }}
-        >
-          <video
-            ref={videoRef}
-            src="/video/neuron-loop.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className={`absolute inset-0 h-full w-full object-cover mix-blend-screen transition-opacity duration-700 ease-out ${
-              anyFieldActive ? "opacity-[0.06]" : "opacity-[0.18]"
-            }`}
-            style={{
-              filter: "hue-rotate(120deg) saturate(1.8) contrast(1.15) blur(0.4px)",
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, hsl(180 40% 8% / 0.55) 0%, hsl(178 35% 7% / 0.4) 50%, hsl(170 40% 6% / 0.55) 100%)",
-            }}
-          />
-        </div>
 
         {/* ====== AMBIENT NEURON WATERMARK — subtle dendrite tracery behind fields ====== */}
         <svg

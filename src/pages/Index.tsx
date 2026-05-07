@@ -7,6 +7,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import SuccessScreen from "@/components/SuccessScreen";
 import OtpVerification from "@/components/OtpVerification";
 import AmbientParticles from "@/components/AmbientParticles";
+import NeuronAmbient from "@/components/NeuronAmbient";
 import StepProgress from "@/components/StepProgress";
 import HeroBackdrop from "@/components/HeroBackdrop";
 import { surveyQuestions } from "@/data/surveyQuestions";
@@ -196,6 +197,7 @@ const Index = () => {
 
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      <NeuronAmbient />
       {screen === "squeeze" && <HeroBackdrop />}
       <AmbientParticles />
 
