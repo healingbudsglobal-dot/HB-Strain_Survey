@@ -365,6 +365,37 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           }}
         />
 
+        {/* ====== AMBIENT NEURON FOOTAGE — subtle bio-energy living behind the form ====== */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse 70% 90% at 50% 40%, black 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 70% 90% at 50% 40%, black 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+          }}
+        >
+          <video
+            src="/video/neuron-loop.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.18] mix-blend-screen"
+            style={{
+              filter: "hue-rotate(120deg) saturate(1.8) contrast(1.15) blur(0.4px)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, hsl(180 40% 8% / 0.55) 0%, hsl(178 35% 7% / 0.4) 50%, hsl(170 40% 6% / 0.55) 100%)",
+            }}
+          />
+        </div>
+
         {/* ====== AMBIENT NEURON WATERMARK — subtle dendrite tracery behind fields ====== */}
         <svg
           aria-hidden
