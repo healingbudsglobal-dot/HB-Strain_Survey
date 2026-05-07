@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Shield, User, MessageCircle, Mail, Lock } from "lucide-react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 
 interface ContactCaptureProps {
   onSubmit: (name: string, whatsappE164?: string, optIn?: boolean) => void;

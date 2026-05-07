@@ -3,7 +3,7 @@ import { surveyQuestions } from "@/data/surveyQuestions";
 import { ChevronLeft, Dna, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { icons } from "lucide-react";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import bgFlower from "@/assets/hero-flower.jpg";
 import bgTrichomes from "@/assets/hero-trichomes.jpg";
 import bgBud from "@/assets/hero-bud.jpg";

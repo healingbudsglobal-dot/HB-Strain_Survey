@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, RotateCw, Mail, CheckCircle2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 
 interface OtpVerificationProps {
   email: string;
