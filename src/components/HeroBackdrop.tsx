@@ -3,40 +3,100 @@ import heroFlower from "@/assets/hero-flower.jpg";
 
 /**
  * Crystal-clear hero image with a dark emerald-glass overlay.
- * Image stays sharp and unfiltered; depth comes from the tinted glass plate above it.
+ * Tint + scrim opacities are driven by CSS variables so they adapt to:
+ *  - prefers-contrast: more         → darker, higher-contrast plate
+ *  - prefers-color-scheme: light    → brighter ambient → darken plate to keep white text legible
+ *  - dynamic-range: high (HDR/OLED) → slightly lighter plate so image still reads
  */
 const HeroBackdrop = () => (
   <motion.div
     aria-hidden
-    className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    className="hero-backdrop pointer-events-none fixed inset-0 -z-10 overflow-hidden"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 1.2 }}
   >
-    {/* 1. Flower image — soft blur + saturation lift, like looking through a rain-flecked window */}
+    <style>{`
+      .hero-backdrop {
+        --tint-a: 0.55;
+        --vignette-a: 0.55;
+        --scrim-top-a: 0.45;
+        --scrim-bot-a: 0.78;
+        --img-contrast: 1.18;
+        --img-brightness: 0.95;
+      }
+      /* Bright ambient (user prefers light UI) → darken plate so white text stays readable */
+      @media (prefers-color-scheme: light) {
+        .hero-backdrop {
+          --tint-a: 0.72;
+          --vignette-a: 0.7;
+          --scrim-top-a: 0.55;
+          --scrim-bot-a: 0.88;
+          --img-brightness: 0.85;
+        }
+      }
+      /* User explicitly wants more contrast → push everything harder */
+      @media (prefers-contrast: more) {
+        .hero-backdrop {
+          --tint-a: 0.78;
+          --vignette-a: 0.78;
+          --scrim-top-a: 0.6;
+          --scrim-bot-a: 0.92;
+          --img-contrast: 1.28;
+          --img-brightness: 0.8;
+        }
+      }
+      /* HDR / wide-gamut OLED → image punches harder, ease the plate slightly */
+      @media (dynamic-range: high) {
+        .hero-backdrop {
+          --tint-a: 0.5;
+          --vignette-a: 0.5;
+        }
+      }
+      /* Small screens are usually held closer at high brightness → bump contrast a touch */
+      @media (max-width: 640px) {
+        .hero-backdrop {
+          --tint-a: calc(var(--tint-a) + 0.05);
+          --img-contrast: 1.22;
+        }
+      }
+    `}</style>
+
     <motion.img
       src={heroFlower}
       alt=""
       className="absolute top-1/2 left-1/2 w-[145vw] h-[145vh] max-w-none object-cover"
       style={{
         transform: "translate(-50%, -50%)",
-        filter: "saturate(1.15) contrast(1.18) brightness(0.95)",
+        filter: "saturate(1.15) contrast(var(--img-contrast)) brightness(var(--img-brightness))",
       }}
       initial={{ scale: 1.12, x: "-50%", y: "-50%" }}
       animate={{ scale: 1.0, x: "-50%", y: "-50%" }}
       transition={{ duration: 32, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
     />
 
-    {/* 2. Dark emerald glass tint — light enough to keep image crisp and visible */}
-    <div className="absolute inset-0 bg-[hsl(165_55%_6%_/_0.55)]" />
+    {/* Dark emerald glass tint */}
+    <div className="absolute inset-0" style={{ background: "hsl(165 55% 6% / var(--tint-a))" }} />
 
-    {/* 3. Subtle radial vignette — keeps center slightly clearer, edges fall to near-black */}
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_85%_at_50%_50%,transparent_35%,hsl(170_50%_3%_/_0.55)_80%,hsl(180_50%_2%_/_0.9)_100%)]" />
+    {/* Radial vignette */}
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          "radial-gradient(ellipse 80% 85% at 50% 50%, transparent 35%, hsl(170 50% 3% / var(--vignette-a)) 80%, hsl(180 50% 2% / 0.9) 100%)",
+      }}
+    />
 
-    {/* 4. Top + bottom legibility scrims */}
-    <div className="absolute inset-0 bg-gradient-to-b from-[hsl(180_45%_3%_/_0.45)] via-transparent to-[hsl(180_50%_2%_/_0.78)]" />
+    {/* Top + bottom legibility scrims */}
+    <div
+      className="absolute inset-0"
+      style={{
+        background:
+          "linear-gradient(to bottom, hsl(180 45% 3% / var(--scrim-top-a)), transparent, hsl(180 50% 2% / var(--scrim-bot-a)))",
+      }}
+    />
 
-    {/* 5. Faint film grain — kills banding */}
+    {/* Faint film grain — kills banding */}
     <div
       className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
       style={{
