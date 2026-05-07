@@ -72,28 +72,19 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic backdrop — crisp tint + film grain + emerald orbs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.9)_75%)]" />
-        <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.12)]" style={{ mixBlendMode: "overlay" }} />
-        <motion.div
-          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,hsl(164_80%_45%/0.18)_0%,transparent_65%)]"
-          animate={{ y: [0, 20, 0], x: [0, 14, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,hsl(180_70%_50%/0.14)_0%,transparent_65%)]"
-          animate={{ y: [0, -18, 0], x: [0, -12, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      {/* Static backdrop — no animated blobs, no blend modes (caused mobile flickering) */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.92)_75%)]" />
+        <div
+          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full"
+          style={{ background: "radial-gradient(circle, hsl(164 80% 45% / 0.12) 0%, transparent 65%)" }}
         />
         <div
-          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-          }}
+          className="absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full"
+          style={{ background: "radial-gradient(circle, hsl(180 70% 50% / 0.10) 0%, transparent 65%)" }}
         />
       </div>
+
 
       <motion.div variants={itemVariants} className="mb-6">
         <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
