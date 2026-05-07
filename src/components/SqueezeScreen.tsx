@@ -133,7 +133,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           <img
             src={hbLogoWhite}
             alt="Healing Buds"
-            className="h-16 w-auto sm:h-20 relative z-10"
+            className="h-28 w-auto sm:h-36 md:h-40 relative z-10"
             draggable={false}
           />
 
