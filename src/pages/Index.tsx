@@ -223,12 +223,28 @@ const Index = () => {
     </>
   );
 
+  // Detect mobile/coarse pointer — kill ALL ambient animation layers there.
+  // They're the root cause of mobile compositor flicker.
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+  const noAmbients = reduceMotion || isMobile;
+
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
-      {!reduceMotion && <BudAmbient intensity={isResults ? 0.5 : 1} />}
-      {!isResults && !reduceMotion && <NeuronAmbient />}
-      {(screen === "squeeze" || screen === "otp") && <HeroBackdrop />}
-      {!isResults && !reduceMotion && <AmbientParticles />}
+      {/* Static dark backdrop — always present, no animation */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-30"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 30%, hsl(178 48% 14%) 0%, hsl(180 40% 6%) 60%, hsl(180 50% 4%) 100%)",
+        }}
+      />
+
+      {/* Desktop-only animated layers */}
+      {!noAmbients && <BudAmbient intensity={isResults ? 0.5 : 1} />}
+      {!noAmbients && !isResults && <NeuronAmbient />}
+      {!noAmbients && screen === "squeeze" && <HeroBackdrop />}
+      {!noAmbients && !isResults && <AmbientParticles />}
 
       {screen !== "squeeze" && (
         <div className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 bg-[hsl(180_8%_7%_/_0.85)] border-b border-border/40">
@@ -236,24 +252,10 @@ const Index = () => {
         </div>
       )}
 
-      {reduceMotion ? (
-        <div key={screen} className="flex w-full items-center justify-center pt-20">
-          {screenContent}
-        </div>
-      ) : (
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.div
-            key={screen}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="flex w-full items-center justify-center pt-20"
-          >
-            {screenContent}
-          </motion.div>
-        </AnimatePresence>
-      )}
+      {/* No AnimatePresence — direct render eliminates all swap flicker */}
+      <div key={screen} className="flex w-full items-center justify-center pt-20">
+        {screenContent}
+      </div>
     </div>
   );
 };
