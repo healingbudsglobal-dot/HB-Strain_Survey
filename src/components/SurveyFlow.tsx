@@ -19,21 +19,11 @@ const SECTION_META: Record<string, { emoji: string; subtitle: string }> = {
   "Lifestyle & Context": { emoji: "⚡", subtitle: "Fine-tuning your match" },
 };
 
-// Vibrant, bright wellness-style icon palette (rotates by index for visual energy)
-const ICON_PALETTES = [
-  "bg-gradient-to-br from-[hsl(40_95%_70%)] to-[hsl(35_95%_60%)] text-white shadow-md shadow-[hsl(40_85%_55%/0.35)]",
-  "bg-gradient-to-br from-[hsl(164_70%_60%)] to-[hsl(178_60%_40%)] text-white shadow-md shadow-[hsl(164_48%_53%/0.35)]",
-  "bg-gradient-to-br from-[hsl(84_75%_55%)] to-[hsl(140_60%_45%)] text-white shadow-md shadow-[hsl(84_81%_44%/0.3)]",
-  "bg-gradient-to-br from-[hsl(20_90%_65%)] to-[hsl(15_85%_55%)] text-white shadow-md shadow-[hsl(15_85%_55%/0.3)]",
-  "bg-gradient-to-br from-[hsl(280_60%_70%)] to-[hsl(260_55%_55%)] text-white shadow-md shadow-[hsl(270_50%_55%/0.25)]",
-  "bg-gradient-to-br from-[hsl(195_75%_60%)] to-[hsl(210_70%_50%)] text-white shadow-md shadow-[hsl(200_70%_50%/0.3)]",
-  "bg-gradient-to-br from-[hsl(330_75%_70%)] to-[hsl(340_70%_55%)] text-white shadow-md shadow-[hsl(335_70%_60%/0.3)]",
-  "bg-gradient-to-br from-[hsl(50_95%_60%)] to-[hsl(45_90%_50%)] text-white shadow-md shadow-[hsl(48_90%_55%/0.3)]",
-];
+// Unified emerald icon treatment — single accent across all options for cohesion
+const ICON_EMERALD =
+  "bg-gradient-to-br from-[hsl(164_70%_55%)] to-[hsl(175_55%_30%)] text-white shadow-md shadow-[hsl(164_70%_40%/0.4)] ring-1 ring-[hsl(164_70%_60%/0.25)]";
 
-const getIconColor = (_questionId: string, _optionLabel: string, index: number): string => {
-  return ICON_PALETTES[index % ICON_PALETTES.length];
-};
+const getIconColor = (_q: string, _o: string, _i: number): string => ICON_EMERALD;
 
 const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
   const { hydrated, initial, save, clear } = useSurveyProgress();
@@ -189,7 +179,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
         <img
           src={hbLogoWhite}
           alt="Healing Buds"
-          className="h-7 w-auto opacity-80"
+          className="h-12 w-auto sm:h-14"
         />
         <motion.span
           key={currentIndex}
@@ -244,9 +234,23 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
             className="relative overflow-hidden rounded-2xl"
           >
             {/* Card with layered depth */}
-            <div className="relative glass-card-elevated rounded-2xl p-6 sm:p-8">
-              {/* Green-to-gold accent line at top */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] opacity-60" style={{ background: 'linear-gradient(90deg, hsl(var(--accent-green)), hsl(var(--brand-gold)))' }} />
+            <div
+              className="relative rounded-2xl p-6 sm:p-8 border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl"
+              style={{
+                boxShadow:
+                  "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.08), 0 0 40px -10px hsl(164 80% 55% / 0.25), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+              }}
+            >
+              {/* Aurora accent line at top */}
+              <div
+                className="absolute top-0 left-0 right-0 h-[2px] opacity-80"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, hsl(164 70% 60%), hsl(180 70% 75%), hsl(164 70% 60%), transparent)",
+                  backgroundSize: "200% 100%",
+                  animation: "auroraShift 6s ease-in-out infinite",
+                }}
+              />
 
               {/* Section + question number pill */}
               <motion.div
@@ -293,18 +297,18 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                       animate={{ opacity: 1, x: 0, scale: 1 }}
                       transition={{ delay: 0.08 + i * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       onClick={() => handleSelect(option.label)}
-                      whileHover={{ scale: 1.03, x: 6, boxShadow: "var(--shadow-glow-gold)" }}
-                      whileTap={{ scale: 0.94 }}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.96 }}
                       className={`group w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
                         isSelected
-                          ? 'border-[hsl(var(--brand-gold))] bg-[hsl(var(--brand-gold)_/_0.12)] shadow-[var(--shadow-glow-gold)]'
-                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--brand-gold)_/_0.5)] hover:bg-[hsl(var(--brand-gold)_/_0.06)]'
+                          ? 'border-[hsl(var(--accent-green)_/_0.7)] bg-[hsl(var(--accent-green)_/_0.1)] shadow-[0_0_0_1px_hsl(164_80%_55%_/_0.2),0_0_30px_-6px_hsl(164_80%_55%_/_0.5)]'
+                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.45)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_24px_-8px_hsl(164_80%_55%_/_0.35)]'
                       }`}
                     >
                       <span className="flex items-center gap-3">
                         <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg transition-all duration-300 ${
                           isSelected
-                            ? 'bg-[hsl(var(--brand-gold)_/_0.2)] text-[hsl(var(--brand-gold))] scale-110'
+                            ? 'bg-[hsl(var(--accent-green)_/_0.22)] text-[hsl(var(--accent-green))] scale-110 ring-1 ring-[hsl(var(--accent-green)_/_0.4)]'
                             : `${iconColorClass} group-hover:scale-105`
                         }`}>
                           {option.icon ? getIcon(option.icon) : String.fromCharCode(65 + i)}
@@ -318,7 +322,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                           initial={false}
                           animate={{ opacity: isSelected ? 1 : 0, scale: isSelected ? 1 : 0.5 }}
                         >
-                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[hsl(var(--brand-gold))]">
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[hsl(var(--accent-green))]">
                             <svg className="h-3 w-3 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
@@ -338,9 +342,22 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                   transition={{ delay: 0.4 }}
                   onClick={handleMultiContinue}
                   disabled={multiSelected.size === 0}
-                  className="mt-5 w-full rounded-xl bg-[hsl(var(--accent-green))] py-3.5 text-base font-bold text-background transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="group relative mt-5 w-full overflow-hidden rounded-xl py-3.5 text-base font-bold text-[hsl(180_25%_6%)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(135deg, hsl(164 70% 62%) 0%, hsl(164 60% 48%) 50%, hsl(170 65% 42%) 100%)",
+                    boxShadow:
+                      "0 12px 32px -8px hsl(164 80% 35% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.25)",
+                  }}
                 >
-                  Continue
+                  {multiSelected.size > 0 && (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                      style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
+                    />
+                  )}
+                  <span className="relative z-10">Continue</span>
                 </motion.button>
               )}
             </div>

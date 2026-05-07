@@ -347,3 +347,16 @@
   color: hsl(var(--foreground)); font-size: 16px; padding: 0.4rem 0;
 }
 .hb-phone-wrap .PhoneInputInput::placeholder { color: hsl(var(--muted-foreground)); }
+
+/* Global 2026 motion accents — used across funnel screens */
+@keyframes auroraShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes sheenSweep {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(220%) skewX(-20deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*="auroraShift"], [style*="sheenSweep"] { animation: none !important; }
+}
