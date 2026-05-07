@@ -48,6 +48,21 @@ Deno.serve(async (req) => {
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+    // Brute-force protection: cap total failed attempts across all recent codes for this email
+    const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { data: recentCodes } = await admin
+      .from('otp_codes')
+      .select('attempts')
+      .eq('email', trimmedEmail)
+      .gte('created_at', fifteenMinAgo);
+    const totalAttempts = (recentCodes ?? []).reduce((s, r: any) => s + (r.attempts ?? 0), 0);
+    if (totalAttempts >= 15) {
+      return new Response(
+        JSON.stringify({ ok: false, error: 'too_many_attempts' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { data: rows, error: selErr } = await admin
       .from('otp_codes')
       .select('id, code_hash, expires_at, consumed_at, attempts')

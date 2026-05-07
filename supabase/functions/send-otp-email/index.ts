@@ -75,6 +75,33 @@ Deno.serve(async (req) => {
     const expires_at = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+    // Rate limit: max 5 codes per email per 10 minutes, and min 30s between sends
+    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: recent, error: recentErr } = await admin
+      .from('otp_codes')
+      .select('created_at')
+      .eq('email', trimmed)
+      .gte('created_at', tenMinAgo)
+      .order('created_at', { ascending: false });
+    if (recentErr) {
+      console.error('rate check error:', recentErr);
+    } else if (recent && recent.length > 0) {
+      if (recent.length >= 5) {
+        return new Response(
+          JSON.stringify({ error: 'Too many code requests. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const lastSent = new Date(recent[0].created_at).getTime();
+      if (Date.now() - lastSent < 30 * 1000) {
+        return new Response(
+          JSON.stringify({ error: 'Please wait a moment before requesting another code.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const { error: insertErr } = await admin
       .from('otp_codes')
       .insert({ email: trimmed, code_hash, expires_at });
