@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 
 
 import {

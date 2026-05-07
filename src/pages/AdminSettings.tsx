@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Star, Trash2, Save, Loader2, Phone, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import {
   TEMPLATE_VARIABLES,
   renderTemplate,

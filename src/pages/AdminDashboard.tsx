@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, CheckCircle2, Circle, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { renderTemplate, buildWaLink, getLeadVars } from "@/lib/whatsappTemplate";
 
 interface Lead {
