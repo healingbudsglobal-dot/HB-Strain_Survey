@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { surveyQuestions } from "@/data/surveyQuestions";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Dna, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
