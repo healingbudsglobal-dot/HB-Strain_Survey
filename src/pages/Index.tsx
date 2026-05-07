@@ -42,6 +42,12 @@ const Index = () => {
   const [strainResult, setStrainResult] = useState<StrainMatch | null>(null);
   const { toast } = useToast();
   const utm = useUtmTracking();
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    markScreenEnter(screen);
+    return () => markScreenExit(screen);
+  }, [screen]);
 
   const stepIndex = useMemo(() => {
     const map: Record<Screen, number> = {
