@@ -195,7 +195,7 @@ const Index = () => {
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
       <BudAmbient intensity={isResults ? 0.5 : 1} />
       {!isResults && <NeuronAmbient />}
-      {screen === "squeeze" && <HeroBackdrop />}
+      {(screen === "squeeze" || screen === "otp") && <HeroBackdrop />}
       {!isResults && <AmbientParticles />}
 
       {/* Step Progress - fixed at top, hidden on squeeze screen */}
