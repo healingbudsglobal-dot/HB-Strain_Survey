@@ -13,15 +13,38 @@ const HeroBackdrop = () => (
     animate={{ opacity: 1 }}
     transition={{ duration: 1.2 }}
   >
-    {/* 1. Crystal-clear flower — no filters, gentle Ken Burns */}
+    {/* 1. Flower image — soft blur + saturation lift, like looking through a rain-flecked window */}
     <motion.img
       src={heroFlower}
       alt=""
-      className="absolute top-1/2 left-1/2 w-[140vw] h-[140vh] max-w-none object-cover"
-      style={{ transform: "translate(-50%, -50%)" }}
+      className="absolute top-1/2 left-1/2 w-[145vw] h-[145vh] max-w-none object-cover"
+      style={{
+        transform: "translate(-50%, -50%)",
+        filter: "blur(2.5px) saturate(1.18) contrast(1.05)",
+      }}
       initial={{ scale: 1.12, x: "-50%", y: "-50%" }}
       animate={{ scale: 1.0, x: "-50%", y: "-50%" }}
       transition={{ duration: 32, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+    />
+
+    {/* 1b. Condensation droplets — SVG turbulence beading across the glass */}
+    <div
+      className="absolute inset-0 opacity-[0.18] mix-blend-screen"
+      style={{
+        backgroundImage:
+          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500'><filter id='d'><feTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='3' seed='4'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 18 -7'/><feGaussianBlur stdDeviation='1.2'/></filter><rect width='100%' height='100%' filter='url(%23d)'/></svg>\")",
+        backgroundSize: "700px 700px",
+      }}
+    />
+
+    {/* 1c. Streaks running down — vertical wet trails */}
+    <div
+      className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+      style={{
+        backgroundImage:
+          "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='800'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='0.6 0.008' numOctaves='2' seed='9'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.5 -0.4'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>\")",
+        backgroundSize: "500px 1000px",
+      }}
     />
 
     {/* 2. Dark emerald glass plate — almost black, deep brand tint */}
