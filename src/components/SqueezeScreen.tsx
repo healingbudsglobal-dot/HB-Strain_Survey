@@ -143,8 +143,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             backgroundImage:
               "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
             WebkitBackgroundClip: "text",
+            // Embossed: top highlight + bottom shadow + soft outer glow
             filter:
-              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
           }}
         >
           Discover your
@@ -159,7 +160,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             animation: "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
             filter:
-              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.5)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.45))",
+              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           perfect match.
