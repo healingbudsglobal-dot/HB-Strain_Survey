@@ -90,10 +90,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       </motion.div>
 
       {/* Logo */}
-      <motion.div variants={itemVariants} className="mb-6 relative">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-14 w-auto sm:h-16 drop-shadow-lg" />
-        {/* Soft glow behind logo */}
-        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.08)] rounded-full scale-[2.5]" />
+      <motion.div variants={itemVariants} className="mb-8 relative">
+        <img src={hbLogoWhite} alt="Healing Buds" className="h-16 w-auto sm:h-20" />
+        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.12)] rounded-full scale-[2]" />
       </motion.div>
 
 
@@ -113,15 +112,13 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
-      {/* Form — refined editorial glass card */}
+      {/* Form — solid dark plate anchors content over cinematic bg */}
       <motion.form
         variants={itemVariants}
         onSubmit={handleSubmit}
-        className="flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border border-white/[0.06] bg-[hsl(175_6%_11%_/_0.55)] backdrop-blur-2xl"
-        style={{ boxShadow: "var(--shadow-elegant), 0 0 100px -25px hsl(var(--accent-green) / 0.12), inset 0 1px 0 hsl(0 0% 100% / 0.04)" }}
+        className="flex w-full max-w-sm flex-col gap-3 rounded-3xl p-5 relative overflow-hidden border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl"
+        style={{ boxShadow: "0 30px 80px -20px hsl(180 30% 2% / 0.6), inset 0 1px 0 hsl(0 0% 100% / 0.05)" }}
       >
-        {/* Green-to-gold shimmer line — fades at edges */}
-        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent-green)), hsl(var(--brand-gold)), transparent)' }} />
 
         <div className={`relative rounded-2xl transition-all duration-300 ${focused ? 'shadow-[var(--shadow-glow-gold)]' : ''}`}>
           <input
@@ -195,9 +192,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <motion.button
           type="submit"
           disabled={!agreed}
-          whileHover={agreed ? { scale: 1.02 } : undefined}
-          whileTap={agreed ? { scale: 0.97 } : undefined}
-          className="group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 animate-pulse-glow flex items-center justify-center gap-2 min-h-[52px] disabled:opacity-50 disabled:cursor-not-allowed disabled:animate-none disabled:hover:brightness-100"
+          whileHover={agreed ? { scale: 1.01 } : undefined}
+          whileTap={agreed ? { scale: 0.98 } : undefined}
+          className="group w-full rounded-2xl py-4 font-display font-semibold text-[hsl(180_20%_8%)] text-base transition-all flex items-center justify-center gap-2 min-h-[54px] bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green)_/_0.92)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Reveal My Match
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
