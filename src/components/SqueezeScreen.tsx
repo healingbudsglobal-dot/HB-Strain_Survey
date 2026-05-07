@@ -309,7 +309,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           initial="hidden"
           animate="visible"
           onSubmit={handleSubmit}
-          className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] p-5 border transition-[border-color,box-shadow] duration-500 ${
+          className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] py-5 pr-5 pl-7 border transition-[border-color,box-shadow] duration-500 ${
             focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
           }`}
           style={{
