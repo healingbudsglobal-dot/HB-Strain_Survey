@@ -68,10 +68,20 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic backdrop — crisp tint + film grain (no blur) */}
+      {/* Cinematic backdrop — crisp tint + film grain + emerald orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.9)_75%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.12)]" style={{ mixBlendMode: "overlay" }} />
+        <motion.div
+          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,hsl(164_80%_45%/0.18)_0%,transparent_65%)]"
+          animate={{ y: [0, 20, 0], x: [0, 14, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,hsl(180_70%_50%/0.14)_0%,transparent_65%)]"
+          animate={{ y: [0, -18, 0], x: [0, -12, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
           style={{
