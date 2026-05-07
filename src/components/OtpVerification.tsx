@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Shield, RotateCw, Mail, CheckCircle2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import { verifyOtp } from "@/lib/webhook";
 
 interface OtpVerificationProps {
   email: string;
-  otpCode: string;
   onVerified: () => void;
   onResend: () => void;
   onBack: () => void;
@@ -22,10 +22,11 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVerificationProps) => {
+const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificationProps) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const [verified, setVerified] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
@@ -39,17 +40,20 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
   }, [cooldown]);
 
   const handleComplete = useCallback(
-    (val: string) => {
-      if (val === otpCode) {
-        setError("");
+    async (val: string) => {
+      setVerifying(true);
+      setError("");
+      const ok = await verifyOtp(email, val);
+      setVerifying(false);
+      if (ok) {
         setVerified(true);
         setTimeout(() => onVerified(), 1200);
       } else {
-        setError("Incorrect code. Please try again.");
+        setError("Incorrect or expired code. Please try again.");
         setValue("");
       }
     },
-    [otpCode, onVerified]
+    [email, onVerified]
   );
 
   const handleResend = useCallback(() => {
@@ -207,7 +211,7 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
             value={value}
             onChange={setValue}
             onComplete={handleComplete}
-            disabled={verified}
+            disabled={verified || verifying}
           >
             <InputOTPGroup className="gap-2.5">
               {[0, 1, 2, 3, 4, 5].map((i) => (
