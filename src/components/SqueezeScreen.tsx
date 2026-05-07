@@ -402,12 +402,15 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           }}
         >
           <video
+            ref={videoRef}
             src="/video/neuron-loop.mp4"
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.18] mix-blend-screen"
+            className={`absolute inset-0 h-full w-full object-cover mix-blend-screen transition-opacity duration-700 ease-out ${
+              anyFieldActive ? "opacity-[0.06]" : "opacity-[0.18]"
+            }`}
             style={{
               filter: "hue-rotate(120deg) saturate(1.8) contrast(1.15) blur(0.4px)",
             }}
