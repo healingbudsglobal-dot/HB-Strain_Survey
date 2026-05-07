@@ -161,72 +161,144 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
-      {/* Form — wet glass card formed from coalescing liquid droplets */}
+      {/* Form — cannabinoid molecules + neural pathways converge into the card */}
       <div className="relative w-full max-w-sm">
-        {/* SVG goo filter — makes overlapping blurred shapes merge like mercury/water */}
-        <svg className="pointer-events-none absolute h-0 w-0" aria-hidden>
-          <defs>
-            <filter id="liquid-goo">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-              <feColorMatrix
-                in="blur"
-                mode="matrix"
-                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -11"
-                result="goo"
-              />
-              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-            </filter>
-          </defs>
-        </svg>
-
-        {/* Liquid coalescence overlay — droplets fly in & merge into the card silhouette */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 z-20"
-          style={{ filter: "url(#liquid-goo)" }}
-          initial="scatter"
-          animate="merged"
-          variants={{
-            scatter: { opacity: 1 },
-            merged: { opacity: 0, transition: { delay: 1.0, duration: 0.4 } },
-          }}
+        {/* Cannabinoid + neural form-up overlay */}
+        <motion.svg
+          className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
+          viewBox="0 0 400 480"
+          preserveAspectRatio="none"
           aria-hidden
+          initial="alive"
+          animate="absorbed"
+          variants={{
+            alive: { opacity: 1 },
+            absorbed: { opacity: 0, transition: { delay: 2.0, duration: 0.5 } },
+          }}
         >
+          <defs>
+            {/* Glow blur — molecules and synaptic pulses bleed soft mint light */}
+            <filter id="neural-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Cannabinoid molecule — hexagon with bond-tail (CBD/THC backbone vibe) */}
+            <symbol id="cannabinoid" viewBox="-20 -20 40 40">
+              <polygon
+                points="14,0 7,12 -7,12 -14,0 -7,-12 7,-12"
+                fill="none"
+                stroke="hsl(164 80% 60%)"
+                strokeWidth="1.6"
+              />
+              <circle cx="14" cy="0" r="2" fill="hsl(38 90% 60%)" />
+              <circle cx="-14" cy="0" r="2" fill="hsl(164 70% 70%)" />
+              <circle cx="7" cy="12" r="1.5" fill="hsl(180 60% 75%)" />
+              <circle cx="-7" cy="-12" r="1.5" fill="hsl(180 60% 75%)" />
+            </symbol>
+            {/* Neural pulse gradient travelling along synaptic paths */}
+            <linearGradient id="synapse-pulse" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="hsl(164 80% 60% / 0)" />
+              <stop offset="50%" stopColor="hsl(164 90% 70% / 0.95)" />
+              <stop offset="100%" stopColor="hsl(38 90% 65% / 0)" />
+            </linearGradient>
+          </defs>
+
+          {/* Synaptic pathways — drawn first so molecules sit on top.
+              Each path snakes from a molecule's incoming position toward an anchor point on the card outline. */}
           {[
-            { x: "-60%", y: "-40%", s: 60, d: 0.05 },
-            { x: "70%", y: "-30%", s: 70, d: 0.12 },
-            { x: "-50%", y: "60%", s: 80, d: 0.18 },
-            { x: "65%", y: "70%", s: 65, d: 0.24 },
-            { x: "10%", y: "-70%", s: 55, d: 0.30 },
-            { x: "-20%", y: "85%", s: 75, d: 0.36 },
-          ].map((d, i) => (
-            <motion.span
+            { d: "M -40,40   C 60,20  140,80  200,40", delay: 0.4 },
+            { d: "M 440,60   C 340,40 260,100 200,60", delay: 0.5 },
+            { d: "M -30,240  C 70,200 140,260 200,240", delay: 0.55 },
+            { d: "M 430,260  C 330,220 260,280 200,260", delay: 0.6 },
+            { d: "M -20,440  C 80,420 140,380 200,440", delay: 0.65 },
+            { d: "M 420,420  C 320,400 260,360 200,420", delay: 0.7 },
+            { d: "M 200,-30  C 200,80 200,180 200,240", delay: 0.45 },
+            { d: "M 200,510  C 200,400 200,300 200,260", delay: 0.5 },
+          ].map((p, i) => (
+            <g key={i} filter="url(#neural-glow)">
+              {/* Static dim trace */}
+              <motion.path
+                d={p.d}
+                fill="none"
+                stroke="hsl(164 60% 55%)"
+                strokeWidth="1"
+                strokeOpacity="0.45"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.7, delay: p.delay, ease: [0.65, 0, 0.35, 1] }}
+              />
+              {/* Travelling pulse — bright dash sliding along path */}
+              <motion.path
+                d={p.d}
+                fill="none"
+                stroke="url(#synapse-pulse)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray="40 600"
+                initial={{ strokeDashoffset: 600, opacity: 0 }}
+                animate={{ strokeDashoffset: -200, opacity: [0, 1, 1, 0] }}
+                transition={{
+                  duration: 1.1,
+                  delay: p.delay + 0.15,
+                  ease: "easeOut",
+                  times: [0, 0.2, 0.85, 1],
+                }}
+              />
+            </g>
+          ))}
+
+          {/* Card outline — drawn by light, the "solid form" the network resolves into */}
+          <motion.rect
+            x="2"
+            y="2"
+            width="396"
+            height="476"
+            rx="28"
+            ry="28"
+            fill="none"
+            stroke="hsl(164 85% 60%)"
+            strokeWidth="1.4"
+            filter="url(#neural-glow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: [0, 1, 1, 0.6] }}
+            transition={{ duration: 1.0, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
+          />
+
+          {/* Floating cannabinoid molecules — drift in, snap to anchor points, then fade as card materialises */}
+          {[
+            { from: { x: -60, y: 30 }, to: { x: 0, y: 40 }, delay: 0.05 },
+            { from: { x: 460, y: 50 }, to: { x: 400, y: 40 }, delay: 0.1 },
+            { from: { x: -50, y: 240 }, to: { x: 0, y: 240 }, delay: 0.15 },
+            { from: { x: 450, y: 250 }, to: { x: 400, y: 260 }, delay: 0.2 },
+            { from: { x: -40, y: 450 }, to: { x: 0, y: 440 }, delay: 0.25 },
+            { from: { x: 440, y: 430 }, to: { x: 400, y: 420 }, delay: 0.3 },
+            { from: { x: 200, y: -40 }, to: { x: 200, y: 0 }, delay: 0.0 },
+            { from: { x: 200, y: 520 }, to: { x: 200, y: 480 }, delay: 0.35 },
+          ].map((m, i) => (
+            <motion.g
               key={i}
-              className="absolute left-1/2 top-1/2 rounded-full"
-              style={{
-                width: d.s,
-                height: d.s,
-                marginLeft: -d.s / 2,
-                marginTop: -d.s / 2,
-                background:
-                  "radial-gradient(circle at 30% 30%, hsl(164 70% 55% / 0.95), hsl(178 50% 18% / 0.95) 70%)",
-                boxShadow: "inset 0 -6px 12px hsl(180 50% 4% / 0.4), inset 0 4px 8px hsl(0 0% 100% / 0.15)",
-              }}
-              initial={{ x: d.x, y: d.y, scale: 0.6, opacity: 0 }}
+              initial={{ x: m.from.x, y: m.from.y, opacity: 0, scale: 0.4 }}
               animate={{
-                x: ["0%", "0%"],
-                y: ["0%", "0%"],
-                scale: [0.6, 1.3, 4.5],
+                x: [m.from.x, m.to.x, m.to.x],
+                y: [m.from.y, m.to.y, m.to.y],
                 opacity: [0, 1, 1, 0],
+                scale: [0.4, 1, 1.1, 0.6],
+                rotate: [0, 60, 120],
               }}
               transition={{
-                duration: 1.1,
-                delay: d.d,
-                ease: [0.65, 0, 0.35, 1],
-                times: [0, 0.4, 0.85, 1],
+                duration: 1.6,
+                delay: m.delay,
+                ease: [0.16, 1, 0.3, 1],
+                times: [0, 0.45, 0.85, 1],
               }}
-            />
+            >
+              <use href="#cannabinoid" filter="url(#neural-glow)" />
+            </motion.g>
           ))}
-        </motion.div>
+        </motion.svg>
 
         <motion.form
           variants={formVariants}
