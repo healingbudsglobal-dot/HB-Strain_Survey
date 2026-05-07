@@ -240,8 +240,9 @@ const Index = () => {
         }}
       />
 
-      {/* Desktop-only animated layers */}
-      {!noAmbients && <BudAmbient intensity={isResults ? 0.5 : 1} />}
+      {/* Static bud/trichome backdrop — no animation, safe on mobile */}
+      {!reduceMotion && <BudAmbient intensity={isResults ? 0.5 : 1} />}
+      {/* Animated layers — desktop only */}
       {!noAmbients && !isResults && <NeuronAmbient />}
       {!noAmbients && screen === "squeeze" && <HeroBackdrop />}
       {!noAmbients && !isResults && <AmbientParticles />}
