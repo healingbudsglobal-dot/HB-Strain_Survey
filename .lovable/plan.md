@@ -1,44 +1,31 @@
-## Dramatically bolder form: email + province + consent + CTA
+## Goal
+Remove the human silhouette that appears in the current ambient `neuron-loop.mp4` clip and replace it with a pure, vector-based neural-signal animation that has zero people in it. Apply this animation as the global ambient layer behind every screen (squeeze, OTP, survey, contact, loading, success).
 
-The circled area is the conversion moment. Right now it reads as three stacked grey rectangles. We'll re-engineer it into a single tactile, premium, "instrument panel" feel — with floating labels, live icons, and stronger CTA presence — without breaking the existing liquid/cannabinoid form-up animation.
+## Why
+The downloaded PBS neuron clip contains a brief shot of a person, which conflicts with the brand. A hand-built SVG/CSS animation guarantees no humans ever appear and also gives us a higher-quality, perfectly looping, lightweight ambient with brand-correct pink → pearl → green pulses.
 
-### Changes (all in `src/components/SqueezeScreen.tsx`)
+## Changes
 
-**1. Email input → floating-label glass field with live state**
-- Mail icon (lucide `Mail`) inside the field, left side, that **pulses mint** when the field is focused and **flips to a checkmark in mint** when the email regex passes
-- Floating label "Your email" lifts and shrinks on focus/filled (smooth 200ms)
-- Bigger text (`text-[17px]`), more padding (`py-5`), thicker emerald focus ring (2px → soft 4px glow)
-- Helper text becomes a thin animated underline progress bar that fills mint as the email becomes valid (replaces the small grey hint line — still keeps an aria-describedby for screen readers)
+1. **New component** `src/components/NeuronAmbient.tsx`
+   - Fixed full-screen, `pointer-events-none`, `-z-10` layer.
+   - SVG with ~5 dendrite curves and ~10 synaptic nodes.
+   - Travelling stroke-dash gradient pulse (pink → pearl → green) along each dendrite, staggered.
+   - Soft node glow that breathes.
+   - Respects `prefers-reduced-motion`.
+   - Optional `intensity` prop (0–1) so individual screens can dim it further.
 
-**2. Province select → premium picker with map-pin icon + chevron rotation**
-- `MapPin` icon left, animated chevron right that rotates 180° when open
-- Floating label "Province" lifts on selection
-- Selected province shows in **DM-Sans-weight emphasis** (heavier than placeholder)
-- SelectContent gets glass treatment to match: `bg-card/80 backdrop-blur-xl`, soft mint border, items get a left mint accent bar on hover
+2. **`src/pages/Index.tsx`**
+   - Import `NeuronAmbient` and render it once at the top of the page wrapper so it shows on every screen state (squeeze / otp / survey / contact / loading / success).
+   - Keeps existing `<AmbientParticles />` and `<HeroBackdrop />` intact (they layer above the neuron field).
 
-**3. Consent row → custom checkbox with mint check animation**
-- Replace native checkbox with a custom 18px rounded square; checkmark draws in (SVG path with `pathLength` framer animation) on check
-- Whole row gets a subtle mint inner glow when checked (already partial — strengthen it)
-- Slightly larger text (`text-[12px]`) and tighter alignment
+3. **`src/components/SqueezeScreen.tsx`**
+   - Remove the `<video src="/video/neuron-loop.mp4">` block and its surrounding mask wrapper (lines around the AMBIENT NEURON FOOTAGE comment).
+   - Remove the `videoRef`, the two `useEffect` hooks driving play/pause, and the `anyFieldActive`-based opacity (no longer needed since there's no video).
+   - Keep the SVG dendrite watermark already present inside the form card.
 
-**4. CTA button → command-button presence**
-- Bigger: `py-5 text-[17px]`
-- Add a soft animated mint **halo glow** behind the button that pulses gently (2.4s) when consent is checked → signals "ready"
-- Disabled state gets a clearer "locked" cue: subtle lock icon + lighter copy "Confirm 18+ to continue"
-- Arrow icon scales up slightly and the sheen sweep already exists — keep it
-- Add tactile depth: stronger inset highlight on top, deeper shadow below
+4. **Delete `public/video/neuron-loop.mp4`** to remove the clip with the person from the bundle.
 
-**5. Section rhythm**
-- Tighten gaps from default form spacing to `space-y-3.5` so the four elements read as one cohesive instrument cluster, not four floating cards
-- Add a faint mint divider hairline above the CTA (gradient line, fades in/out edges) to separate "your details" from "the action"
-
-### What stays
-- The cannabinoid + neural network form-up animation
-- The wet-glass card outer shell, breathe animation, droplet sheen
-- All existing logic (email regex, province list, consent gate, error handling, submit flow)
-- Color tokens — purely additive
-
-### Files to edit
-- `src/components/SqueezeScreen.tsx` only
-
-No backend, no schema, no new deps (Mail, MapPin, ChevronDown, Lock from lucide-react are already available).
+## Result
+- No human ever appears anywhere in the ambient.
+- A consistent, brand-aligned neural-signal field lives behind every step of the funnel.
+- Lighter bundle (drops the 452 KB MP4) and crisper visuals at any resolution.
