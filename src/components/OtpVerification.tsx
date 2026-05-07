@@ -69,18 +69,17 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic flower backdrop */}
+      {/* Cinematic backdrop — crisp tint + film grain (no blur) */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <motion.img
-          src={heroFlower}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]"
-          style={{ filter: "blur(25px) saturate(1.2)", mixBlendMode: "soft-light" }}
-          animate={{ scale: [1, 1.05, 1], x: [0, 10, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.9)_75%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.12)]" style={{ mixBlendMode: "overlay" }} />
+        <div
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          }}
+        />
       </div>
 
       <motion.div variants={itemVariants} className="mb-6">
