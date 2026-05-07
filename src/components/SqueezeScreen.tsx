@@ -677,9 +677,45 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           60%  { transform: translateX(320%); }
           100% { transform: translateX(320%); }
         }
+        .cta-ripple {
+          position: absolute;
+          width: 8px; height: 8px;
+          border-radius: 9999px;
+          transform: translate(-50%, -50%);
+          background: radial-gradient(circle, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0) 70%);
+          pointer-events: none;
+          animation: ctaRipple 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          z-index: 5;
+        }
+        @keyframes ctaRipple {
+          0%   { width: 8px; height: 8px; opacity: 0.9; }
+          100% { width: 520px; height: 520px; opacity: 0; }
+        }
+        .cta-burst-layer {
+          position: absolute;
+          left: 50%; top: 50%;
+          pointer-events: none;
+          z-index: 6;
+        }
+        .cta-particle {
+          position: absolute;
+          left: 0; top: 0;
+          width: 6px; height: 6px;
+          border-radius: 9999px;
+          background: hsl(164 80% 80%);
+          box-shadow: 0 0 8px hsl(164 80% 60% / 0.9);
+          transform: translate(-50%, -50%);
+          animation: ctaParticle 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes ctaParticle {
+          0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2); opacity: 0; }
+        }
         @media (prefers-reduced-motion: reduce) {
           [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"] { animation: none !important; }
+          .cta-ripple, .cta-particle { animation: none !important; display: none; }
         }
+
       `}</style>
     </motion.div>
   );
