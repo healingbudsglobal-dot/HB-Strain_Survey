@@ -320,7 +320,8 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05, duration: 0.35 }}
-                className="font-display text-xl font-bold tracking-[0.02em] text-foreground sm:text-2xl mb-1 relative z-10"
+                className="font-display text-[1.6rem] font-bold leading-[1.1] tracking-[-0.02em] text-foreground sm:text-3xl mb-1.5 relative z-10"
+                style={{ textShadow: "0 2px 18px hsl(180 50% 2% / 0.5)" }}
               >
                 {question.question}
               </motion.h2>
