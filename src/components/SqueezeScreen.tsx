@@ -34,6 +34,15 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
+// Liquid form-up: droplets scatter, then merge into the card shape under an SVG goo filter
+const formVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.4, delay: 0.45, ease: [0.16, 1, 0.3, 1] as const },
+  },
+};
+
 const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [email, setEmail] = useState("");
   const [province, setProvince] = useState("");
