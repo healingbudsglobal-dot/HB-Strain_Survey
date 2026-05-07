@@ -4,8 +4,11 @@
  * Sits beneath NeuronAmbient. No humans. Pure botanical texture.
  */
 import budMacro from "@/assets/bud-macro.jpg";
+import { useReducedMotion } from "framer-motion";
 
 const BudAmbient = ({ intensity = 1 }: { intensity?: number }) => {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
   return (
     <div
       aria-hidden
