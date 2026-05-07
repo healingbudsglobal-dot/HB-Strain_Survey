@@ -214,7 +214,7 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
                 <InputOTPSlot
                   key={i}
                   index={i}
-                  className={`!h-14 !w-12 !border !rounded-xl !bg-[hsl(180_8%_7%_/_0.8)] text-foreground !text-xl font-bold backdrop-blur-sm transition-all duration-300 !ring-0 data-[active]:!ring-2 data-[active]:!ring-[hsl(var(--accent-green)_/_0.6)] data-[active]:!border-[hsl(var(--accent-green)_/_0.5)] data-[active]:!bg-[hsl(var(--accent-green)_/_0.08)] data-[active]:shadow-[0_0_12px_hsl(var(--accent-green)_/_0.15)] ${verified ? "!border-[hsl(var(--accent-green)_/_0.5)] !bg-[hsl(var(--accent-green)_/_0.1)]" : "!border-[hsl(var(--accent-green)_/_0.2)]"}`}
+                  className={`!h-16 !w-12 sm:!w-14 !border !rounded-xl !bg-[hsl(180_10%_6%_/_0.85)] text-foreground !text-2xl font-bold backdrop-blur-sm transition-all duration-300 !ring-0 data-[active]:!ring-2 data-[active]:!ring-[hsl(164_90%_60%_/_0.7)] data-[active]:!border-[hsl(164_90%_60%)] data-[active]:!bg-[hsl(var(--accent-green)_/_0.12)] data-[active]:shadow-[0_0_0_4px_hsl(164_80%_55%_/_0.15),0_0_24px_-2px_hsl(164_90%_60%_/_0.55)] ${verified ? "!border-[hsl(var(--accent-green)_/_0.6)] !bg-[hsl(var(--accent-green)_/_0.12)] shadow-[0_0_18px_-2px_hsl(164_90%_60%_/_0.5)]" : "!border-[hsl(var(--accent-green)_/_0.22)]"}`}
                 />
               ))}
             </InputOTPGroup>
