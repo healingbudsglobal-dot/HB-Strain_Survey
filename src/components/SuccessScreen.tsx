@@ -216,7 +216,7 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
             href="mailto:info@healingbuds.co.za?subject=Private%20Enquiry%20-%20Lifestyle%20Match"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="mt-4 group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 flex items-center justify-center gap-2 min-h-[52px] animate-pulse-glow"
+            className="mt-4 group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 flex items-center justify-center gap-2 min-h-[52px] shadow-glow"
           >
             Enquire Privately
             <Mail className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
