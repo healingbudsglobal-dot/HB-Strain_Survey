@@ -384,28 +384,18 @@
 }
 
 /* ===== Mobile flicker kill switch =====
- * Mobile GPUs choke on stacked backdrop-blur + infinite animations + mix-blend-mode.
- * On phones, force everything to be static. Aesthetic loss is worth flicker-free UX.
+ * Targeted: only strip ANIMATED layers that cause flicker.
+ * Keep static glass + bud trichome blur effects intact for visual depth.
  */
 @media (max-width: 768px), (pointer: coarse) {
+  /* Stop infinite/looping animations — they cause strobe on mobile GPUs */
   *, *::before, *::after {
-    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
   }
-  /* Backdrop-blur is the #1 mobile compositor killer — strip it everywhere */
-  [class*="backdrop-blur"],
-  .glass-card,
-  .glass-card-elevated {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  /* Strip blend modes that force per-frame full-layer recomposite */
-  * {
+  /* Strip blend modes only on decorative ambient layers, not glass cards */
+  [aria-hidden="true"] *,
+  .hero-backdrop * {
     mix-blend-mode: normal !important;
   }
-  /* Cap heavy filters that re-blur every frame */
-  [style*="filter"] {
-    filter: none !important;
-  }
 }
+
