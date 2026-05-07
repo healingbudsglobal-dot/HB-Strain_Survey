@@ -163,6 +163,24 @@ Deno.serve(async (req) => {
       throw new Error('RESEND_API_KEY not configured');
     }
 
+    // Plain-text fallback — boosts deliverability + serves text-only clients
+    const textBody = [
+      `Healing Buds — Bio-Map Verification`,
+      ``,
+      `Your verification code: ${otp_code}`,
+      ``,
+      `This code expires in 5 minutes and can only be used once.`,
+      `Enter it on the page where you started your strain bio-mapping session.`,
+      ``,
+      `If you didn't request this code, you can safely ignore this email — your account stays safe.`,
+      ``,
+      `— Healing Buds`,
+      `Precision-matched botanical wellness · South Africa`,
+      `https://mystrain.healingbuds.co.za`,
+      ``,
+      `© 2026 Healing Buds (Pty) Ltd. Transactional verification email.`,
+    ].join('\n');
+
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -172,8 +190,17 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'Healing Buds <noreply@send.healingbuds.co.za>',
         to: [email],
-        subject: `Your Healing Buds Verification Code: ${otp_code}`,
+        subject: `${otp_code} is your Healing Buds code`,
         html: buildOtpHtml(email, otp_code),
+        text: textBody,
+        headers: {
+          'X-Entity-Ref-ID': `otp-${otp_code}-${Date.now()}`,
+          'List-Unsubscribe': '<mailto:healingbudsglobal@gmail.com?subject=unsubscribe>',
+        },
+        tags: [
+          { name: 'category', value: 'transactional' },
+          { name: 'type', value: 'otp_verification' },
+        ],
       }),
     });
 
