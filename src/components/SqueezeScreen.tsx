@@ -578,25 +578,56 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
                 const rect = btn.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                const ripple = document.createElement("span");
-                ripple.className = "cta-ripple";
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                btn.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 700);
-                const burst = document.createElement("span");
-                burst.className = "cta-burst-layer";
-                for (let i = 0; i < 10; i++) {
-                  const p = document.createElement("span");
-                  const angle = (i / 10) * Math.PI * 2;
-                  const dist = 38 + Math.random() * 22;
-                  p.className = "cta-particle";
-                  p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`);
-                  p.style.setProperty("--ty", `${Math.sin(angle) * dist}px`);
-                  burst.appendChild(p);
+
+                // Hot ignition flash from click point
+                const flash = document.createElement("span");
+                flash.className = "cta-ignite";
+                flash.style.left = `${x}px`;
+                flash.style.top = `${y}px`;
+                btn.appendChild(flash);
+                setTimeout(() => flash.remove(), 600);
+
+                // Fizzling match-head sparks — amber/neon trichome energy
+                const fizzle = document.createElement("span");
+                fizzle.className = "cta-fizzle-layer";
+                fizzle.style.left = `${x}px`;
+                fizzle.style.top = `${y}px`;
+                const SPARK_COUNT = 28;
+                for (let i = 0; i < SPARK_COUNT; i++) {
+                  const s = document.createElement("span");
+                  s.className = "cta-spark";
+                  // Bias upward arc like a struck match
+                  const angle = (-Math.PI / 2) + (Math.random() - 0.5) * Math.PI * 1.1;
+                  const speed = 60 + Math.random() * 90;
+                  const tx = Math.cos(angle) * speed;
+                  const ty = Math.sin(angle) * speed;
+                  // Gravity pulls them down at the end
+                  const fy = ty + 50 + Math.random() * 40;
+                  const dur = 600 + Math.random() * 500;
+                  const size = 2 + Math.random() * 3;
+                  // Color shift: hot white -> amber -> trichome mint flick
+                  const hue = Math.random() < 0.7
+                    ? 38 + Math.random() * 12          // amber
+                    : 158 + Math.random() * 14;         // mint flick
+                  s.style.setProperty("--tx", `${tx}px`);
+                  s.style.setProperty("--ty", `${ty}px`);
+                  s.style.setProperty("--fy", `${fy}px`);
+                  s.style.setProperty("--dur", `${dur}ms`);
+                  s.style.setProperty("--size", `${size}px`);
+                  s.style.setProperty("--hue", `${hue}`);
+                  s.style.animationDelay = `${Math.random() * 80}ms`;
+                  fizzle.appendChild(s);
                 }
-                btn.appendChild(burst);
-                setTimeout(() => burst.remove(), 800);
+                // Smoldering ember plume above ignition
+                for (let i = 0; i < 4; i++) {
+                  const e2 = document.createElement("span");
+                  e2.className = "cta-ember";
+                  e2.style.setProperty("--ex", `${(Math.random() - 0.5) * 30}px`);
+                  e2.style.animationDelay = `${i * 80}ms`;
+                  fizzle.appendChild(e2);
+                }
+                btn.appendChild(fizzle);
+                setTimeout(() => fizzle.remove(), 1400);
               }}
               className="group relative w-full overflow-hidden rounded-[22px] py-5 font-display font-bold text-[18px] tracking-[-0.01em] transition-[background,box-shadow] duration-150 flex items-center justify-center gap-2.5 min-h-[64px] disabled:cursor-not-allowed will-change-transform"
               style={{
@@ -677,44 +708,82 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           60%  { transform: translateX(320%); }
           100% { transform: translateX(320%); }
         }
-        .cta-ripple {
+        /* === Match-head ignition flash === */
+        .cta-ignite {
           position: absolute;
-          width: 8px; height: 8px;
+          width: 10px; height: 10px;
           border-radius: 9999px;
           transform: translate(-50%, -50%);
-          background: radial-gradient(circle, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0) 70%);
+          background: radial-gradient(circle, hsl(50 100% 90%) 0%, hsl(38 100% 60% / 0.9) 30%, hsl(20 100% 45% / 0.5) 55%, transparent 75%);
+          filter: blur(0.5px);
           pointer-events: none;
-          animation: ctaRipple 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: ctaIgnite 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           z-index: 5;
+          mix-blend-mode: screen;
         }
-        @keyframes ctaRipple {
-          0%   { width: 8px; height: 8px; opacity: 0.9; }
-          100% { width: 520px; height: 520px; opacity: 0; }
+        @keyframes ctaIgnite {
+          0%   { width: 8px;  height: 8px;  opacity: 1;   filter: blur(0.5px); }
+          25%  { width: 90px; height: 90px; opacity: 0.95; filter: blur(2px); }
+          100% { width: 220px; height: 220px; opacity: 0; filter: blur(8px); }
         }
-        .cta-burst-layer {
-          position: absolute;
-          left: 50%; top: 50%;
-          pointer-events: none;
-          z-index: 6;
-        }
-        .cta-particle {
+
+        /* === Fizzle layer (origin = click point) === */
+        .cta-fizzle-layer {
           position: absolute;
           left: 0; top: 0;
-          width: 6px; height: 6px;
+          width: 0; height: 0;
+          pointer-events: none;
+          z-index: 6;
+          overflow: visible;
+        }
+
+        /* === Individual sparks: amber/mint trichome flecks === */
+        .cta-spark {
+          position: absolute;
+          left: 0; top: 0;
+          width: var(--size, 3px);
+          height: var(--size, 3px);
           border-radius: 9999px;
-          background: hsl(164 80% 80%);
-          box-shadow: 0 0 8px hsl(164 80% 60% / 0.9);
+          background: hsl(var(--hue, 40) 100% 75%);
+          box-shadow:
+            0 0 4px hsl(var(--hue, 40) 100% 65% / 0.95),
+            0 0 10px hsl(var(--hue, 40) 100% 55% / 0.8),
+            0 0 18px hsl(var(--hue, 40) 100% 50% / 0.5);
           transform: translate(-50%, -50%);
-          animation: ctaParticle 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: ctaSpark var(--dur, 800ms) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          mix-blend-mode: screen;
         }
-        @keyframes ctaParticle {
-          0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-          100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2); opacity: 0; }
+        @keyframes ctaSpark {
+          0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+          8%   { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+          50%  { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1); opacity: 0.95; }
+          80%  { opacity: 0.7; }
+          100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--fy))) scale(0.2); opacity: 0; }
         }
+
+        /* === Smoldering ember plume drifting up === */
+        .cta-ember {
+          position: absolute;
+          left: 0; top: 0;
+          width: 14px; height: 14px;
+          border-radius: 9999px;
+          background: radial-gradient(circle, hsl(38 90% 65% / 0.7), transparent 70%);
+          transform: translate(-50%, -50%);
+          animation: ctaEmber 1.2s ease-out forwards;
+          mix-blend-mode: screen;
+          filter: blur(3px);
+        }
+        @keyframes ctaEmber {
+          0%   { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+          20%  { opacity: 0.9; }
+          100% { transform: translate(calc(-50% + var(--ex, 0px)), -90px) scale(2.4); opacity: 0; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"] { animation: none !important; }
-          .cta-ripple, .cta-particle { animation: none !important; display: none; }
+          .cta-ignite, .cta-spark, .cta-ember { animation: none !important; display: none; }
         }
+
 
       `}</style>
     </motion.div>
