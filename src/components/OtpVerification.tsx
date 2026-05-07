@@ -134,13 +134,13 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
       </button>
 
       <div className="rounded-2xl border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.92)] p-6 w-full">
-        <div className="flex justify-center mb-4">
+        <div ref={otpContainerRef} className="flex justify-center mb-4">
           <InputOTP
             maxLength={6}
             value={value}
             onChange={setValue}
             onComplete={handleComplete}
-            disabled={verified || verifying}
+            disabled={verified || verifying || lockoutSeconds > 0}
           >
             <InputOTPGroup className="gap-2.5">
               {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -154,18 +154,30 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
           </InputOTP>
         </div>
 
-        {error && (
-          <p className="text-sm text-destructive mb-3">{error}</p>
+        {lockoutSeconds > 0 ? (
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.06)] px-3 py-2.5 text-sm text-foreground">
+            <Clock className="h-4 w-4 text-[hsl(var(--accent-green))]" />
+            <span>
+              Too many attempts — try again in{" "}
+              <span className="font-semibold text-[hsl(var(--accent-green))]">{lockoutSeconds}s</span>
+            </span>
+          </div>
+        ) : (
+          error && <p className="text-sm text-destructive mb-3" role="alert">{error}</p>
         )}
 
         <button
           type="button"
           onClick={handleResend}
-          disabled={!canResend}
+          disabled={!canResend || lockoutSeconds > 0}
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-[hsl(var(--accent-green))] transition-colors disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] px-4"
         >
           <RotateCw className="h-3.5 w-3.5" />
-          {canResend ? "Resend code" : `Resend in ${cooldown}s`}
+          {lockoutSeconds > 0
+            ? `Locked (${lockoutSeconds}s)`
+            : canResend
+            ? "Resend code"
+            : `Resend in ${cooldown}s`}
         </button>
       </div>
 
