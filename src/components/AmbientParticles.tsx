@@ -1,7 +1,9 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useMemo } from "react";
 
 const AmbientParticles = () => {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
   const particles = useMemo(() => {
     return Array.from({ length: 18 }, (_, i) => ({
       id: i,
