@@ -13,8 +13,8 @@ export default {
       },
     },
     fontFamily: {
-      display: ['DM Sans', 'sans-serif'],
-      body: ['Inter', 'sans-serif'],
+      display: ['Avenir', 'Montserrat', 'Corbel', 'URW Gothic', 'source-sans-pro', 'sans-serif'],
+      body: ['Avenir', 'Montserrat', 'Corbel', 'URW Gothic', 'source-sans-pro', 'sans-serif'],
     },
     extend: {
       colors: {
