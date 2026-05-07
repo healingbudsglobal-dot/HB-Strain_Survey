@@ -402,10 +402,10 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                       onClick={() => handleSelect(option.label)}
                       whileHover={{ scale: 1.02, x: 4 }}
                       whileTap={{ scale: 0.96 }}
-                      className={`group w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
+                      className={`group option-emerald-focus w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
                         isSelected
-                          ? 'border-[hsl(var(--accent-green)_/_0.7)] bg-[hsl(var(--accent-green)_/_0.1)] shadow-[0_0_0_1px_hsl(164_80%_55%_/_0.2),0_0_30px_-6px_hsl(164_80%_55%_/_0.5)]'
-                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.45)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_24px_-8px_hsl(164_80%_55%_/_0.35)]'
+                          ? 'option-emerald-selected border-[hsl(164_90%_60%/0.9)] bg-[hsl(var(--accent-green)_/_0.12)]'
+                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.6)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_28px_-6px_hsl(164_80%_55%_/_0.45)]'
                       }`}
                     >
                       <span className="flex items-center gap-3">
