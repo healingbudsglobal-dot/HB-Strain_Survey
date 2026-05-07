@@ -195,29 +195,23 @@ const Index = () => {
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
       <BudAmbient intensity={isResults ? 0.5 : 1} />
       {!isResults && <NeuronAmbient />}
-      {screen === "squeeze" && <HeroBackdrop />}
+      {(screen === "squeeze" || screen === "otp") && <HeroBackdrop />}
       {!isResults && <AmbientParticles />}
 
       {/* Step Progress - fixed at top, hidden on squeeze screen */}
       {screen !== "squeeze" && (
-        <motion.div
-          className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 bg-[hsl(180_8%_7%_/_0.85)] border-b border-border/40"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
+        <div className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 bg-[hsl(180_8%_7%_/_0.85)] border-b border-border/40">
           <StepProgress currentStep={stepIndex} />
-        </motion.div>
+        </div>
       )}
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout" initial={false}>
         <motion.div
           key={screen}
-          variants={screenVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={screenTransition}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
           className="flex w-full items-center justify-center pt-20"
         >
           {screen === "squeeze" && <SqueezeScreen onSubmit={handleEmailSubmit} />}
