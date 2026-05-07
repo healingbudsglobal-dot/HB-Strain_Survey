@@ -45,28 +45,14 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-md w-full"
     >
-      {/* Mixed green + gold confetti */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: i % 2 === 0 ? 8 : 5,
-              height: i % 2 === 0 ? 8 : 5,
-              left: `${10 + i * 13}%`,
-              background: i % 3 === 0
-                ? "hsl(var(--brand-gold))"
-                : i % 3 === 1
-                  ? "hsl(var(--accent-green))"
-                  : "hsl(var(--lime-green))",
-            }}
-            initial={{ y: 0, opacity: 0 }}
-            animate={{ y: -150, opacity: [0, 1, 0], scale: [1, 1.2, 0.3] }}
-            transition={{ duration: 2.5, delay: i * 0.15, ease: "easeOut" }}
-          />
-        ))}
-      </div>
+      {/* Soft static glow — no animated confetti (caused mobile strobing) */}
+      <div
+        className="pointer-events-none absolute inset-x-0 -top-10 h-40 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, hsl(var(--accent-green) / 0.18) 0%, transparent 70%)",
+        }}
+      />
 
       {/* Success icon — green */}
       <motion.div variants={itemVariants} className="relative mb-6">
