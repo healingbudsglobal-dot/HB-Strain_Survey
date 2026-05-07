@@ -51,6 +51,31 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const anyFieldActive = focused || email.length > 0 || province.length > 0;
+
+  // Pause + dim the ambient neuron loop when the user is engaging with the form,
+  // and gently resume when they look away. Also pause when tab is hidden.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (anyFieldActive) {
+      try { v.pause(); } catch {}
+    } else {
+      v.play().catch(() => {});
+    }
+  }, [anyFieldActive]);
+
+  useEffect(() => {
+    const onVis = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      if (document.hidden) v.pause();
+      else if (!anyFieldActive) v.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [anyFieldActive]);
   const emailValid = validateEmail(email.trim()).valid;
   const emailFilled = email.length > 0;
 
