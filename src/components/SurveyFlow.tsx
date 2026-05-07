@@ -4,7 +4,18 @@ import { ChevronLeft, Dna, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import bgFlower from "@/assets/hero-flower.jpg";
+import bgTrichomes from "@/assets/hero-trichomes.jpg";
+import bgBud from "@/assets/hero-bud.jpg";
 import { useSurveyProgress } from "@/hooks/useSurveyProgress";
+
+// Visual story — each survey section reveals a new ambient backdrop
+const SECTION_BG: Record<string, string> = {
+  "Your Cannabis Background": bgFlower,
+  "Your Ideal Experience": bgTrichomes,
+  "Your Body & Preferences": bgBud,
+  "Lifestyle & Context": bgFlower,
+};
 
 
 interface SurveyFlowProps {
@@ -174,6 +185,24 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
   return (
     <div className="relative z-10 flex w-full max-w-lg flex-col px-5" style={{ perspective: "1200px" }}>
 
+      {/* Ambient story backdrop — crossfades by section so user sees a slow visual journey */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={question.section}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 0.18, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${SECTION_BG[question.section] || bgFlower})`,
+              filter: "saturate(1.1) hue-rotate(-8deg) blur(2px)",
+            }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(180_30%_4%/0.55)_0%,hsl(180_30%_4%/0.92)_75%)]" />
+      </div>
       {/* Ambient emerald orbs — matching home screen drama */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,hsl(var(--accent-green)_/_0.08)_0%,transparent_65%)]" />
       <motion.div
@@ -202,6 +231,28 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
         @keyframes sheenSweep {
           0% { transform: translateX(-120%) skewX(-20deg); }
           100% { transform: translateX(220%) skewX(-20deg); }
+        }
+        @keyframes emeraldPulse {
+          0%, 100% {
+            box-shadow:
+              0 0 0 1px hsl(164 80% 55% / 0.55),
+              0 0 0 4px hsl(164 80% 55% / 0.18),
+              0 0 32px -4px hsl(164 80% 55% / 0.55);
+          }
+          50% {
+            box-shadow:
+              0 0 0 2px hsl(164 90% 65% / 0.85),
+              0 0 0 7px hsl(164 80% 55% / 0.10),
+              0 0 48px -2px hsl(164 90% 60% / 0.75);
+          }
+        }
+        .option-emerald-focus:focus-visible {
+          outline: none;
+          animation: emeraldPulse 1.6s ease-in-out infinite;
+          border-color: hsl(164 90% 60% / 0.9) !important;
+        }
+        .option-emerald-selected {
+          animation: emeraldPulse 2.4s ease-in-out infinite;
         }
         @keyframes orbFloat {
           0%, 100% { transform: translate(0,0) scale(1); }
@@ -351,10 +402,10 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                       onClick={() => handleSelect(option.label)}
                       whileHover={{ scale: 1.02, x: 4 }}
                       whileTap={{ scale: 0.96 }}
-                      className={`group w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
+                      className={`group option-emerald-focus w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
                         isSelected
-                          ? 'border-[hsl(var(--accent-green)_/_0.7)] bg-[hsl(var(--accent-green)_/_0.1)] shadow-[0_0_0_1px_hsl(164_80%_55%_/_0.2),0_0_30px_-6px_hsl(164_80%_55%_/_0.5)]'
-                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.45)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_24px_-8px_hsl(164_80%_55%_/_0.35)]'
+                          ? 'option-emerald-selected border-[hsl(164_90%_60%/0.9)] bg-[hsl(var(--accent-green)_/_0.12)]'
+                          : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.6)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_28px_-6px_hsl(164_80%_55%_/_0.45)]'
                       }`}
                     >
                       <span className="flex items-center gap-3">
