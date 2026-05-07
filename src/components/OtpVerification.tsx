@@ -68,10 +68,20 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic backdrop — crisp tint + film grain (no blur) */}
+      {/* Cinematic backdrop — crisp tint + film grain + emerald orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.9)_75%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.12)]" style={{ mixBlendMode: "overlay" }} />
+        <motion.div
+          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,hsl(164_80%_45%/0.18)_0%,transparent_65%)]"
+          animate={{ y: [0, 20, 0], x: [0, 14, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,hsl(180_70%_50%/0.14)_0%,transparent_65%)]"
+          animate={{ y: [0, -18, 0], x: [0, -12, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
           style={{
@@ -128,12 +138,32 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
             initial={verified ? { opacity: 0, y: 8 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="font-display text-2xl font-bold tracking-[0.02em] text-foreground"
+            className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl"
           >
-            {verified ? "Verified!" : "Verify Your Email"}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage: verified
+                  ? "linear-gradient(110deg, hsl(164 60% 75%) 0%, hsl(164 90% 60%) 50%, hsl(180 75% 82%) 100%)"
+                  : "linear-gradient(110deg, hsl(164 55% 72%) 0%, hsl(164 85% 58%) 35%, hsl(180 75% 82%) 50%, hsl(164 85% 58%) 65%, hsl(164 55% 72%) 100%)",
+                backgroundSize: "200% 100%",
+                animation: "auroraShift 6s ease-in-out infinite",
+                WebkitBackgroundClip: "text",
+                filter:
+                  "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.65)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.55)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.5))",
+              }}
+            >
+              {verified ? "Verified!" : "Verify Your Email"}
+            </span>
           </motion.h2>
         </AnimatePresence>
       </motion.div>
+      <style>{`
+        @keyframes auroraShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+      `}</style>
 
       <motion.p variants={itemVariants} className="mb-1.5 text-sm text-muted-foreground leading-relaxed max-w-xs">
         We sent a 6-digit code to{" "}
@@ -184,7 +214,7 @@ const OtpVerification = ({ email, otpCode, onVerified, onResend, onBack }: OtpVe
                 <InputOTPSlot
                   key={i}
                   index={i}
-                  className={`!h-14 !w-12 !border !rounded-xl !bg-[hsl(180_8%_7%_/_0.8)] text-foreground !text-xl font-bold backdrop-blur-sm transition-all duration-300 !ring-0 data-[active]:!ring-2 data-[active]:!ring-[hsl(var(--accent-green)_/_0.6)] data-[active]:!border-[hsl(var(--accent-green)_/_0.5)] data-[active]:!bg-[hsl(var(--accent-green)_/_0.08)] data-[active]:shadow-[0_0_12px_hsl(var(--accent-green)_/_0.15)] ${verified ? "!border-[hsl(var(--accent-green)_/_0.5)] !bg-[hsl(var(--accent-green)_/_0.1)]" : "!border-[hsl(var(--accent-green)_/_0.2)]"}`}
+                  className={`!h-16 !w-12 sm:!w-14 !border !rounded-xl !bg-[hsl(180_10%_6%_/_0.85)] text-foreground !text-2xl font-bold backdrop-blur-sm transition-all duration-300 !ring-0 data-[active]:!ring-2 data-[active]:!ring-[hsl(164_90%_60%_/_0.7)] data-[active]:!border-[hsl(164_90%_60%)] data-[active]:!bg-[hsl(var(--accent-green)_/_0.12)] data-[active]:shadow-[0_0_0_4px_hsl(164_80%_55%_/_0.15),0_0_24px_-2px_hsl(164_90%_60%_/_0.55)] ${verified ? "!border-[hsl(var(--accent-green)_/_0.6)] !bg-[hsl(var(--accent-green)_/_0.12)] shadow-[0_0_18px_-2px_hsl(164_90%_60%_/_0.5)]" : "!border-[hsl(var(--accent-green)_/_0.22)]"}`}
                 />
               ))}
             </InputOTPGroup>

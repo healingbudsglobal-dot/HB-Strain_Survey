@@ -53,10 +53,20 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full"
     >
-      {/* Cinematic backdrop — crisp tint + film grain (no blur) */}
+      {/* Cinematic backdrop — crisp tint + film grain + emerald orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.9)_75%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.12)]" style={{ mixBlendMode: "overlay" }} />
+        <motion.div
+          className="absolute -top-32 -left-32 h-[480px] w-[480px] rounded-full bg-[radial-gradient(circle,hsl(164_80%_45%/0.18)_0%,transparent_65%)]"
+          animate={{ y: [0, 20, 0], x: [0, 14, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -right-32 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,hsl(180_70%_50%/0.14)_0%,transparent_65%)]"
+          animate={{ y: [0, -18, 0], x: [0, -12, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
         <div
           className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
           style={{
@@ -65,6 +75,16 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
           }}
         />
       </div>
+      <style>{`
+        @keyframes auroraShift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        @keyframes sheenSweep {
+          0% { transform: translateX(-120%) skewX(-20deg); }
+          100% { transform: translateX(220%) skewX(-20deg); }
+        }
+      `}</style>
 
       <motion.div variants={itemVariants} className="mb-6">
         <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
@@ -72,9 +92,20 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
 
       <motion.h2
         variants={itemVariants}
-        className="font-display text-2xl font-bold tracking-[0.02em] text-foreground sm:text-3xl mb-2"
+        className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl mb-2"
       >
-        Your Strain Match Is{" "}
+        <span
+          className="bg-clip-text text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
+            WebkitBackgroundClip: "text",
+            filter:
+              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+          }}
+        >
+          Your Strain Match Is{" "}
+        </span>
         <span
           className="bg-clip-text text-transparent"
           style={{
@@ -83,7 +114,8 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
             backgroundSize: "200% 100%",
             animation: "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
-            filter: "drop-shadow(0 0 18px hsl(164 80% 55% / 0.35))",
+            filter:
+              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           Ready
