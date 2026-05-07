@@ -4,7 +4,18 @@ import { ChevronLeft, Dna, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
+import bgFlower from "@/assets/hero-flower.jpg";
+import bgTrichomes from "@/assets/hero-trichomes.jpg";
+import bgBud from "@/assets/hero-bud.jpg";
 import { useSurveyProgress } from "@/hooks/useSurveyProgress";
+
+// Visual story — each survey section reveals a new ambient backdrop
+const SECTION_BG: Record<string, string> = {
+  "Your Cannabis Background": bgFlower,
+  "Your Ideal Experience": bgTrichomes,
+  "Your Body & Preferences": bgBud,
+  "Lifestyle & Context": bgFlower,
+};
 
 
 interface SurveyFlowProps {
