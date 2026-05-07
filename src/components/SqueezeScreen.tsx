@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
@@ -51,6 +51,31 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const anyFieldActive = focused || email.length > 0 || province.length > 0;
+
+  // Pause + dim the ambient neuron loop when the user is engaging with the form,
+  // and gently resume when they look away. Also pause when tab is hidden.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (anyFieldActive) {
+      try { v.pause(); } catch {}
+    } else {
+      v.play().catch(() => {});
+    }
+  }, [anyFieldActive]);
+
+  useEffect(() => {
+    const onVis = () => {
+      const v = videoRef.current;
+      if (!v) return;
+      if (document.hidden) v.pause();
+      else if (!anyFieldActive) v.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [anyFieldActive]);
   const emailValid = validateEmail(email.trim()).valid;
   const emailFilled = email.length > 0;
 
@@ -118,8 +143,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             backgroundImage:
               "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
             WebkitBackgroundClip: "text",
+            // Embossed: top highlight + bottom shadow + soft outer glow
             filter:
-              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
           }}
         >
           Discover your
@@ -134,7 +160,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             animation: "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
             filter:
-              "drop-shadow(0 1px 0 hsl(180 50% 4% / 0.5)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.45))",
+              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           perfect match.
@@ -377,12 +403,15 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           }}
         >
           <video
+            ref={videoRef}
             src="/video/neuron-loop.mp4"
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.18] mix-blend-screen"
+            className={`absolute inset-0 h-full w-full object-cover mix-blend-screen transition-opacity duration-700 ease-out ${
+              anyFieldActive ? "opacity-[0.06]" : "opacity-[0.18]"
+            }`}
             style={{
               filter: "hue-rotate(120deg) saturate(1.8) contrast(1.15) blur(0.4px)",
             }}
