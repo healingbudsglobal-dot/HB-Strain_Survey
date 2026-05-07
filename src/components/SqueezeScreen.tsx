@@ -161,23 +161,103 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         A 2-minute lifestyle quiz to explore botanical profiles tailored to you.
       </motion.p>
 
-      {/* Form — wet glass card with chromatic resin blobs */}
-      <motion.form
-        variants={itemVariants}
-        onSubmit={handleSubmit}
-        className={`relative flex w-full max-w-sm flex-col gap-3 overflow-hidden rounded-[28px] p-5 border transition-all duration-500 ${
-          focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
-        }`}
-        style={{
-          background:
-            "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
-          backdropFilter: "blur(24px) saturate(160%)",
-          WebkitBackdropFilter: "blur(24px) saturate(160%)",
-          boxShadow: focused
-            ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
-            : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
-        }}
-      >
+      {/* Form — wet glass card formed from coalescing liquid droplets */}
+      <div className="relative w-full max-w-sm">
+        {/* SVG goo filter — makes overlapping blurred shapes merge like mercury/water */}
+        <svg className="pointer-events-none absolute h-0 w-0" aria-hidden>
+          <defs>
+            <filter id="liquid-goo">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+              <feColorMatrix
+                in="blur"
+                mode="matrix"
+                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -11"
+                result="goo"
+              />
+              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+          </defs>
+        </svg>
+
+        {/* Liquid coalescence overlay — droplets fly in & merge into the card silhouette */}
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-20"
+          style={{ filter: "url(#liquid-goo)" }}
+          initial="scatter"
+          animate="merged"
+          variants={{
+            scatter: { opacity: 1 },
+            merged: { opacity: 0, transition: { delay: 1.0, duration: 0.4 } },
+          }}
+          aria-hidden
+        >
+          {[
+            { x: "-60%", y: "-40%", s: 60, d: 0.05 },
+            { x: "70%", y: "-30%", s: 70, d: 0.12 },
+            { x: "-50%", y: "60%", s: 80, d: 0.18 },
+            { x: "65%", y: "70%", s: 65, d: 0.24 },
+            { x: "10%", y: "-70%", s: 55, d: 0.30 },
+            { x: "-20%", y: "85%", s: 75, d: 0.36 },
+          ].map((d, i) => (
+            <motion.span
+              key={i}
+              className="absolute left-1/2 top-1/2 rounded-full"
+              style={{
+                width: d.s,
+                height: d.s,
+                marginLeft: -d.s / 2,
+                marginTop: -d.s / 2,
+                background:
+                  "radial-gradient(circle at 30% 30%, hsl(164 70% 55% / 0.95), hsl(178 50% 18% / 0.95) 70%)",
+                boxShadow: "inset 0 -6px 12px hsl(180 50% 4% / 0.4), inset 0 4px 8px hsl(0 0% 100% / 0.15)",
+              }}
+              initial={{ x: d.x, y: d.y, scale: 0.6, opacity: 0 }}
+              animate={{
+                x: ["0%", "0%"],
+                y: ["0%", "0%"],
+                scale: [0.6, 1.3, 4.5],
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: 1.1,
+                delay: d.d,
+                ease: [0.65, 0, 0.35, 1],
+                times: [0, 0.4, 0.85, 1],
+              }}
+            />
+          ))}
+        </motion.div>
+
+        <motion.form
+          variants={formVariants}
+          initial="hidden"
+          animate="visible"
+          onSubmit={handleSubmit}
+          className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] p-5 border transition-[border-color,box-shadow] duration-500 ${
+            focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
+          }`}
+          style={{
+            background:
+              "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
+            backdropFilter: "blur(24px) saturate(160%)",
+            WebkitBackdropFilter: "blur(24px) saturate(160%)",
+            boxShadow: focused
+              ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
+              : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
+            animation: "liquidBreathe 7s ease-in-out infinite",
+          }}
+        >
+          {/* Focus ripple — radial pulse from center when input gains focus */}
+          {focused && (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                background: "radial-gradient(circle, hsl(164 80% 60% / 0.5), transparent 70%)",
+                animation: "liquidRipple 1.6s ease-out infinite",
+              }}
+            />
+          )}
         {/* Chromatic blobs — soft mint + amber resin glow inside the glass */}
         <div
           aria-hidden
