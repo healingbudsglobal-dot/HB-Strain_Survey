@@ -134,20 +134,18 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
 
       <motion.div
         variants={itemVariants}
-        className="rounded-2xl border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.88)] backdrop-blur-xl p-6 w-full relative overflow-hidden"
+        className="rounded-2xl border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.92)] p-6 w-full relative overflow-hidden"
         style={{
           boxShadow:
-            "0 30px 80px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.1), 0 0 40px -10px hsl(164 80% 55% / 0.3), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
+            "0 20px 50px -20px hsl(180 30% 2% / 0.6), 0 0 0 1px hsl(164 80% 55% / 0.1), inset 0 1px 0 hsl(0 0% 100% / 0.05)",
         }}
       >
-        {/* Aurora accent line at top */}
+        {/* Static accent line at top */}
         <div
           className="absolute top-0 left-0 right-0 h-[2px] opacity-80"
           style={{
             background:
               "linear-gradient(90deg, transparent, hsl(164 70% 60%), hsl(180 70% 75%), hsl(164 70% 60%), transparent)",
-            backgroundSize: "200% 100%",
-            animation: "auroraShift 6s ease-in-out infinite",
           }}
         />
 
