@@ -542,55 +542,110 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           }}
         />
 
-        {/* ====== CTA — command button with halo ====== */}
-        <div className="relative">
+        {/* ====== CTA — chunky 3D press button with shelf, ripple & particle burst ====== */}
+        <div className="relative pt-1 pb-2 select-none">
           {agreed && (
             <span
               aria-hidden
-              className="pointer-events-none absolute -inset-2 rounded-3xl"
+              className="pointer-events-none absolute -inset-3 rounded-[32px]"
               style={{
-                background: "radial-gradient(60% 60% at 50% 50%, hsl(164 80% 55% / 0.45), transparent 70%)",
-                filter: "blur(18px)",
+                background: "radial-gradient(60% 60% at 50% 55%, hsl(164 80% 55% / 0.55), transparent 70%)",
+                filter: "blur(22px)",
                 animation: "ctaHalo 2.6s ease-in-out infinite",
               }}
             />
           )}
-          <motion.button
-            type="submit"
-            disabled={!agreed}
-            whileHover={agreed ? { scale: 1.01 } : undefined}
-            whileTap={agreed ? { scale: 0.98 } : undefined}
-            className="group relative w-full overflow-hidden rounded-2xl py-5 font-display font-semibold text-[hsl(180_25%_6%)] text-[17px] transition-all flex items-center justify-center gap-2 min-h-[60px] disabled:cursor-not-allowed"
+          <div
+            className="relative rounded-[22px]"
             style={{
-              backgroundImage: agreed
-                ? "linear-gradient(135deg, hsl(164 75% 65%) 0%, hsl(164 65% 50%) 50%, hsl(170 70% 42%) 100%)"
-                : "linear-gradient(135deg, hsl(180 10% 22%), hsl(180 10% 16%))",
+              background: agreed
+                ? "linear-gradient(180deg, hsl(170 65% 22%) 0%, hsl(175 70% 14%) 100%)"
+                : "linear-gradient(180deg, hsl(180 10% 14%) 0%, hsl(180 12% 9%) 100%)",
               boxShadow: agreed
-                ? "0 18px 40px -10px hsl(164 80% 30% / 0.65), inset 0 1.5px 0 hsl(0 0% 100% / 0.35), inset 0 -2px 0 hsl(180 50% 5% / 0.3)"
-                : "inset 0 1px 0 hsl(0 0% 100% / 0.05), inset 0 -1px 0 hsl(180 50% 3% / 0.4)",
-              color: agreed ? "hsl(180 25% 6%)" : "hsl(180 8% 55%)",
+                ? "0 16px 32px -10px hsl(164 80% 18% / 0.7), 0 2px 0 hsl(180 50% 4% / 0.6)"
+                : "0 6px 16px -6px hsl(180 50% 3% / 0.5)",
+              padding: "0 0 7px 0",
             }}
           >
-            {agreed && (
-              <span
-                data-sheen
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-                style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
-              />
-            )}
-            {agreed ? (
-              <>
-                <span className="relative z-10">Reveal My Match</span>
-                <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={2.5} />
-              </>
-            ) : (
-              <>
-                <Lock className="relative z-10 h-4 w-4" />
-                <span className="relative z-10">Confirm 18+ to continue</span>
-              </>
-            )}
-          </motion.button>
+            <motion.button
+              type="submit"
+              disabled={!agreed}
+              whileHover={agreed ? { y: -1 } : undefined}
+              whileTap={agreed ? { y: 6, transition: { type: "spring", stiffness: 900, damping: 30 } } : undefined}
+              onClick={(e) => {
+                if (!agreed) return;
+                const btn = e.currentTarget;
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const ripple = document.createElement("span");
+                ripple.className = "cta-ripple";
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                btn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 700);
+                const burst = document.createElement("span");
+                burst.className = "cta-burst-layer";
+                for (let i = 0; i < 10; i++) {
+                  const p = document.createElement("span");
+                  const angle = (i / 10) * Math.PI * 2;
+                  const dist = 38 + Math.random() * 22;
+                  p.className = "cta-particle";
+                  p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`);
+                  p.style.setProperty("--ty", `${Math.sin(angle) * dist}px`);
+                  burst.appendChild(p);
+                }
+                btn.appendChild(burst);
+                setTimeout(() => burst.remove(), 800);
+              }}
+              className="group relative w-full overflow-hidden rounded-[22px] py-5 font-display font-bold text-[18px] tracking-[-0.01em] transition-[background,box-shadow] duration-150 flex items-center justify-center gap-2.5 min-h-[64px] disabled:cursor-not-allowed will-change-transform"
+              style={{
+                backgroundImage: agreed
+                  ? "linear-gradient(180deg, hsl(164 78% 68%) 0%, hsl(164 70% 55%) 45%, hsl(168 72% 46%) 100%)"
+                  : "linear-gradient(180deg, hsl(180 10% 26%) 0%, hsl(180 10% 18%) 100%)",
+                boxShadow: agreed
+                  ? "inset 0 2px 0 hsl(0 0% 100% / 0.55), inset 0 -3px 0 hsl(170 70% 22% / 0.6), inset 0 0 0 1px hsl(164 60% 40% / 0.4), 0 1px 2px hsl(180 50% 5% / 0.3)"
+                  : "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 3% / 0.4)",
+                color: agreed ? "hsl(180 30% 8%)" : "hsl(180 8% 55%)",
+                textShadow: agreed ? "0 1px 0 hsl(0 0% 100% / 0.25)" : "none",
+              }}
+            >
+              {agreed && (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[22px]"
+                  style={{
+                    background: "linear-gradient(180deg, hsl(0 0% 100% / 0.32) 0%, hsl(0 0% 100% / 0) 100%)",
+                  }}
+                />
+              )}
+              {agreed && (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/45 to-transparent"
+                  style={{ animation: "sheenSweep 3s ease-in-out infinite", animationDelay: "1s" }}
+                />
+              )}
+
+              {agreed ? (
+                <>
+                  <span className="relative z-10">Reveal My Match</span>
+                  <motion.span
+                    className="relative z-10 inline-flex"
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ArrowRight className="h-5 w-5" strokeWidth={2.75} />
+                  </motion.span>
+                </>
+              ) : (
+                <>
+                  <Lock className="relative z-10 h-4 w-4" />
+                  <span className="relative z-10">Confirm 18+ to continue</span>
+                </>
+              )}
+            </motion.button>
+          </div>
         </div>
 
         <p className="text-[11px] text-muted-foreground/80 mt-0.5 text-center">
