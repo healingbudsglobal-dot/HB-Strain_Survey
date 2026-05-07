@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import hbLogoJar from "@/assets/hb-logo-jar.png";
-import heroFlower from "@/assets/hero-flower.jpg";
 
 const STATUS_MESSAGES = [
   "Comparing your answers to our strain library…",
@@ -88,18 +87,17 @@ const LoadingScreen = () => {
       transition={{ duration: 0.4 }}
       className="relative z-10 flex flex-col items-center justify-center px-6 text-center"
     >
-      {/* Full-bleed flower backdrop — cinematic */}
+      {/* Crisp backdrop — tint + film grain (no blur) */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <motion.img
-          src={heroFlower}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "blur(30px) saturate(1.2)", mixBlendMode: "soft-light" }}
-          animate={{ opacity: [0.08, 0.14, 0.08], scale: [1, 1.03, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.85)_80%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.15)]" style={{ mixBlendMode: "overlay" }} />
+        <div
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          }}
+        />
       </div>
 
       {/* DNA Helix animation */}
