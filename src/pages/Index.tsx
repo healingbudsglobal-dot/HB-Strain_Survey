@@ -198,51 +198,60 @@ const Index = () => {
   // Calm the screen on results — animated ambients caused strobing on mobile
   const isResults = screen === "success" || screen === "loading";
 
+  const screenContent = (
+    <>
+      {screen === "squeeze" && <SqueezeScreen onSubmit={handleEmailSubmit} />}
+      {screen === "otp" && (
+        <OtpVerification
+          email={email}
+          onVerified={handleOtpVerified}
+          onResend={handleOtpResend}
+          onBack={handleOtpBack}
+        />
+      )}
+      {screen === "survey" && <SurveyFlow onComplete={handleSurveyComplete} />}
+      {screen === "contact" && (
+        <ContactCapture
+          onSubmit={handleContactSubmit}
+          onSkip={handleContactSkip}
+          strainName={strainResult?.strain.name}
+          userEmail={email}
+        />
+      )}
+      {screen === "loading" && <LoadingScreen />}
+      {screen === "success" && <SuccessScreen result={strainResult} />}
+    </>
+  );
+
   return (
     <div className="leaf-pattern relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden pb-[env(safe-area-inset-bottom)]">
-      <BudAmbient intensity={isResults ? 0.5 : 1} />
-      {!isResults && <NeuronAmbient />}
+      {!reduceMotion && <BudAmbient intensity={isResults ? 0.5 : 1} />}
+      {!isResults && !reduceMotion && <NeuronAmbient />}
       {(screen === "squeeze" || screen === "otp") && <HeroBackdrop />}
-      {!isResults && <AmbientParticles />}
+      {!isResults && !reduceMotion && <AmbientParticles />}
 
-      {/* Step Progress - fixed at top, hidden on squeeze screen */}
       {screen !== "squeeze" && (
         <div className="fixed top-0 left-0 right-0 z-50 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 px-6 bg-[hsl(180_8%_7%_/_0.85)] border-b border-border/40">
           <StepProgress currentStep={stepIndex} />
         </div>
       )}
 
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.div
-          key={screen}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
-          className="flex w-full items-center justify-center pt-20"
-        >
-          {screen === "squeeze" && <SqueezeScreen onSubmit={handleEmailSubmit} />}
-          {screen === "otp" && (
-            <OtpVerification
-              email={email}
-              
-              onVerified={handleOtpVerified}
-              onResend={handleOtpResend}
-              onBack={handleOtpBack}
-            />
-          )}
-          {screen === "survey" && <SurveyFlow onComplete={handleSurveyComplete} />}
-          {screen === "contact" && (
-            <ContactCapture
-              onSubmit={handleContactSubmit}
-              onSkip={handleContactSkip}
-              strainName={strainResult?.strain.name}
-              userEmail={email}
-            />
-          )}
-          {screen === "loading" && <LoadingScreen />}
-          {screen === "success" && <SuccessScreen result={strainResult} />}
-        </motion.div>
+      {reduceMotion ? (
+        <div key={screen} className="flex w-full items-center justify-center pt-20">
+          {screenContent}
+        </div>
+      ) : (
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.div
+            key={screen}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="flex w-full items-center justify-center pt-20"
+          >
+            {screenContent}
+          </motion.div>
       </AnimatePresence>
     </div>
   );
