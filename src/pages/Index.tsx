@@ -252,7 +252,8 @@ const Index = () => {
           >
             {screenContent}
           </motion.div>
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
     </div>
   );
 };
