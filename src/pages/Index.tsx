@@ -1,5 +1,6 @@
-import { useState, useCallback, useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { markScreenEnter, markScreenExit } from "@/lib/perf";
 import SqueezeScreen from "@/components/SqueezeScreen";
 import SurveyFlow from "@/components/SurveyFlow";
 import ContactCapture from "@/components/ContactCapture";
