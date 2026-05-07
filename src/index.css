@@ -361,3 +361,24 @@
 @media (prefers-reduced-motion: reduce) {
   [style*="auroraShift"], [style*="sheenSweep"] { animation: none !important; }
 }
+
+/* ===== Global reduced-motion kill switch =====
+ * Honors OS-level prefers-reduced-motion: reduce.
+ * Strips animations, transitions, blend modes, and heavy filters that
+ * cause flicker on low-end mobile GPUs.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Kill expensive compositing on decorative layers */
+  .hero-backdrop *,
+  [aria-hidden="true"] {
+    mix-blend-mode: normal !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
