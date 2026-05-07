@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import hbLogoJar from "@/assets/hb-logo-jar.png";
-import heroFlower from "@/assets/hero-flower.jpg";
 
 const STATUS_MESSAGES = [
   "Comparing your answers to our strain library…",
