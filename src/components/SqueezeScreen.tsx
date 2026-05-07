@@ -221,10 +221,11 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <span
           className="relative inline-block bg-clip-text text-transparent"
           style={{
-            backgroundImage:
-              "linear-gradient(110deg, hsl(164 55% 72%) 0%, hsl(164 85% 58%) 35%, hsl(180 75% 82%) 50%, hsl(164 85% 58%) 65%, hsl(164 55% 72%) 100%)",
-            backgroundSize: "200% 100%",
-            animation: "auroraShift 6s ease-in-out infinite",
+            backgroundImage: disableAurora
+              ? "linear-gradient(180deg, hsl(164 75% 78%) 0%, hsl(164 85% 58%) 100%)"
+              : "linear-gradient(110deg, hsl(164 55% 72%) 0%, hsl(164 85% 58%) 35%, hsl(180 75% 82%) 50%, hsl(164 85% 58%) 65%, hsl(164 55% 72%) 100%)",
+            backgroundSize: disableAurora ? "100% 100%" : "200% 100%",
+            animation: disableAurora ? "none" : "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
             filter:
               "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
