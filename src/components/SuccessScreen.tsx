@@ -45,28 +45,14 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
       animate="visible"
       className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-md w-full"
     >
-      {/* Mixed green + gold confetti */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: i % 2 === 0 ? 8 : 5,
-              height: i % 2 === 0 ? 8 : 5,
-              left: `${10 + i * 13}%`,
-              background: i % 3 === 0
-                ? "hsl(var(--brand-gold))"
-                : i % 3 === 1
-                  ? "hsl(var(--accent-green))"
-                  : "hsl(var(--lime-green))",
-            }}
-            initial={{ y: 0, opacity: 0 }}
-            animate={{ y: -150, opacity: [0, 1, 0], scale: [1, 1.2, 0.3] }}
-            transition={{ duration: 2.5, delay: i * 0.15, ease: "easeOut" }}
-          />
-        ))}
-      </div>
+      {/* Soft static glow — no animated confetti (caused mobile strobing) */}
+      <div
+        className="pointer-events-none absolute inset-x-0 -top-10 h-40 opacity-60"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, hsl(var(--accent-green) / 0.18) 0%, transparent 70%)",
+        }}
+      />
 
       {/* Success icon — green */}
       <motion.div variants={itemVariants} className="relative mb-6">
@@ -230,7 +216,7 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
             href="mailto:info@healingbuds.co.za?subject=Private%20Enquiry%20-%20Lifestyle%20Match"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            className="mt-4 group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 flex items-center justify-center gap-2 min-h-[52px] animate-pulse-glow"
+            className="mt-4 group w-full rounded-2xl gradient-accent py-4 font-display font-bold text-white text-base transition-all hover:brightness-110 flex items-center justify-center gap-2 min-h-[52px] shadow-glow"
           >
             Enquire Privately
             <Mail className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

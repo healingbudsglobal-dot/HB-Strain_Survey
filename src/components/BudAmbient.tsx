@@ -19,10 +19,10 @@ const BudAmbient = ({ intensity = 1 }: { intensity?: number }) => {
           backgroundImage: `url(${budMacro})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(36px) saturate(1.15) hue-rotate(-8deg)",
+          filter: "blur(36px) saturate(1.1)",
           maskImage: "radial-gradient(circle at center, black 30%, transparent 72%)",
           WebkitMaskImage: "radial-gradient(circle at center, black 30%, transparent 72%)",
-          mixBlendMode: "screen",
+          opacity: 0.5,
         }}
       />
       {/* Bottom-right bud, mirrored */}
@@ -33,10 +33,10 @@ const BudAmbient = ({ intensity = 1 }: { intensity?: number }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           transform: "scaleX(-1)",
-          filter: "blur(44px) saturate(1.2) hue-rotate(6deg)",
+          filter: "blur(44px) saturate(1.15)",
           maskImage: "radial-gradient(circle at center, black 28%, transparent 70%)",
           WebkitMaskImage: "radial-gradient(circle at center, black 28%, transparent 70%)",
-          mixBlendMode: "screen",
+          opacity: 0.45,
         }}
       />
       {/* Deep emerald wash to keep contrast */}
