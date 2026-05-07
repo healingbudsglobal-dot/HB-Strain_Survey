@@ -10,7 +10,7 @@ const BudAmbient = ({ intensity = 1 }: { intensity?: number }) => {
     <div
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-20 overflow-hidden"
-      style={{ opacity: 0.32 * intensity }}
+      style={{ opacity: 0.32 * intensity, transform: "translateZ(0)", willChange: "opacity", backfaceVisibility: "hidden" }}
     >
       {/* Top-left bud */}
       <div
