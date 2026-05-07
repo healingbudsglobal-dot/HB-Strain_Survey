@@ -20,9 +20,6 @@ import { useUtmTracking, utmToPayload } from "@/hooks/useUtmTracking";
 
 type Screen = "squeeze" | "otp" | "survey" | "contact" | "loading" | "success";
 
-function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
 
 // Cinematic screen transition variants
 const screenVariants = {
@@ -40,7 +37,6 @@ const Index = () => {
   const [screen, setScreen] = useState<Screen>("squeeze");
   const [email, setEmail] = useState("");
   const [province, setProvince] = useState("");
-  const [otpCode, setOtpCode] = useState("");
   const [surveyAnswers, setSurveyAnswers] = useState<Record<string, string>>({});
   const [strainResult, setStrainResult] = useState<StrainMatch | null>(null);
   const { toast } = useToast();
