@@ -102,38 +102,19 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
           )}
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.h2
-            key={verified ? "verified" : "verify"}
-            initial={verified ? { opacity: 0, y: 8 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl"
+        <h2 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl">
+          <span
+            className="bg-clip-text text-transparent"
+            style={{
+              backgroundImage:
+                "linear-gradient(110deg, hsl(164 60% 75%) 0%, hsl(164 90% 60%) 50%, hsl(180 75% 82%) 100%)",
+              WebkitBackgroundClip: "text",
+            }}
           >
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage: verified
-                  ? "linear-gradient(110deg, hsl(164 60% 75%) 0%, hsl(164 90% 60%) 50%, hsl(180 75% 82%) 100%)"
-                  : "linear-gradient(110deg, hsl(164 55% 72%) 0%, hsl(164 85% 58%) 35%, hsl(180 75% 82%) 50%, hsl(164 85% 58%) 65%, hsl(164 55% 72%) 100%)",
-                backgroundSize: "200% 100%",
-                animation: "auroraShift 6s ease-in-out infinite",
-                WebkitBackgroundClip: "text",
-                filter:
-                  "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.65)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.55)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.5))",
-              }}
-            >
-              {verified ? "Verified!" : "Verify Your Email"}
-            </span>
-          </motion.h2>
-        </AnimatePresence>
-      </motion.div>
-      <style>{`
-        @keyframes auroraShift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
+            {verified ? "Verified!" : "Verify Your Email"}
+          </span>
+        </h2>
+
 
       <motion.p variants={itemVariants} className="mb-1.5 text-sm text-muted-foreground leading-relaxed max-w-xs">
         We sent a 6-digit code to{" "}
