@@ -45,6 +45,7 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
         setTimeout(() => onVerified(), 700);
         return;
       }
+      const reason = result.reason;
       const msg: Record<string, string> = {
         invalid_code: "Incorrect code. Please try again.",
         expired: "This code has expired. Tap Resend to get a new one.",
@@ -55,10 +56,9 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
         server_error: "Verification service unavailable. Please try again.",
         network_error: "Network error. Check your connection and retry.",
       };
-      setError(msg[result.reason] ?? "Incorrect or expired code. Please try again.");
+      setError(msg[reason] ?? "Incorrect or expired code. Please try again.");
       setValue("");
-      // Allow immediate resend on dead-code errors
-      if (["expired", "already_used", "no_code"].includes(result.reason)) {
+      if (["expired", "already_used", "no_code"].includes(reason)) {
         setCanResend(true);
         setCooldown(0);
       }
