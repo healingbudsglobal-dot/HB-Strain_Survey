@@ -181,7 +181,10 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
         <div className="relative">
           <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
           <input
+            id="contact-first-name"
+            name="firstName"
             type="text"
+            autoComplete="given-name"
             placeholder="Your first name"
             value={name}
             onChange={(e) => setName(e.target.value)}
