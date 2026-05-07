@@ -21,6 +21,13 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   const [verifying, setVerifying] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
+  const otpContainerRef = useRef<HTMLDivElement>(null);
+
+  const focusOtpInput = useCallback(() => {
+    const el = otpContainerRef.current?.querySelector<HTMLInputElement>("input");
+    el?.focus();
+  }, []);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => markOtpReady());
@@ -36,8 +43,15 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
     return () => clearTimeout(timer);
   }, [cooldown]);
 
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return;
+    const timer = setTimeout(() => setLockoutSeconds((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [lockoutSeconds]);
+
   const handleComplete = useCallback(
     async (val: string) => {
+      if (lockoutSeconds > 0) return;
       setVerifying(true);
       setError("");
       const result = await verifyOtp(email, val);
@@ -53,29 +67,36 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
         expired: "This code has expired. Tap Resend to get a new one.",
         already_used: "This code was already used. Tap Resend for a new one.",
         no_code: "No code found. Tap Resend to get a new one.",
-        too_many_attempts: "Too many attempts. Please wait and resend.",
+        too_many_attempts: "Too many attempts. Please wait before trying again.",
         invalid_input: "Please enter all 6 digits.",
         server_error: "Verification service unavailable. Please try again.",
         network_error: "Network error. Check your connection and retry.",
       };
       setError(msg[reason] ?? "Incorrect or expired code. Please try again.");
       setValue("");
+      if (reason === "too_many_attempts") {
+        setLockoutSeconds(LOCKOUT_SECONDS);
+      } else {
+        // Re-focus input for quick retry
+        setTimeout(() => focusOtpInput(), 50);
+      }
       if (["expired", "already_used", "no_code"].includes(reason)) {
         setCanResend(true);
         setCooldown(0);
       }
     },
-    [email, onVerified]
+    [email, onVerified, lockoutSeconds, focusOtpInput]
   );
 
   const handleResend = useCallback(() => {
-    if (!canResend) return;
+    if (!canResend || lockoutSeconds > 0) return;
     setCanResend(false);
     setCooldown(30);
     setValue("");
     setError("");
     onResend();
-  }, [canResend, onResend]);
+    setTimeout(() => focusOtpInput(), 50);
+  }, [canResend, lockoutSeconds, onResend, focusOtpInput]);
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full">
