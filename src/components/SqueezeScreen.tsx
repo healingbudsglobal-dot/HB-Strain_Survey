@@ -127,10 +127,98 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         <Sparkles className="h-16 w-16 text-[hsl(var(--accent-green))]" />
       </motion.div>
 
-      {/* Logo */}
+      {/* Logo with nerve-signal shimmer (pink → pearl → green pulse across the mark) */}
       <motion.div variants={itemVariants} className="mb-8 relative">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-16 w-auto sm:h-20" />
+        <div className="relative inline-block">
+          <img
+            src={hbLogoWhite}
+            alt="Healing Buds"
+            className="h-16 w-auto sm:h-20 relative z-10"
+            draggable={false}
+          />
+
+          {/* Nerve signal — masked to the logo silhouette so the pulse only paints the mark */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-20 overflow-hidden"
+            style={{
+              WebkitMaskImage: `url(${hbLogoWhite})`,
+              maskImage: `url(${hbLogoWhite})`,
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskSize: "100% 100%",
+              maskSize: "100% 100%",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }}
+          >
+            {/* Travelling synaptic gradient — pink ➜ pearl ➜ green, sweeping diagonally */}
+            <div
+              className="absolute -inset-x-1/2 inset-y-0"
+              style={{
+                background:
+                  "linear-gradient(115deg, transparent 30%, hsl(330 90% 72% / 0.0) 36%, hsl(330 95% 72% / 0.95) 44%, hsl(0 0% 100% / 1) 50%, hsl(155 90% 62% / 0.95) 56%, hsl(155 90% 62% / 0) 64%, transparent 70%)",
+                filter: "blur(0.4px)",
+                mixBlendMode: "screen",
+                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+              }}
+            />
+            {/* Trailing ember — slower, deeper green afterglow */}
+            <div
+              className="absolute -inset-x-1/2 inset-y-0 opacity-70"
+              style={{
+                background:
+                  "linear-gradient(115deg, transparent 42%, hsl(155 95% 55% / 0.55) 50%, transparent 58%)",
+                filter: "blur(2px)",
+                mixBlendMode: "screen",
+                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                animationDelay: "0.18s",
+              }}
+            />
+            {/* Pink leading spark */}
+            <div
+              className="absolute -inset-x-1/2 inset-y-0 opacity-80"
+              style={{
+                background:
+                  "linear-gradient(115deg, transparent 38%, hsl(330 100% 78% / 0.7) 46%, transparent 54%)",
+                filter: "blur(2.5px)",
+                mixBlendMode: "screen",
+                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                animationDelay: "-0.15s",
+              }}
+            />
+          </div>
+
+          {/* Subtle synaptic flicker glow that pulses with the sweep */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 rounded-full"
+            style={{
+              background:
+                "radial-gradient(ellipse at 20% 50%, hsl(330 90% 65% / 0.18), transparent 55%), radial-gradient(ellipse at 80% 50%, hsl(155 90% 55% / 0.22), transparent 55%)",
+              filter: "blur(28px)",
+              transform: "scale(2)",
+              animation: "nervePulse 4.6s ease-in-out infinite",
+            }}
+          />
+        </div>
         <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.18)] rounded-full scale-[2]" />
+
+        <style>{`
+          @keyframes nerveSweep {
+            0%   { transform: translateX(-65%); opacity: 0; }
+            12%  { opacity: 1; }
+            88%  { opacity: 1; }
+            100% { transform: translateX(65%); opacity: 0; }
+          }
+          @keyframes nervePulse {
+            0%, 100% { opacity: 0.35; }
+            50%      { opacity: 0.85; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            [style*="nerveSweep"], [style*="nervePulse"] { animation: none !important; }
+          }
+        `}</style>
       </motion.div>
 
       <motion.h1
