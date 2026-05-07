@@ -63,20 +63,33 @@ export async function sendOtpEmail(email: string): Promise<boolean> {
   }
 }
 
-/** Verify a 6-digit OTP server-side. Returns true only if the server confirms. */
-export async function verifyOtp(email: string, code: string): Promise<boolean> {
+export type VerifyOtpResult = { ok: true } | { ok: false; reason: string };
+
+/** Verify a 6-digit OTP server-side. Returns ok plus reason on failure. */
+export async function verifyOtp(email: string, code: string): Promise<VerifyOtpResult> {
   try {
     const { data, error } = await supabase.functions.invoke("verify-otp", {
       body: { email, code },
     });
+    // supabase-js returns FunctionsHttpError for non-2xx; the body is in error.context
     if (error) {
       console.error("OTP verify error:", error);
-      return false;
+      let reason = "server_error";
+      try {
+        const ctx: any = (error as any).context;
+        if (ctx && typeof ctx.json === "function") {
+          const body = await ctx.json();
+          if (body?.error) reason = String(body.error);
+        }
+      } catch {}
+      return { ok: false, reason };
     }
-    return Boolean((data as { ok?: boolean } | null)?.ok);
+    const body = data as { ok?: boolean; error?: string } | null;
+    if (body?.ok) return { ok: true };
+    return { ok: false, reason: body?.error ?? "invalid_code" };
   } catch (err) {
     console.error("OTP verify failed:", err);
-    return false;
+    return { ok: false, reason: "network_error" };
   }
 }
 

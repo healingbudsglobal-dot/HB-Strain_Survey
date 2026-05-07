@@ -38,14 +38,29 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
     async (val: string) => {
       setVerifying(true);
       setError("");
-      const ok = await verifyOtp(email, val);
+      const result = await verifyOtp(email, val);
       setVerifying(false);
-      if (ok) {
+      if (result.ok === true) {
         setVerified(true);
         setTimeout(() => onVerified(), 700);
-      } else {
-        setError("Incorrect or expired code. Please try again.");
-        setValue("");
+        return;
+      }
+      const reason = (result as { ok: false; reason: string }).reason;
+      const msg: Record<string, string> = {
+        invalid_code: "Incorrect code. Please try again.",
+        expired: "This code has expired. Tap Resend to get a new one.",
+        already_used: "This code was already used. Tap Resend for a new one.",
+        no_code: "No code found. Tap Resend to get a new one.",
+        too_many_attempts: "Too many attempts. Please wait and resend.",
+        invalid_input: "Please enter all 6 digits.",
+        server_error: "Verification service unavailable. Please try again.",
+        network_error: "Network error. Check your connection and retry.",
+      };
+      setError(msg[reason] ?? "Incorrect or expired code. Please try again.");
+      setValue("");
+      if (["expired", "already_used", "no_code"].includes(reason)) {
+        setCanResend(true);
+        setCooldown(0);
       }
     },
     [email, onVerified]
