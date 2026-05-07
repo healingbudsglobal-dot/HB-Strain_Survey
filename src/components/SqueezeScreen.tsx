@@ -309,7 +309,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           initial="hidden"
           animate="visible"
           onSubmit={handleSubmit}
-          className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] p-5 border transition-[border-color,box-shadow] duration-500 ${
+          className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] py-5 pr-5 pl-7 border transition-[border-color,box-shadow] duration-500 ${
             focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
           }`}
           style={{
@@ -364,6 +364,98 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.35), transparent)",
           }}
         />
+
+        {/* ====== AMBIENT NEURON WATERMARK — subtle dendrite tracery behind fields ====== */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.07] mix-blend-screen"
+          viewBox="0 0 400 600"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <g fill="none" stroke="hsl(164 70% 65%)" strokeWidth="0.6">
+            <path d="M 60 80 Q 120 140 90 220 T 130 380 Q 110 460 160 540" />
+            <path d="M 340 60 Q 280 130 320 230 T 270 400 Q 300 480 250 560" />
+            <path d="M 200 40 Q 180 120 220 200 T 180 360 Q 220 440 200 540" />
+            <path d="M 90 220 L 140 240" /><path d="M 320 230 L 270 250" />
+            <path d="M 130 380 L 180 360" /><path d="M 270 400 L 220 380" />
+          </g>
+          <g fill="hsl(164 80% 70%)">
+            <circle cx="60" cy="80" r="2" /><circle cx="340" cy="60" r="2" />
+            <circle cx="90" cy="220" r="1.6" /><circle cx="320" cy="230" r="1.6" />
+            <circle cx="200" cy="40" r="1.8" /><circle cx="160" cy="540" r="2" />
+            <circle cx="250" cy="560" r="2" /><circle cx="130" cy="380" r="1.6" />
+            <circle cx="270" cy="400" r="1.6" />
+          </g>
+        </svg>
+
+        {/* ====== SIGNAL RAIL — left-edge neural wire that lights up as fields complete ====== */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute left-1.5 top-6 bottom-24 w-3 z-[2]"
+          viewBox="0 0 12 400"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id="rail-pulse" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="hsl(164 90% 70% / 0)" />
+              <stop offset="50%" stopColor="hsl(164 95% 75% / 1)" />
+              <stop offset="100%" stopColor="hsl(38 90% 65% / 0)" />
+            </linearGradient>
+            <filter id="rail-glow" x="-100%" y="-50%" width="300%" height="200%">
+              <feGaussianBlur stdDeviation="1.5" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          {/* Static dim rail */}
+          <path d="M 6 10 L 6 390" stroke="hsl(164 50% 50% / 0.25)" strokeWidth="1" />
+          {/* Lit segments per completed step */}
+          <motion.path d="M 6 10 L 6 140" stroke="hsl(164 85% 60%)" strokeWidth="1.6" filter="url(#rail-glow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: emailValid ? 1 : 0, opacity: emailValid ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} />
+          <motion.path d="M 6 140 L 6 270" stroke="hsl(164 85% 60%)" strokeWidth="1.6" filter="url(#rail-glow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: emailValid && province ? 1 : 0, opacity: emailValid && province ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} />
+          <motion.path d="M 6 270 L 6 390" stroke="hsl(38 90% 65%)" strokeWidth="1.6" filter="url(#rail-glow)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: agreed ? 1 : 0, opacity: agreed ? 1 : 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} />
+          {/* Travelling pulse on most recent activation */}
+          {(emailValid || province || agreed) && (
+            <motion.circle
+              key={`${emailValid}-${province}-${agreed}`}
+              cx="6"
+              r="2.5"
+              fill="hsl(50 100% 85%)"
+              filter="url(#rail-glow)"
+              initial={{ cy: 10, opacity: 0 }}
+              animate={{
+                cy: agreed ? 390 : province ? 270 : emailValid ? 140 : 10,
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{ duration: 0.7, ease: "easeOut", times: [0, 0.15, 0.85, 1] }}
+            />
+          )}
+          {/* Three nodes — one per field */}
+          {[
+            { cy: 10, lit: emailValid },
+            { cy: 140, lit: emailValid },
+            { cy: 270, lit: emailValid && !!province },
+            { cy: 390, lit: agreed },
+          ].map((n, i) => (
+            <circle
+              key={i}
+              cx="6"
+              cy={n.cy}
+              r={n.lit ? 3.5 : 2.5}
+              fill={n.lit ? (i === 3 ? "hsl(38 95% 70%)" : "hsl(164 90% 70%)") : "hsl(170 30% 35%)"}
+              filter={n.lit ? "url(#rail-glow)" : undefined}
+              style={{ transition: "fill 0.3s, r 0.3s" }}
+            />
+          ))}
+        </svg>
+
 
         {/* ====== EMAIL — floating label, live mint icon ====== */}
         <div className="relative">
