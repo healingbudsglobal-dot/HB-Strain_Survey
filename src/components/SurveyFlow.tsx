@@ -232,6 +232,28 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
           0% { transform: translateX(-120%) skewX(-20deg); }
           100% { transform: translateX(220%) skewX(-20deg); }
         }
+        @keyframes emeraldPulse {
+          0%, 100% {
+            box-shadow:
+              0 0 0 1px hsl(164 80% 55% / 0.55),
+              0 0 0 4px hsl(164 80% 55% / 0.18),
+              0 0 32px -4px hsl(164 80% 55% / 0.55);
+          }
+          50% {
+            box-shadow:
+              0 0 0 2px hsl(164 90% 65% / 0.85),
+              0 0 0 7px hsl(164 80% 55% / 0.10),
+              0 0 48px -2px hsl(164 90% 60% / 0.75);
+          }
+        }
+        .option-emerald-focus:focus-visible {
+          outline: none;
+          animation: emeraldPulse 1.6s ease-in-out infinite;
+          border-color: hsl(164 90% 60% / 0.9) !important;
+        }
+        .option-emerald-selected {
+          animation: emeraldPulse 2.4s ease-in-out infinite;
+        }
         @keyframes orbFloat {
           0%, 100% { transform: translate(0,0) scale(1); }
           50% { transform: translate(8px,-12px) scale(1.05); }
