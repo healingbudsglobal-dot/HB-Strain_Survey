@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import { Shield, RotateCw, Mail, CheckCircle2 } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Shield, RotateCw, Mail, CheckCircle2, Clock } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { verifyOtp } from "@/lib/webhook";
 import { markOtpReady } from "@/lib/perf";
+
+const LOCKOUT_SECONDS = 60;
 
 interface OtpVerificationProps {
   email: string;
@@ -19,6 +21,13 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   const [verifying, setVerifying] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
+  const otpContainerRef = useRef<HTMLDivElement>(null);
+
+  const focusOtpInput = useCallback(() => {
+    const el = otpContainerRef.current?.querySelector<HTMLInputElement>("input");
+    el?.focus();
+  }, []);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => markOtpReady());
@@ -34,8 +43,15 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
     return () => clearTimeout(timer);
   }, [cooldown]);
 
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return;
+    const timer = setTimeout(() => setLockoutSeconds((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [lockoutSeconds]);
+
   const handleComplete = useCallback(
     async (val: string) => {
+      if (lockoutSeconds > 0) return;
       setVerifying(true);
       setError("");
       const result = await verifyOtp(email, val);
@@ -51,29 +67,36 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
         expired: "This code has expired. Tap Resend to get a new one.",
         already_used: "This code was already used. Tap Resend for a new one.",
         no_code: "No code found. Tap Resend to get a new one.",
-        too_many_attempts: "Too many attempts. Please wait and resend.",
+        too_many_attempts: "Too many attempts. Please wait before trying again.",
         invalid_input: "Please enter all 6 digits.",
         server_error: "Verification service unavailable. Please try again.",
         network_error: "Network error. Check your connection and retry.",
       };
       setError(msg[reason] ?? "Incorrect or expired code. Please try again.");
       setValue("");
+      if (reason === "too_many_attempts") {
+        setLockoutSeconds(LOCKOUT_SECONDS);
+      } else {
+        // Re-focus input for quick retry
+        setTimeout(() => focusOtpInput(), 50);
+      }
       if (["expired", "already_used", "no_code"].includes(reason)) {
         setCanResend(true);
         setCooldown(0);
       }
     },
-    [email, onVerified]
+    [email, onVerified, lockoutSeconds, focusOtpInput]
   );
 
   const handleResend = useCallback(() => {
-    if (!canResend) return;
+    if (!canResend || lockoutSeconds > 0) return;
     setCanResend(false);
     setCooldown(30);
     setValue("");
     setError("");
     onResend();
-  }, [canResend, onResend]);
+    setTimeout(() => focusOtpInput(), 50);
+  }, [canResend, lockoutSeconds, onResend, focusOtpInput]);
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full">
@@ -111,13 +134,13 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
       </button>
 
       <div className="rounded-2xl border border-white/[0.08] bg-[hsl(180_20%_5%_/_0.92)] p-6 w-full">
-        <div className="flex justify-center mb-4">
+        <div ref={otpContainerRef} className="flex justify-center mb-4">
           <InputOTP
             maxLength={6}
             value={value}
             onChange={setValue}
             onComplete={handleComplete}
-            disabled={verified || verifying}
+            disabled={verified || verifying || lockoutSeconds > 0}
           >
             <InputOTPGroup className="gap-2.5">
               {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -131,18 +154,30 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
           </InputOTP>
         </div>
 
-        {error && (
-          <p className="text-sm text-destructive mb-3">{error}</p>
+        {lockoutSeconds > 0 ? (
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--accent-green)_/_0.2)] bg-[hsl(var(--accent-green)_/_0.06)] px-3 py-2.5 text-sm text-foreground">
+            <Clock className="h-4 w-4 text-[hsl(var(--accent-green))]" />
+            <span>
+              Too many attempts — try again in{" "}
+              <span className="font-semibold text-[hsl(var(--accent-green))]">{lockoutSeconds}s</span>
+            </span>
+          </div>
+        ) : (
+          error && <p className="text-sm text-destructive mb-3" role="alert">{error}</p>
         )}
 
         <button
           type="button"
           onClick={handleResend}
-          disabled={!canResend}
+          disabled={!canResend || lockoutSeconds > 0}
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-[hsl(var(--accent-green))] transition-colors disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] px-4"
         >
           <RotateCw className="h-3.5 w-3.5" />
-          {canResend ? "Resend code" : `Resend in ${cooldown}s`}
+          {lockoutSeconds > 0
+            ? `Locked (${lockoutSeconds}s)`
+            : canResend
+            ? "Resend code"
+            : `Resend in ${cooldown}s`}
         </button>
       </div>
 
