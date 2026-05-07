@@ -21,6 +21,11 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
+    const id = requestAnimationFrame(() => markOtpReady());
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  useEffect(() => {
     if (cooldown <= 0) {
       setCanResend(true);
       return;
