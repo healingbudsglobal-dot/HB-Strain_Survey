@@ -23,7 +23,11 @@ const NODES = [
   { cx: 800, cy: 660, r: 2.8, d: 0.9 },
 ];
 
+import { useReducedMotion } from "framer-motion";
+
 const NeuronAmbient = ({ intensity = 1 }: { intensity?: number }) => {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
   return (
     <div
       aria-hidden

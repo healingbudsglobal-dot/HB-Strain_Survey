@@ -3,6 +3,7 @@ import { Shield, RotateCw, Mail, CheckCircle2 } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { verifyOtp } from "@/lib/webhook";
+import { markOtpReady } from "@/lib/perf";
 
 interface OtpVerificationProps {
   email: string;
@@ -18,6 +19,11 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   const [verifying, setVerifying] = useState(false);
   const [cooldown, setCooldown] = useState(30);
   const [canResend, setCanResend] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => markOtpReady());
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   useEffect(() => {
     if (cooldown <= 0) {
