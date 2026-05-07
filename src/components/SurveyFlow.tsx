@@ -185,6 +185,24 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
   return (
     <div className="relative z-10 flex w-full max-w-lg flex-col px-5" style={{ perspective: "1200px" }}>
 
+      {/* Ambient story backdrop — crossfades by section so user sees a slow visual journey */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={question.section}
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 0.18, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${SECTION_BG[question.section] || bgFlower})`,
+              filter: "saturate(1.1) hue-rotate(-8deg) blur(2px)",
+            }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(180_30%_4%/0.55)_0%,hsl(180_30%_4%/0.92)_75%)]" />
+      </div>
       {/* Ambient emerald orbs — matching home screen drama */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,hsl(var(--accent-green)_/_0.08)_0%,transparent_65%)]" />
       <motion.div
