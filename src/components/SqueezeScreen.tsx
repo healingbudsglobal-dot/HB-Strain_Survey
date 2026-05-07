@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Dna, Sparkles } from "lucide-react";
+import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
@@ -51,6 +51,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const emailValid = validateEmail(email.trim()).valid;
+  const emailFilled = email.length > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
