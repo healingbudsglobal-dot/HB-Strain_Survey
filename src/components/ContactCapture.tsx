@@ -92,9 +92,20 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
 
       <motion.h2
         variants={itemVariants}
-        className="font-display text-2xl font-bold tracking-[0.02em] text-foreground sm:text-3xl mb-2"
+        className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl mb-2"
       >
-        Your Strain Match Is{" "}
+        <span
+          className="bg-clip-text text-transparent"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
+            WebkitBackgroundClip: "text",
+            filter:
+              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+          }}
+        >
+          Your Strain Match Is{" "}
+        </span>
         <span
           className="bg-clip-text text-transparent"
           style={{
@@ -103,7 +114,8 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
             backgroundSize: "200% 100%",
             animation: "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
-            filter: "drop-shadow(0 0 18px hsl(164 80% 55% / 0.35))",
+            filter:
+              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           Ready
