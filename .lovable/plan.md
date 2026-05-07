@@ -1,37 +1,44 @@
-## Adopt the Geometric Humanist system font stack
+## Dramatically bolder form: email + province + consent + CTA
 
-You picked the **Geometric Humanist** stack from modernfontstacks.com — clean, friendly, slightly geometric (think Avenir / Futura family). It's already installed on every device, so we ship 0kb of font data and the page paints instantly.
+The circled area is the conversion moment. Right now it reads as three stacked grey rectangles. We'll re-engineer it into a single tactile, premium, "instrument panel" feel — with floating labels, live icons, and stronger CTA presence — without breaking the existing liquid/cannabinoid form-up animation.
 
-The stack:
-```text
-Avenir, Montserrat, Corbel, 'URW Gothic', source-sans-pro, sans-serif
-```
-- macOS / iOS → **Avenir** (the hero glyph — soft, premium, very on-brand for wellness)
-- Windows → **Corbel**
-- Android → **Montserrat** (often present) → falls back gracefully
-- Linux → **URW Gothic**
+### Changes (all in `src/components/SqueezeScreen.tsx`)
 
-### Plan
+**1. Email input → floating-label glass field with live state**
+- Mail icon (lucide `Mail`) inside the field, left side, that **pulses mint** when the field is focused and **flips to a checkmark in mint** when the email regex passes
+- Floating label "Your email" lifts and shrinks on focus/filled (smooth 200ms)
+- Bigger text (`text-[17px]`), more padding (`py-5`), thicker emerald focus ring (2px → soft 4px glow)
+- Helper text becomes a thin animated underline progress bar that fills mint as the email becomes valid (replaces the small grey hint line — still keeps an aria-describedby for screen readers)
 
-**1. `src/index.css`**
-- Remove the Google Fonts `@import` for DM Sans + Inter (saves ~80kb, kills render-blocking request)
-- Set body font-family to the Geometric Humanist stack
-- Set headings font-family to the same stack but with heavier weights (700/800) so headlines still feel distinct from body
-- Keep the existing `.font-question` rounded-sans utility idea **off the table for now** — single stack across the app keeps it cohesive
+**2. Province select → premium picker with map-pin icon + chevron rotation**
+- `MapPin` icon left, animated chevron right that rotates 180° when open
+- Floating label "Province" lifts on selection
+- Selected province shows in **DM-Sans-weight emphasis** (heavier than placeholder)
+- SelectContent gets glass treatment to match: `bg-card/80 backdrop-blur-xl`, soft mint border, items get a left mint accent bar on hover
 
-**2. `tailwind.config.ts`**
-- Update `fontFamily.display` and `fontFamily.body` both to the Geometric Humanist stack
-- This means existing `font-display` / `font-body` classes keep working — no component edits needed
+**3. Consent row → custom checkbox with mint check animation**
+- Replace native checkbox with a custom 18px rounded square; checkmark draws in (SVG path with `pathLength` framer animation) on check
+- Whole row gets a subtle mint inner glow when checked (already partial — strengthen it)
+- Slightly larger text (`text-[12px]`) and tighter alignment
 
-**3. Smoke check**
-- Verify `SqueezeScreen`, `SurveyFlow`, header, and results screen still feel right (they should — only the typeface changes, no layout shifts since metrics are similar)
+**4. CTA button → command-button presence**
+- Bigger: `py-5 text-[17px]`
+- Add a soft animated mint **halo glow** behind the button that pulses gently (2.4s) when consent is checked → signals "ready"
+- Disabled state gets a clearer "locked" cue: subtle lock icon + lighter copy "Confirm 18+ to continue"
+- Arrow icon scales up slightly and the sheen sweep already exists — keep it
+- Add tactile depth: stronger inset highlight on top, deeper shadow below
 
-### Trade-offs
+**5. Section rhythm**
+- Tighten gaps from default form spacing to `space-y-3.5` so the four elements read as one cohesive instrument cluster, not four floating cards
+- Add a faint mint divider hairline above the CTA (gradient line, fades in/out edges) to separate "your details" from "the action"
 
-- Glyph shape varies by OS (Avenir vs Corbel vs URW Gothic). The *vibe* — geometric, humanist, friendly — stays consistent. This is the modernfontstacks.com philosophy.
-- Lose DM Sans's specific personality. Gain instant paint, no FOIT/FOUT, no Google privacy ping, no licensing concerns.
-- If you ever miss DM Sans on a specific element (e.g. logo wordmark), we can add it back surgically as a single self-hosted woff2.
+### What stays
+- The cannabinoid + neural network form-up animation
+- The wet-glass card outer shell, breathe animation, droplet sheen
+- All existing logic (email regex, province list, consent gate, error handling, submit flow)
+- Color tokens — purely additive
 
 ### Files to edit
-- `src/index.css` (remove import, update font-family declarations)
-- `tailwind.config.ts` (update fontFamily tokens)
+- `src/components/SqueezeScreen.tsx` only
+
+No backend, no schema, no new deps (Mail, MapPin, ChevronDown, Lock from lucide-react are already available).

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Dna, Sparkles } from "lucide-react";
+import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.png";
@@ -51,6 +51,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const emailValid = validateEmail(email.trim()).valid;
+  const emailFilled = email.length > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -363,41 +365,109 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           }}
         />
 
-        <div className="relative rounded-2xl">
+        {/* ====== EMAIL — floating label, live mint icon ====== */}
+        <div className="relative">
           <input
+            id="email-field"
             type="email"
             inputMode="email"
             autoComplete="email"
-            placeholder="name@domain.com"
+            placeholder=" "
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            className="w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] px-5 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all text-[16px] backdrop-blur-md"
+            className="peer w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] pl-12 pr-12 pt-6 pb-3 text-[17px] text-foreground placeholder-transparent focus:outline-none focus:ring-[3px] focus:ring-[hsl(164_80%_55%_/_0.25)] focus:border-[hsl(164_80%_55%_/_0.6)] transition-all backdrop-blur-md"
             style={{ boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 5% / 0.4)" }}
             required
             aria-describedby="email-hint"
           />
-        </div>
-        <p id="email-hint" className="-mt-1 px-1 text-[11px] text-muted-foreground relative">
-          Use a real address (e.g. <span className="font-mono text-foreground/80">name@domain.com</span>) — we'll send your match here.
-        </p>
-
-        <Select value={province} onValueChange={setProvince}>
-          <SelectTrigger
-            className="w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] px-5 py-4 text-[16px] text-foreground focus:ring-2 focus:ring-[hsl(var(--accent-green)_/_0.5)] focus:border-[hsl(var(--accent-green)_/_0.6)] transition-all h-auto [&>span]:text-left backdrop-blur-md"
-            style={{ boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 5% / 0.4)" }}
+          {/* floating label */}
+          <label
+            htmlFor="email-field"
+            className={`pointer-events-none absolute left-12 transition-all duration-200 ${
+              focused || emailFilled
+                ? "top-2 text-[11px] font-medium text-[hsl(164_70%_65%)] tracking-wide uppercase"
+                : "top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground"
+            }`}
           >
-            <SelectValue placeholder="Select your province" />
-          </SelectTrigger>
-          <SelectContent className="z-50 rounded-xl border border-border bg-card text-card-foreground shadow-lg">
-            {PROVINCES.map((p) => (
-              <SelectItem key={p} value={p} className="cursor-pointer">
-                {p}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            Your email
+          </label>
+          {/* left icon — pulses on focus, becomes check on valid */}
+          <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center">
+            <motion.div
+              key={emailValid ? "check" : "mail"}
+              initial={{ scale: 0.6, opacity: 0, rotate: -20 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {emailValid ? (
+                <Check className="h-5 w-5 text-[hsl(164_80%_60%)]" strokeWidth={2.5} />
+              ) : (
+                <Mail className={`h-5 w-5 transition-colors ${focused ? "text-[hsl(164_70%_65%)]" : "text-muted-foreground/70"}`} />
+              )}
+            </motion.div>
+            {focused && !emailValid && (
+              <span
+                aria-hidden
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "radial-gradient(circle, hsl(164 80% 60% / 0.35), transparent 70%)",
+                  animation: "iconPulse 1.6s ease-in-out infinite",
+                }}
+              />
+            )}
+          </div>
+          {/* progress underline */}
+          <div className="absolute bottom-0 left-3 right-3 h-[2px] overflow-hidden rounded-full">
+            <motion.div
+              className="h-full"
+              initial={false}
+              animate={{ width: emailValid ? "100%" : emailFilled ? "40%" : "0%" }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ background: "linear-gradient(90deg, hsl(164 80% 55%), hsl(170 70% 50%))" }}
+            />
+          </div>
+          <p id="email-hint" className="sr-only">We'll send your match here.</p>
+        </div>
+
+        {/* ====== PROVINCE — pin + floating label + glass dropdown ====== */}
+        <div className="relative">
+          <Select value={province} onValueChange={setProvince}>
+            <SelectTrigger
+              className="w-full rounded-2xl border border-white/[0.08] bg-[hsl(180_25%_4%_/_0.55)] pl-12 pr-10 pt-6 pb-3 text-[16px] text-foreground focus:ring-[3px] focus:ring-[hsl(164_80%_55%_/_0.25)] focus:border-[hsl(164_80%_55%_/_0.6)] transition-all h-auto [&>span]:text-left [&>svg]:hidden backdrop-blur-md font-display font-medium"
+              style={{ boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 5% / 0.4)" }}
+            >
+              <SelectValue placeholder=" " />
+            </SelectTrigger>
+            <SelectContent className="z-50 rounded-2xl border border-[hsl(164_60%_40%_/_0.25)] bg-card/90 text-card-foreground shadow-2xl backdrop-blur-xl">
+              {PROVINCES.map((p) => (
+                <SelectItem
+                  key={p}
+                  value={p}
+                  className="cursor-pointer rounded-lg focus:bg-[hsl(164_60%_40%_/_0.15)] focus:text-foreground"
+                >
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <label
+            className={`pointer-events-none absolute left-12 transition-all duration-200 ${
+              province
+                ? "top-2 text-[11px] font-medium text-[hsl(164_70%_65%)] tracking-wide uppercase"
+                : "top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground"
+            }`}
+          >
+            Province
+          </label>
+          <MapPin
+            className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors ${
+              province ? "text-[hsl(164_70%_65%)]" : "text-muted-foreground/70"
+            }`}
+          />
+          <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
+        </div>
 
         {error && (
           <motion.p
@@ -409,14 +479,14 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           </motion.p>
         )}
 
-        {/* Single consolidated consent — emerald accent for cohesion */}
+        {/* ====== CONSENT — custom animated checkbox ====== */}
         <motion.label
           variants={itemVariants}
           htmlFor="consent-checkbox"
-          className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-[11px] leading-snug cursor-pointer transition-colors ${
+          className={`group flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-[12px] leading-snug cursor-pointer transition-all ${
             agreed
-              ? "border-[hsl(var(--accent-green)_/_0.5)] bg-[hsl(var(--accent-green)_/_0.07)]"
-              : "border-border bg-[hsl(var(--surface-elevated)_/_0.5)] hover:border-[hsl(var(--accent-green)_/_0.3)]"
+              ? "border-[hsl(164_70%_55%_/_0.5)] bg-[hsl(164_70%_45%_/_0.10)] shadow-[inset_0_0_24px_-8px_hsl(164_80%_55%_/_0.4)]"
+              : "border-white/[0.08] bg-[hsl(180_25%_4%_/_0.4)] hover:border-[hsl(164_70%_55%_/_0.3)]"
           }`}
         >
           <input
@@ -424,43 +494,104 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-[hsl(var(--accent-green))] cursor-pointer"
+            className="sr-only"
             required
             aria-required="true"
           />
-          <span className="text-foreground/75">
-            I'm <span className="font-semibold text-foreground/95">18+ in South Africa</span> and agree to the{" "}
-            <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(var(--accent-green))] underline underline-offset-2">
+          <span
+            aria-hidden
+            className={`relative flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+              agreed
+                ? "border-[hsl(164_80%_55%)] bg-[hsl(164_80%_50%)]"
+                : "border-white/30 bg-transparent group-hover:border-[hsl(164_70%_55%)]"
+            }`}
+          >
+            <motion.svg
+              viewBox="0 0 16 16"
+              className="h-3.5 w-3.5"
+              initial={false}
+              animate={{ opacity: agreed ? 1 : 0 }}
+            >
+              <motion.path
+                d="M3 8.5 L6.5 12 L13 4.5"
+                fill="none"
+                stroke="hsl(180 30% 8%)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={false}
+                animate={{ pathLength: agreed ? 1 : 0 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </motion.svg>
+          </span>
+          <span className="text-foreground/80">
+            I'm <span className="font-semibold text-foreground">18+ in South Africa</span> and agree to the{" "}
+            <a href="/legal" target="_blank" rel="noopener noreferrer" className="font-semibold text-[hsl(164_70%_65%)] underline underline-offset-2">
               Terms &amp; Privacy
             </a>.
           </span>
         </motion.label>
 
-        <motion.button
-          type="submit"
-          disabled={!agreed}
-          whileHover={agreed ? { scale: 1.01 } : undefined}
-          whileTap={agreed ? { scale: 0.98 } : undefined}
-          className="group relative w-full overflow-hidden rounded-2xl py-4 font-display font-semibold text-[hsl(180_25%_6%)] text-base transition-all flex items-center justify-center gap-2 min-h-[54px] disabled:opacity-40 disabled:cursor-not-allowed"
+        {/* hairline divider */}
+        <div
+          aria-hidden
+          className="h-px w-full"
           style={{
-            backgroundImage:
-              "linear-gradient(135deg, hsl(164 70% 62%) 0%, hsl(164 60% 48%) 50%, hsl(170 65% 42%) 100%)",
-            boxShadow:
-              "0 12px 32px -8px hsl(164 80% 35% / 0.55), inset 0 1px 0 hsl(0 0% 100% / 0.25), inset 0 -1px 0 hsl(180 50% 5% / 0.25)",
+            background: "linear-gradient(90deg, transparent, hsl(164 60% 50% / 0.25), transparent)",
           }}
-        >
-          {/* Sheen sweep — runs once on mount, again on hover */}
+        />
+
+        {/* ====== CTA — command button with halo ====== */}
+        <div className="relative">
           {agreed && (
             <span
-              data-sheen
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-              style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
+              className="pointer-events-none absolute -inset-2 rounded-3xl"
+              style={{
+                background: "radial-gradient(60% 60% at 50% 50%, hsl(164 80% 55% / 0.45), transparent 70%)",
+                filter: "blur(18px)",
+                animation: "ctaHalo 2.6s ease-in-out infinite",
+              }}
             />
           )}
-          <span className="relative z-10">Reveal My Match</span>
-          <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </motion.button>
+          <motion.button
+            type="submit"
+            disabled={!agreed}
+            whileHover={agreed ? { scale: 1.01 } : undefined}
+            whileTap={agreed ? { scale: 0.98 } : undefined}
+            className="group relative w-full overflow-hidden rounded-2xl py-5 font-display font-semibold text-[hsl(180_25%_6%)] text-[17px] transition-all flex items-center justify-center gap-2 min-h-[60px] disabled:cursor-not-allowed"
+            style={{
+              backgroundImage: agreed
+                ? "linear-gradient(135deg, hsl(164 75% 65%) 0%, hsl(164 65% 50%) 50%, hsl(170 70% 42%) 100%)"
+                : "linear-gradient(135deg, hsl(180 10% 22%), hsl(180 10% 16%))",
+              boxShadow: agreed
+                ? "0 18px 40px -10px hsl(164 80% 30% / 0.65), inset 0 1.5px 0 hsl(0 0% 100% / 0.35), inset 0 -2px 0 hsl(180 50% 5% / 0.3)"
+                : "inset 0 1px 0 hsl(0 0% 100% / 0.05), inset 0 -1px 0 hsl(180 50% 3% / 0.4)",
+              color: agreed ? "hsl(180 25% 6%)" : "hsl(180 8% 55%)",
+            }}
+          >
+            {agreed && (
+              <span
+                data-sheen
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                style={{ animation: "sheenSweep 2.4s ease-in-out infinite" }}
+              />
+            )}
+            {agreed ? (
+              <>
+                <span className="relative z-10">Reveal My Match</span>
+                <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={2.5} />
+              </>
+            ) : (
+              <>
+                <Lock className="relative z-10 h-4 w-4" />
+                <span className="relative z-10">Confirm 18+ to continue</span>
+              </>
+            )}
+          </motion.button>
+        </div>
 
         <p className="text-[11px] text-muted-foreground/80 mt-0.5 text-center">
           2 min · 100% private · lifestyle preference tool
@@ -478,8 +609,21 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           0%   { width: 8px; height: 8px; opacity: 0.7; }
           100% { width: 480px; height: 480px; opacity: 0; }
         }
+        @keyframes iconPulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50%      { opacity: 0.8; transform: scale(1.4); }
+        }
+        @keyframes ctaHalo {
+          0%, 100% { opacity: 0.55; transform: scale(1); }
+          50%      { opacity: 0.95; transform: scale(1.04); }
+        }
+        @keyframes sheenSweep {
+          0%   { transform: translateX(-100%); }
+          60%  { transform: translateX(320%); }
+          100% { transform: translateX(320%); }
+        }
         @media (prefers-reduced-motion: reduce) {
-          [style*="liquidBreathe"], [style*="liquidRipple"] { animation: none !important; }
+          [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"] { animation: none !important; }
         }
       `}</style>
     </motion.div>
