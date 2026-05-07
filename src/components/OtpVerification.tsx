@@ -40,12 +40,12 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
       setError("");
       const result = await verifyOtp(email, val);
       setVerifying(false);
-      if (result.ok) {
+      if (result.ok === true) {
         setVerified(true);
         setTimeout(() => onVerified(), 700);
         return;
       }
-      const reason = result.reason;
+      const reason = (result as { ok: false; reason: string }).reason;
       const msg: Record<string, string> = {
         invalid_code: "Incorrect code. Please try again.",
         expired: "This code has expired. Tap Resend to get a new one.",
