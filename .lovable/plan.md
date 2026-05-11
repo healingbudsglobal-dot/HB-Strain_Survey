@@ -1,82 +1,52 @@
 ## Goal
 
-Two related additions:
+Add a Playwright end-to-end test suite that drives the real OtpVerification UI in a browser and verifies the five OTP outcome paths: **valid**, **invalid_code**, **no_code**, **expired**, and **too_many_attempts**.
 
-1. **Reduced-motion support** — honor `prefers-reduced-motion: reduce` so flicker-prone animations are disabled at the OS level.
-2. **Timing telemetry** — measure first paint, screen-swap duration, and OTP render so we can verify the flicker gap is gone and catch regressions.
+## Approach
 
----
+The verify-otp edge function is already covered by manual testing. For deterministic, fast E2E we will **mock the Supabase Functions HTTP calls at the network layer** using Playwright's `page.route()`. This avoids polluting the live `otp_codes` table, removes timing flakiness (real expiry is 5 min), and lets us force any reason code on demand.
 
-## 1. Reduced-motion support
+Each test:
+1. Navigates to `/` and walks through the funnel to the OTP screen, OR mounts a small `/test/otp` route guarded by `import.meta.env.DEV` that renders `<OtpVerification>` directly with a fixed email. (Preferred — much faster and isolates the unit under test.)
+2. Stubs `POST **/functions/v1/verify-otp` and `POST **/functions/v1/send-otp-email` to return the scenario response.
+3. Types `123456` into the 6 OTP slots.
+4. Asserts the visible UI message and follow-up state.
 
-### CSS-level kill switch (`src/index.css`)
+## Files to add
 
-Append a global `@media (prefers-reduced-motion: reduce)` block that:
-- Sets `animation-duration: 0.001ms !important` and `transition-duration: 0.001ms !important` on `*, *::before, *::after`.
-- Removes `mix-blend-mode`, `backdrop-filter`, and heavy `filter: blur(...)` on ambient layers (`.hero-backdrop`, `BudAmbient`, `NeuronAmbient`, `AmbientParticles` root).
-- Disables the `animate-pulse-glow`, `auroraShift`, `caret-blink`, and any infinite keyframes.
-
-This catches every framer-motion and Tailwind animation in one shot — no per-component refactor needed.
-
-### Component-level guards
-
-Use framer-motion's `useReducedMotion()` in:
-- `src/pages/Index.tsx` — when reduced, skip the `AnimatePresence` opacity swap entirely (render the active screen directly).
-- `src/components/HeroBackdrop.tsx` — already has a `lite` mode; force `lite=true` when reduced.
-- `src/components/BudAmbient.tsx` — return `null` when reduced (pure decorative).
-- `src/components/NeuronAmbient.tsx`, `src/components/AmbientParticles.tsx` — return `null` when reduced.
-- `src/components/LoadingScreen.tsx` — replace the DNA helix + spinning ring with a static spinner SVG when reduced.
-- `src/components/SuccessScreen.tsx` — drop the radial halo, keep static layout.
-
----
-
-## 2. Timing telemetry
-
-A tiny instrumentation module that logs to `console` and exposes a `window.__perf` object for quick inspection.
-
-### New file: `src/lib/perf.ts`
-
-Exports:
-- `markFirstPaint()` — called once from `src/main.tsx` after `createRoot().render(...)`. Reads `performance.getEntriesByType('paint')` to log FP and FCP, plus `performance.now()` as "react-mounted".
-- `markScreenEnter(screen: string)` — called when a new screen becomes the active screen. Logs ms since previous `markScreenExit` (the swap gap) and stores the timestamp.
-- `markScreenExit(screen: string)` — called from the previous screen's unmount. Records exit time.
-- `markOtpReady()` — called from `OtpVerification` mount effect. Logs ms from "otp" screen swap → first OTP paint.
-- All entries pushed to `window.__perf = { events: [...], summary() }` for ad-hoc inspection.
-
-### Wiring
-
-- `src/main.tsx` — call `markFirstPaint()` after render.
-- `src/pages/Index.tsx` — `useEffect` keyed on `screen` to call `markScreenEnter(screen)`; cleanup calls `markScreenExit(screen)`.
-- `src/components/OtpVerification.tsx` — `useEffect(() => markOtpReady(), [])` on mount. Use `requestAnimationFrame` so it fires after first paint, not before.
-
-### Output format
-
-Each event logs as:
-```
-[perf] otp-render: 42ms (since screen-enter)
-[perf] screen-swap squeeze→otp: 18ms gap
+```text
+playwright.config.ts              # base URL http://localhost:8080, webServer runs `npm run dev`
+e2e/otp.spec.ts                   # the 5 scenarios
+e2e/helpers/otpHarness.ts         # navigation + fill helper
+src/pages/OtpTestHarness.tsx      # DEV-only route mounting <OtpVerification>
 ```
 
-`window.__perf.summary()` prints a table of the last 50 events.
+Update:
+- `src/App.tsx` — add `{import.meta.env.DEV && <Route path="/test/otp" element={<OtpTestHarness />} />}`
+- `package.json` — add `"test:e2e": "playwright test"` script and devDeps `@playwright/test`
+- `.gitignore` — add `test-results/`, `playwright-report/`
 
----
+## Test scenarios
 
-## Technical details
+| # | Name | Mock response | Assertion |
+|---|------|---------------|-----------|
+| 1 | valid | `200 {ok:true}` | "Verified!" heading appears, onVerified fires (spy via `window.__otpVerified`) |
+| 2 | invalid_code | `400 {ok:false,error:"invalid_code"}` | "Incorrect code. Please try again." visible; input cleared; first slot focused |
+| 3 | no_code | `400 {ok:false,error:"no_code"}` | "No code found. Tap Resend…" visible; Resend button enabled immediately |
+| 4 | expired | `400 {ok:false,error:"expired"}` | "This code has expired…" visible; Resend enabled |
+| 5 | too_many_attempts | `429 {ok:false,error:"too_many_attempts"}` | Lockout card "Too many attempts — try again in 60s" visible; OTP input disabled; resend button shows "Locked (60s)" |
 
-- No new dependencies — `useReducedMotion` ships with framer-motion (already installed).
-- Telemetry is dev-friendly but kept in production builds (it's <1KB, console-only, no network).
-- The CSS reduced-motion block is the single highest-leverage change for residual flicker; component guards are belt-and-braces for any animation that escapes CSS (e.g., framer-motion driving inline styles).
+## Technical notes
 
-## Files touched
+- Playwright's `webServer` config will boot `vite` on port 8080 so CI runs standalone.
+- Route pattern: `**/functions/v1/verify-otp` matches both local and Supabase URLs.
+- Use `await page.route(..., route => route.fulfill({ status, contentType:'application/json', body: JSON.stringify(...) }))`.
+- Fill OTP via `page.locator('input[autocomplete="one-time-code"]').pressSequentially('123456')` — the `input-otp` library exposes a single hidden input.
+- For scenario 1 the harness exposes `window.__otpVerified = true` from its `onVerified` callback so the test can assert without a redirect.
+- Do not run against the published preview URL — always against the local dev server to keep tests hermetic.
 
-- `src/index.css` (append reduced-motion block)
-- `src/lib/perf.ts` (new)
-- `src/main.tsx` (call `markFirstPaint`)
-- `src/pages/Index.tsx` (reduced-motion guard + screen markers)
-- `src/components/HeroBackdrop.tsx` (force lite when reduced)
-- `src/components/BudAmbient.tsx` (null when reduced)
-- `src/components/NeuronAmbient.tsx` (null when reduced)
-- `src/components/AmbientParticles.tsx` (null when reduced)
-- `src/components/LoadingScreen.tsx` (static fallback when reduced)
-- `src/components/SuccessScreen.tsx` (drop halo when reduced)
-- `src/components/OtpVerification.tsx` (call `markOtpReady`)
+## Out of scope
+
+- Server-side tests of the edge function itself (already validated).
+- Resend cooldown timer (covered indirectly by the no_code/expired assertions).
+- CI wiring — the npm script is sufficient; user can plug it into their pipeline.
