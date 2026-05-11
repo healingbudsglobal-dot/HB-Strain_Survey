@@ -9,6 +9,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSettings from "./pages/AdminSettings";
 import Legal from "./pages/Legal";
+import OtpTestHarness from "./pages/OtpTestHarness";
 
 const queryClient = new QueryClient();
 
