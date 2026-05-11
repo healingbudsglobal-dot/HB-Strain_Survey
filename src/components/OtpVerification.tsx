@@ -30,9 +30,12 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   }, []);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => markOtpReady());
+    const id = requestAnimationFrame(() => {
+      markOtpReady();
+      focusOtpInput();
+    });
     return () => cancelAnimationFrame(id);
-  }, []);
+  }, [focusOtpInput]);
 
   useEffect(() => {
     if (cooldown <= 0) {
