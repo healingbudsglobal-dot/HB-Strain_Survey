@@ -10,6 +10,11 @@ export const TEMPLATE_VARIABLES = [
   { key: "compatibility", label: "Compatibility", sample: "94%" },
   { key: "shop_url", label: "Shop URL", sample: "https://healingbuds.co.za/shop" },
   { key: "province", label: "Province", sample: "Gauteng" },
+  { key: "thc", label: "THC %", sample: "18" },
+  { key: "cbd", label: "CBD %", sample: "1" },
+  { key: "strain_type", label: "Strain Type", sample: "Hybrid" },
+  { key: "email", label: "Customer Email", sample: "sarah@example.com" },
+  { key: "whatsapp", label: "Customer WhatsApp", sample: "+27 82 123 4567" },
 ] as const;
 
 export type TemplateVarKey = (typeof TEMPLATE_VARIABLES)[number]["key"];
@@ -20,6 +25,10 @@ export interface LeadLike {
   compatibility?: string | null;
   strain_shop_url?: string | null;
   province?: string | null;
+  strain_thc?: string | null;
+  strain_cbd?: string | null;
+  email?: string | null;
+  whatsapp?: string | null;
 }
 
 export const getLeadVars = (lead: LeadLike): Record<TemplateVarKey, string> => ({
@@ -28,6 +37,11 @@ export const getLeadVars = (lead: LeadLike): Record<TemplateVarKey, string> => (
   compatibility: lead.compatibility || "",
   shop_url: lead.strain_shop_url || "",
   province: lead.province || "",
+  thc: lead.strain_thc || "",
+  cbd: lead.strain_cbd || "",
+  strain_type: "",
+  email: lead.email || "",
+  whatsapp: lead.whatsapp || "",
 });
 
 export const getSampleVars = (): Record<TemplateVarKey, string> =>
