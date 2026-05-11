@@ -7,6 +7,25 @@ const corsHeaders = {
 
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/70z505ty60nkksvtl6l6r1yzj4cs58tb";
 const ADMIN_EMAIL = "healingbudsglobal@gmail.com";
+// Public asset origin for email images (must serve files from /public/).
+const ASSET_ORIGIN = "https://strain-match-finder.lovable.app";
+const LOGO_URL = `${ASSET_ORIGIN}/hb-logo-white-full.png`;
+const TRICHOME_FALLBACK = `${ASSET_ORIGIN}/email-trichomes.jpg`;
+
+// Map matched strain name -> publicly hosted bud image (under /public/strains/).
+const STRAIN_IMAGE_BY_NAME: Record<string, string> = {
+  "BlockBerry": `${ASSET_ORIGIN}/strains/blockberry.jpg`,
+  "Blue Zushi": `${ASSET_ORIGIN}/strains/blue-zushi.jpg`,
+  "Candy Pave": `${ASSET_ORIGIN}/strains/candy-pave.jpg`,
+  "Caribbean Breeze": `${ASSET_ORIGIN}/strains/caribbean-breeze.jpg`,
+  "Femme Fatale": `${ASSET_ORIGIN}/strains/femme-fatale.jpg`,
+  "NFS 12": `${ASSET_ORIGIN}/strains/nfs-12.jpg`,
+  "Peanut Butter Breath": `${ASSET_ORIGIN}/strains/peanut-butter-breath.jpg`,
+};
+function strainImageFor(name: unknown): string {
+  const key = String(name ?? '').trim();
+  return STRAIN_IMAGE_BY_NAME[key] || TRICHOME_FALLBACK;
+}
 
 const DISPOSABLE_DOMAINS = new Set([
   "mailinator.com","tempmail.com","guerrillamail.com","throwaway.email","yopmail.com",
@@ -178,7 +197,7 @@ function buildResultsHtml(data: Record<string, string>): string {
         <tr><td style="height:3px; background:linear-gradient(90deg, #4DBFA1, #E5A31E, #4DBFA1); border-radius:16px 16px 0 0; font-size:0; line-height:0;">&nbsp;</td></tr>
 
         <!-- Logo -->
-        <tr><td align="center" style="padding:32px 32px 16px;"><img src="https://biomapsurvey.lovable.app/images/hb-logo-white-full.png" alt="Healing Buds" width="180" style="display:block; width:180px; height:auto;" /></td></tr>
+        <tr><td align="center" style="padding:32px 32px 16px;"><img src="${LOGO_URL}" alt="Healing Buds" width="180" style="display:block; width:180px; height:auto;" /></td></tr>
 
         <!-- Heading -->
         <tr><td align="center" style="padding:8px 32px 4px;"><h1 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; color:#F0F3F2; letter-spacing:0.02em;">Your Clinical Strain Profile</h1></td></tr>
@@ -191,7 +210,7 @@ function buildResultsHtml(data: Record<string, string>): string {
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#0B2A22; border:1px solid #14463A; border-radius:14px; overflow:hidden;">
             <!-- Hero image -->
             <tr><td style="padding:0; font-size:0; line-height:0; position:relative;">
-              <img src="${safeUrl(data.strain_image_url) !== '#' ? safeUrl(data.strain_image_url) : 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
+              <img src="${strainImageFor(data.matched_strain)}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
             </td></tr>
             <!-- Strain name band -->
             <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
@@ -506,6 +525,7 @@ Deno.serve(async (req) => {
     }
 
     // 2. Send results email to user via Resend
+    const resultsSubject = `Your Strain Match: ${payload.matched_strain} (${payload.compatibility} compatibility)`;
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -515,16 +535,16 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'Healing Buds <noreply@send.healingbuds.co.za>',
         to: [email],
-        subject: `Your Strain Match: ${payload.matched_strain} (${payload.compatibility} compatibility)`,
+        subject: resultsSubject,
         html: buildResultsHtml(payload),
       }),
     });
 
     const resendData = await resendRes.json();
-    if (!resendRes.ok) {
+    const resultsOk = resendRes.ok;
+    if (!resultsOk) {
       console.error('Resend error:', resendData);
     } else if (leadId) {
-      // Log email_sent event
       try {
         await supabase.from('lead_events').insert({
           lead_id: leadId,
@@ -532,17 +552,30 @@ Deno.serve(async (req) => {
           payload: {
             template: 'results',
             resend_id: resendData?.id ?? null,
-            subject: `Your Strain Match: ${payload.matched_strain}`,
+            subject: resultsSubject,
           },
         });
       } catch (e) {
         console.error('lead_events insert (email_sent) failed:', e);
       }
     }
+    // Audit log (admin-visible)
+    try {
+      await supabase.from('email_send_log').insert({
+        recipient_email: email,
+        template_name: 'results',
+        subject: resultsSubject,
+        resend_id: resultsOk ? (resendData?.id ?? null) : null,
+        status: resultsOk ? 'sent' : 'failed',
+        error_message: resultsOk ? null : JSON.stringify(resendData).slice(0, 500),
+        metadata: { matched_strain: payload.matched_strain, compatibility: payload.compatibility },
+      });
+    } catch (e) { console.error('email_send_log insert failed:', e); }
 
     // 3. Send admin notification email
+    const adminSubject = `🧬 New Lead: ${payload.name || 'Anonymous'} → ${payload.matched_strain} (${payload.compatibility})`;
     try {
-      await fetch('https://api.resend.com/emails', {
+      const adminRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${RESEND_API_KEY}`,
@@ -551,10 +584,22 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: 'Healing Buds Bio-Map <noreply@send.healingbuds.co.za>',
           to: [ADMIN_EMAIL],
-          subject: `🧬 New Lead: ${payload.name || 'Anonymous'} → ${payload.matched_strain} (${payload.compatibility})`,
+          subject: adminSubject,
           html: buildAdminNotificationHtml(payload),
         }),
       });
+      const adminData = await adminRes.json().catch(() => ({}));
+      try {
+        await supabase.from('email_send_log').insert({
+          recipient_email: ADMIN_EMAIL,
+          template_name: 'admin_notification',
+          subject: adminSubject,
+          resend_id: adminRes.ok ? (adminData?.id ?? null) : null,
+          status: adminRes.ok ? 'sent' : 'failed',
+          error_message: adminRes.ok ? null : JSON.stringify(adminData).slice(0, 500),
+          metadata: { lead_email: email },
+        });
+      } catch (e) { console.error('email_send_log admin insert failed:', e); }
     } catch (adminEmailErr) {
       console.error('Admin email error:', adminEmailErr);
     }

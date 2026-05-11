@@ -119,7 +119,30 @@ export function matchStrain(answers: Record<string, string>): StrainMatch {
     return { strain, score };
   });
 
-  scored.sort((a, b) => b.score - a.score);
+  // Deterministic tie-break: hash answers so different users with the same top
+  // score don't all collapse onto the first strain in source order.
+  const seed = Object.values(answers).join("|");
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+  hash = Math.abs(hash);
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    // Tie: prefer strain whose THC is closest to a target derived from intensity
+    const intensity = answers.effect_intensity;
+    const targetThc =
+      intensity === "Maximum intensity" ? 26 :
+      intensity === "Strong pronounced effect" ? 23 :
+      intensity === "Mild but noticeable" ? 18 :
+      intensity === "Very mild (barely noticeable)" ? 15 : 21;
+    const da = Math.abs(a.strain.thc - targetThc);
+    const db = Math.abs(b.strain.thc - targetThc);
+    if (da !== db) return da - db;
+    // Final tie: stable hash-based pick across the catalog
+    const ha = (hash + a.strain.name.length) % 7;
+    const hb = (hash + b.strain.name.length) % 7;
+    return ha - hb;
+  });
 
   const best = scored[0];
   // Max possible: 4 high×3 + 4 med×2 + 4 low×1 = 12+8+4 = 24
@@ -129,6 +152,8 @@ export function matchStrain(answers: Record<string, string>): StrainMatch {
   return {
     strain: best.strain,
     score: best.score,
-    compatibility: Math.max(compatibility, 65),
+    // Show the real score (no artificial 65% floor) so different answers
+    // produce visibly different compatibility values.
+    compatibility,
   };
 }

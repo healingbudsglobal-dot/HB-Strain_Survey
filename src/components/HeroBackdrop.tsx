@@ -61,48 +61,41 @@ const HeroBackdrop = () => {
     >
       <style>{`
         .hero-backdrop {
-          --tint-a: 0.42;
-          --vignette-a: 0.6;
-          --scrim-top-a: 0.4;
-          --scrim-bot-a: 0.82;
-          --img-contrast: 1.22;
-          --img-brightness: 1.02;
-          --img-saturate: 1.25;
-          --img-blur: 1.5px;
+          /* Crystal-clear emerald-glass: no blur, light tint, gentle scrim only */
+          --tint-a: 0.22;
+          --vignette-a: 0.42;
+          --scrim-top-a: 0.28;
+          --scrim-bot-a: 0.7;
+          --img-contrast: 1.12;
+          --img-brightness: 1.05;
+          --img-saturate: 1.35;
+          --img-blur: 0px;
         }
         @media (prefers-color-scheme: light) {
           .hero-backdrop {
-            --tint-a: 0.62;
-            --vignette-a: 0.72;
-            --scrim-top-a: 0.5;
-            --scrim-bot-a: 0.9;
-            --img-brightness: 0.9;
+            --tint-a: 0.32;
+            --vignette-a: 0.5;
+            --scrim-top-a: 0.35;
+            --scrim-bot-a: 0.78;
+            --img-brightness: 0.96;
           }
         }
         @media (prefers-contrast: more) {
           .hero-backdrop {
-            --tint-a: 0.7;
-            --vignette-a: 0.8;
-            --scrim-top-a: 0.55;
-            --scrim-bot-a: 0.94;
-            --img-contrast: 1.32;
-            --img-brightness: 0.85;
-          }
-        }
-        @media (dynamic-range: high) {
-          .hero-backdrop {
-            --tint-a: 0.38;
-            --vignette-a: 0.55;
+            --tint-a: 0.45;
+            --vignette-a: 0.6;
+            --scrim-top-a: 0.45;
+            --scrim-bot-a: 0.86;
+            --img-contrast: 1.22;
+            --img-brightness: 0.92;
           }
         }
         @media (max-width: 640px) {
           .hero-backdrop {
-            --tint-a: 0.62;
-            --vignette-a: 0.7;
-            --scrim-top-a: 0.55;
-            --scrim-bot-a: 0.9;
-            --img-contrast: 1.28;
-            --img-blur: 2px;
+            --tint-a: 0.34;
+            --vignette-a: 0.5;
+            --scrim-top-a: 0.38;
+            --scrim-bot-a: 0.78;
           }
         }
       `}</style>
