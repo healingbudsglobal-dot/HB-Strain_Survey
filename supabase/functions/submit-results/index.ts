@@ -24,22 +24,38 @@ function validateEmailServer(raw: unknown): { valid: boolean; error?: string; em
   if (typeof raw !== 'string') return { valid: false, error: 'Email is required' };
   const trimmed = raw.trim().toLowerCase();
   if (trimmed.length > 255) return { valid: false, error: 'Email too long' };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return { valid: false, error: 'Invalid email format' };
+  // Tightened: disallow <, >, ", ', whitespace to block HTML-injection via the email field.
+  if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(trimmed)) return { valid: false, error: 'Invalid email format' };
   const [local, domain] = trimmed.split('@');
   if (DISPOSABLE_DOMAINS.has(domain)) return { valid: false, error: 'Disposable email addresses are not allowed' };
   if (FAKE_LOCAL_PARTS.has(local) || local.length < 2) return { valid: false, error: 'Please use a real email address' };
   return { valid: true, email: trimmed };
 }
 
+function esc(s: unknown): string {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(raw: unknown): string {
+  const s = String(raw ?? '').trim();
+  if (!/^https:\/\/[^\s"'<>]+$/i.test(s)) return '#';
+  return esc(s);
+}
+
 function buildEffectPills(effects: string): string {
-  return effects.split(', ').map(e =>
-    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#162220; border:1px solid #2F3633; border-radius:20px; font-size:12px; color:#4DBFA1; font-weight:500;">${e}</span></td>`
+  return String(effects || '').split(', ').map(e =>
+    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#162220; border:1px solid #2F3633; border-radius:20px; font-size:12px; color:#4DBFA1; font-weight:500;">${esc(e)}</span></td>`
   ).join('');
 }
 
 function buildFlavourPills(flavours: string): string {
-  return flavours.split(', ').map(f =>
-    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#1C1A14; border:1px solid #3D3520; border-radius:20px; font-size:12px; color:#E5A31E; font-weight:500;">${f}</span></td>`
+  return String(flavours || '').split(', ').map(f =>
+    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#1C1A14; border:1px solid #3D3520; border-radius:20px; font-size:12px; color:#E5A31E; font-weight:500;">${esc(f)}</span></td>`
   ).join('');
 }
 
