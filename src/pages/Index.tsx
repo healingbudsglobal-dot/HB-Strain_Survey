@@ -191,23 +191,34 @@ const Index = () => {
     (name: string, whatsappE164?: string, optIn?: boolean) => {
       setContactName(name);
       if (whatsappE164 && optIn && strainResult) {
-        // Build the same wa.me link so SuccessScreen has a fallback CTA
-        import("@/lib/whatsappTemplate").then(({ loadDefaultWaConfig, buildMatchWaLink }) => {
+        const vars = {
+          name: name.split(" ")[0],
+          strain: strainResult.strain.name,
+          compatibility: `${strainResult.compatibility}%`,
+          province,
+          shop_url: strainResult.strain.shopUrl || "",
+          thc: String(strainResult.strain.thc ?? "—"),
+          cbd: String(strainResult.strain.cbd ?? "—"),
+          strain_type: strainResult.strain.type
+            ? strainResult.strain.type.charAt(0).toUpperCase() + strainResult.strain.type.slice(1)
+            : "—",
+          email: email || "—",
+          whatsapp: whatsappE164,
+        };
+        // BudStacks-facing detailed link
+        import("@/lib/whatsappTemplate").then(({ loadDefaultWaConfig, buildMatchWaLink, buildCustomerWaLink }) => {
           loadDefaultWaConfig().then((cfg) => {
-            const link = buildMatchWaLink(cfg.businessNumber, cfg.body, {
-              name: name.split(" ")[0],
-              strain: strainResult.strain.name,
-              compatibility: `${strainResult.compatibility}%`,
-              province,
-              shop_url: strainResult.strain.shopUrl || "",
-            });
+            const link = buildMatchWaLink(cfg.businessNumber, cfg.body, vars);
             if (link) setWaLink(link);
           });
+          // Customer-facing link (chat opens with their own number)
+          const cLink = buildCustomerWaLink(whatsappE164, vars);
+          if (cLink) setCustomerWaLink(cLink);
         });
       }
       handleSendResults(name, whatsappE164, optIn);
     },
-    [handleSendResults, strainResult, province]
+    [handleSendResults, strainResult, province, email]
   );
 
   const handleContactSkip = useCallback(() => {
