@@ -16,7 +16,7 @@ import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
 import { sendOtpEmail, submitResults, postSurveyAnswersWebhook } from "@/lib/webhook";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+
 import { useUtmTracking, utmToPayload } from "@/hooks/useUtmTracking";
 
 type Screen = "squeeze" | "otp" | "survey" | "contact" | "loading" | "success";
@@ -43,6 +43,9 @@ const Index = () => {
   const [waLink, setWaLink] = useState<string | undefined>(undefined);
   const [customerWaLink, setCustomerWaLink] = useState<string | undefined>(undefined);
   const [contactName, setContactName] = useState<string>("");
+  const [submitStatus, setSubmitStatus] = useState<"loading" | "slow" | "error" | "success">("loading");
+  const [submitError, setSubmitError] = useState<string>("");
+  const [pendingPayload, setPendingPayload] = useState<{ payload: Record<string, string>; answersMap: Record<string, string> } | null>(null);
   const { toast } = useToast();
   const utm = useUtmTracking();
   const reduceMotion = useReducedMotion();
@@ -99,6 +102,47 @@ const Index = () => {
     setScreen("contact");
   }, []);
 
+  const runSubmit = useCallback(
+    async (payload: Record<string, string>, answersMap: Record<string, string>) => {
+      setSubmitStatus("loading");
+      setSubmitError("");
+
+      const slowTimer = window.setTimeout(() => {
+        setSubmitStatus((s) => (s === "loading" ? "slow" : s));
+      }, 6000);
+
+      const [resultsOk, webhookRes] = await Promise.all([
+        submitResults(payload),
+        postSurveyAnswersWebhook(payload.email, answersMap),
+      ]);
+
+      window.clearTimeout(slowTimer);
+
+      if (!resultsOk) {
+        // Soft notice — email is the backup channel and may still arrive.
+        toast({
+          title: "Results delivery issue",
+          description: "Your results were sent via our backup system. Check your inbox shortly.",
+          variant: "destructive",
+        });
+      }
+
+      if (!webhookRes.ok) {
+        const reason =
+          webhookRes.status === 0
+            ? "Looks like your connection dropped. Check your network and try again."
+            : `Our server returned ${webhookRes.status}. Please retry in a moment.`;
+        setSubmitError(reason);
+        setSubmitStatus("error");
+        return;
+      }
+
+      setSubmitStatus("success");
+      window.setTimeout(() => setScreen("success"), 600);
+    },
+    [toast]
+  );
+
   const handleSendResults = useCallback(
     async (contactName?: string, whatsappE164?: string, optIn?: boolean) => {
       if (!strainResult) return;
@@ -138,54 +182,20 @@ const Index = () => {
         answersMap[q.id] = surveyAnswers[q.id] || "";
       });
 
-      const [resultsOk, webhookRes] = await Promise.all([
-        submitResults(payload),
-        postSurveyAnswersWebhook(email, answersMap),
-      ]);
-
-      if (!resultsOk) {
-        toast({
-          title: "Results delivery issue",
-          description: "Your results were sent via our backup system. Check your inbox shortly.",
-          variant: "destructive",
-        });
-      }
-
-      if (!webhookRes.ok) {
-        toast({
-          title: "We couldn't save your answers",
-          description:
-            webhookRes.status === 0
-              ? "Network hiccup. Please check your connection and tap Retry."
-              : `Server returned ${webhookRes.status}. Please tap Retry in a moment.`,
-          variant: "destructive",
-          action: (
-            <ToastAction
-              altText="Retry sending answers"
-              onClick={() => {
-                postSurveyAnswersWebhook(email, answersMap).then((r) => {
-                  if (r.ok) {
-                    toast({ title: "Answers sent", description: "Thanks — we got them this time." });
-                  } else {
-                    toast({
-                      title: "Still having trouble",
-                      description: "Please try again shortly or contact support.",
-                      variant: "destructive",
-                    });
-                  }
-                });
-              }}
-            >
-              Retry
-            </ToastAction>
-          ),
-        });
-      }
-
-      setTimeout(() => setScreen("success"), 3000);
+      setPendingPayload({ payload, answersMap });
+      await runSubmit(payload, answersMap);
     },
-    [email, province, strainResult, surveyAnswers, utm, toast]
+    [email, province, strainResult, surveyAnswers, utm, runSubmit]
   );
+
+  const handleRetrySubmit = useCallback(() => {
+    if (!pendingPayload) return;
+    runSubmit(pendingPayload.payload, pendingPayload.answersMap);
+  }, [pendingPayload, runSubmit]);
+
+  const handleContinueAnyway = useCallback(() => {
+    setScreen("success");
+  }, []);
 
   const handleContactSubmit = useCallback(
     (name: string, whatsappE164?: string, optIn?: boolean) => {
@@ -258,7 +268,14 @@ const Index = () => {
           shopUrl={strainResult?.strain.shopUrl}
         />
       )}
-      {screen === "loading" && <LoadingScreen />}
+      {screen === "loading" && (
+        <LoadingScreen
+          status={submitStatus}
+          errorReason={submitError}
+          onRetry={handleRetrySubmit}
+          onContinue={handleContinueAnyway}
+        />
+      )}
       {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} customerWaLink={customerWaLink} userEmail={email} />}
     </>
   );
