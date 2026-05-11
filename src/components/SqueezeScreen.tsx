@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
@@ -57,6 +57,19 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const [agreed, setAgreed] = useState(false);
   const emailValid = validateEmail(email.trim()).valid;
   const emailFilled = email.length > 0;
+
+  // Award-level cursor parallax — subtle tilt on the glass card
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const rotX = useSpring(useTransform(tiltY, [-0.5, 0.5], [2.2, -2.2]), { stiffness: 120, damping: 18, mass: 0.4 });
+  const rotY = useSpring(useTransform(tiltX, [-0.5, 0.5], [-2.6, 2.6]), { stiffness: 120, damping: 18, mass: 0.4 });
+  const handleParallax = (e: React.PointerEvent<HTMLFormElement>) => {
+    if (reduceMotion || e.pointerType === "touch") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    tiltX.set((e.clientX - r.left) / r.width - 0.5);
+    tiltY.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const resetParallax = () => { tiltX.set(0); tiltY.set(0); };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -421,6 +434,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] py-5 pr-5 pl-7 border transition-[border-color,box-shadow] duration-500 ${
             focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
           }`}
+          onPointerMove={handleParallax}
+          onPointerLeave={resetParallax}
           style={{
             background:
               "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
@@ -430,8 +445,32 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
               : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
             animation: "liquidBreathe 7s ease-in-out infinite",
+            transformPerspective: 1100,
+            rotateX: rotX as unknown as number,
+            rotateY: rotY as unknown as number,
+            transformStyle: "preserve-3d",
           }}
         >
+          {/* Ambient drifting conic sheen — catches the light like real glass */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
+            style={{
+              background:
+                "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
+              animation: "glassSheen 18s linear infinite",
+              filter: "blur(40px)",
+            }}
+          />
+          {/* Filmic grain — premium texture */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            }}
+          />
           {/* Focus ripple — radial pulse from center when input gains focus */}
           {focused && (
             <span
@@ -833,8 +872,10 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               className="group relative w-full overflow-hidden rounded-[22px] py-5 font-display font-bold text-[18px] tracking-[-0.01em] transition-[background,box-shadow] duration-150 flex items-center justify-center gap-2.5 min-h-[64px] disabled:cursor-not-allowed will-change-transform"
               style={{
                 backgroundImage: agreed
-                  ? "linear-gradient(180deg, hsl(164 78% 68%) 0%, hsl(164 70% 55%) 45%, hsl(168 72% 46%) 100%)"
+                  ? "linear-gradient(115deg, hsl(164 78% 68%) 0%, hsl(168 72% 50%) 35%, hsl(172 75% 42%) 65%, hsl(164 78% 68%) 100%)"
                   : "linear-gradient(180deg, hsl(180 10% 26%) 0%, hsl(180 10% 18%) 100%)",
+                backgroundSize: agreed ? "220% 220%" : "100% 100%",
+                animation: agreed ? "ctaGradientFlow 8s ease-in-out infinite" : undefined,
                 boxShadow: agreed
                   ? "inset 0 2px 0 hsl(0 0% 100% / 0.55), inset 0 -3px 0 hsl(170 70% 22% / 0.6), inset 0 0 0 1px hsl(164 60% 40% / 0.4), 0 1px 2px hsl(180 50% 5% / 0.3)"
                   : "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 3% / 0.4)",
@@ -909,6 +950,14 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           60%  { transform: translateX(320%); }
           100% { transform: translateX(320%); }
         }
+        @keyframes glassSheen {
+          0%   { transform: rotate(0deg) scale(1.2); }
+          100% { transform: rotate(360deg) scale(1.2); }
+        }
+        @keyframes ctaGradientFlow {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
         /* === Match-head ignition flash === */
         .cta-ignite {
           position: absolute;
@@ -981,7 +1030,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         }
 
         @media (prefers-reduced-motion: reduce) {
-          [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"] { animation: none !important; }
+          [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"], [style*="glassSheen"], [style*="ctaGradientFlow"] { animation: none !important; }
           .cta-ignite, .cta-spark, .cta-ember { animation: none !important; display: none; }
         }
 
