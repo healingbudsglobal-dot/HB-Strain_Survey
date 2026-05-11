@@ -223,7 +223,7 @@ function buildResultsHtml(data: Record<string, string>): string {
                   <!-- Label -->
                   <td valign="middle" style="vertical-align:middle;">
                     <p style="margin:0 0 4px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.14em; font-weight:700;">Bio-Match Score</p>
-                    <p style="margin:0 0 6px; font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#F0F3F2; line-height:1.2;">${data.compatibility} compatibility</p>
+                    <p style="margin:0 0 6px; font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#F0F3F2; line-height:1.2;">${esc(data.compatibility)} compatibility</p>
                     <p style="margin:0; font-size:12px; line-height:1.5; color:#A0D9C4;">A precision match across your terpene, vibe &amp; lifestyle profile.</p>
                   </td>
                 </tr>
