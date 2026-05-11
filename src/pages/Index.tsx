@@ -216,6 +216,8 @@ const Index = () => {
           onSkip={handleContactSkip}
           strainName={strainResult?.strain.name}
           userEmail={email}
+          compatibility={strainResult ? `${strainResult.compatibility}%` : undefined}
+          province={province}
         />
       )}
       {screen === "loading" && <LoadingScreen />}
