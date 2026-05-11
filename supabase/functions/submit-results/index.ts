@@ -72,7 +72,7 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
 
   const surveyRows = surveyKeys
     .filter(s => data[s.key])
-    .map(s => `<tr><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:12px; color:#7F958E;">${s.label}</td><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:13px; color:#F0F3F2; font-weight:500;">${data[s.key]}</td></tr>`)
+    .map(s => `<tr><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:12px; color:#7F958E;">${esc(s.label)}</td><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:13px; color:#F0F3F2; font-weight:500;">${esc(data[s.key])}</td></tr>`)
     .join('');
 
   return `<!DOCTYPE html>
