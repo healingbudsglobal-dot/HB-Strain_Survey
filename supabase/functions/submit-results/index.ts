@@ -7,6 +7,25 @@ const corsHeaders = {
 
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/70z505ty60nkksvtl6l6r1yzj4cs58tb";
 const ADMIN_EMAIL = "healingbudsglobal@gmail.com";
+// Public asset origin for email images (must serve files from /public/).
+const ASSET_ORIGIN = "https://strain-match-finder.lovable.app";
+const LOGO_URL = `${ASSET_ORIGIN}/hb-logo-white-full.png`;
+const TRICHOME_FALLBACK = `${ASSET_ORIGIN}/email-trichomes.jpg`;
+
+// Map matched strain name -> publicly hosted bud image (under /public/strains/).
+const STRAIN_IMAGE_BY_NAME: Record<string, string> = {
+  "BlockBerry": `${ASSET_ORIGIN}/strains/blockberry.jpg`,
+  "Blue Zushi": `${ASSET_ORIGIN}/strains/blue-zushi.jpg`,
+  "Candy Pave": `${ASSET_ORIGIN}/strains/candy-pave.jpg`,
+  "Caribbean Breeze": `${ASSET_ORIGIN}/strains/caribbean-breeze.jpg`,
+  "Femme Fatale": `${ASSET_ORIGIN}/strains/femme-fatale.jpg`,
+  "NFS 12": `${ASSET_ORIGIN}/strains/nfs-12.jpg`,
+  "Peanut Butter Breath": `${ASSET_ORIGIN}/strains/peanut-butter-breath.jpg`,
+};
+function strainImageFor(name: unknown): string {
+  const key = String(name ?? '').trim();
+  return STRAIN_IMAGE_BY_NAME[key] || TRICHOME_FALLBACK;
+}
 
 const DISPOSABLE_DOMAINS = new Set([
   "mailinator.com","tempmail.com","guerrillamail.com","throwaway.email","yopmail.com",
