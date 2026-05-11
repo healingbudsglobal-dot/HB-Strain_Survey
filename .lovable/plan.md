@@ -1,35 +1,30 @@
-## Goal
-Make the green "Send My Match on WhatsApp" button on the Contact Capture screen actually open WhatsApp with the user's strain match pre-filled — zero cost, no Twilio, no Cloud API.
+## Problem
 
-## How it will work
-1. When the user fills in their name + WhatsApp number, ticks the opt-in, and taps the green button:
-   - Submit the lead exactly as today (results email + Make.com webhook still fire in the background).
-   - Immediately open `https://wa.me/<businessNumber>?text=<prefilled message>` in a new tab.
-2. The prefilled message goes FROM the user TO the Healing Buds business number (read from `app_settings.whatsapp_business_number`, currently `+351939455949`). Because the user sends first, business can reply for free within the 24h WhatsApp service window.
-3. On the success screen, also show a persistent "Open WhatsApp" button in case the popup was blocked, using the same wa.me link.
+On the Contact step, tapping the country flag opens the OS-native `<select>` list (full white background, dark text, ignores our dark glass theme — visible in the screenshot). It also overlaps the browser chrome on smaller viewports. This is a native-`<select>` limitation of `react-phone-number-input` — its option list cannot be themed cross-browser.
 
-## Prefilled message (rendered from the default `whatsapp_templates` row, with fallback)
-```
-Hi Healing Buds 🌿
-I'm {name} and I just completed the Bio-Mapping Survey.
-My #1 match: {strain} ({compatibility})
-Province: {province}
-Please send me details and next steps.
-```
+## Decision
 
-## Technical changes (frontend only)
-- `src/lib/whatsappTemplate.ts`: add `loadDefaultTemplate()` that fetches business number + default template (already partially there). Add safe fallback message if DB read fails.
-- `src/components/ContactCapture.tsx`:
-  - On submit with `hasValidWa && optIn`, build the wa.me URL and `window.open(url, "_blank", "noopener")` BEFORE calling `onSubmit` (must run inside the click handler so the popup isn't blocked on iOS Safari).
-  - Keep current `onSubmit(...)` so the loading→success flow continues.
-- `src/components/SuccessScreen.tsx`:
-  - Add a green "Open WhatsApp" CTA above the existing email CTA when the user opted in. It rebuilds the same wa.me link from `result` + cached business number.
-- `src/pages/Index.tsx`: pass `whatsappE164` and the chosen wa.me link (or business number + opt-in flag) into `SuccessScreen` so the success-screen button works after navigation.
+The funnel is South-Africa-only (province step is SA provinces, results copy says "SA 18+"). There's no reason to expose 200+ countries. Lock the input to ZA and remove the country picker entirely.
+
+## Changes
+
+**`src/components/ContactCapture.tsx`** (one block, ~5 lines)
+- Pass `countries={["ZA"]}`, `defaultCountry="ZA"`, `international={false}`, `addInternationalOption={false}` to `<PhoneInput>`.
+- Pass `countrySelectComponent={() => null}` to remove the dropdown trigger entirely. The flag icon stays via `PhoneInputCountryIcon` (rendered separately) — if it disappears too, fall back to keeping the trigger but adding `disabled` so it can't open.
+
+**`src/index.css`** (small additions to the existing `.hb-phone-wrap` block, ~10 lines)
+- Add `color-scheme: dark` on `.hb-phone-wrap` as a defensive fallback so any future native popup inherits dark UA chrome.
+- Add a fixed `+27` prefix label to the left of the input (small `<span>` in the JSX, styled with muted-foreground) so the user still sees the country context.
+- Remove the now-unused `PhoneInputCountrySelectArrow` rule.
 
 ## Out of scope
-- No Twilio, no Cloud API, no edge function for sending — fully client-side.
-- No change to email delivery, OTP flow, strain matching, or hero image.
+
+- No change to validation (`isValidPhoneNumber` still works for ZA numbers).
+- No change to OTP, Reveal CTA, success screen, or strain-match logic.
+- No re-introduction of multi-country support — if you ever expand outside SA, we'd swap to a custom shadcn `Select`-based country picker rather than the native one.
 
 ## Verification
-- Manual: complete a survey, enter a SA WhatsApp number, opt in, tap button → WhatsApp opens with prefilled text to +351 939 455 949.
-- Fallback: if popup blocked, tap CTA on success screen → same behavior.
+
+1. Open Contact step in the preview at 707×502 (current viewport).
+2. Confirm: no country dropdown opens on click, `+27` is shown as a static prefix, the flag still renders, ZA numbers validate, and `Reveal My Match` still posts the right E.164 value.
+3. Re-test at 390×844 (mobile) and 1280×720 (desktop) to confirm the form stays inside the glass card.

@@ -243,15 +243,21 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
               Recommended · 98% open rate
             </span>
           </div>
-          <div className="hb-phone-wrap rounded-2xl border-2 border-[hsl(var(--accent-green)_/_0.3)] bg-[hsl(var(--accent-green)_/_0.04)] px-4 py-3 focus-within:ring-2 focus-within:ring-[hsl(var(--accent-green)_/_0.5)] focus-within:border-[hsl(var(--accent-green))] transition-all">
+          <div className="hb-phone-wrap rounded-2xl border-2 border-[hsl(var(--accent-green)_/_0.3)] bg-[hsl(var(--accent-green)_/_0.04)] px-4 py-3 focus-within:ring-2 focus-within:ring-[hsl(var(--accent-green)_/_0.5)] focus-within:border-[hsl(var(--accent-green))] transition-all flex items-center gap-2">
+            <span aria-hidden className="select-none text-base leading-none">🇿🇦</span>
+            <span className="select-none text-sm font-medium text-muted-foreground">+27</span>
+            <span className="h-5 w-px bg-border" aria-hidden />
             <PhoneInput
-              international
+              international={false}
               defaultCountry="ZA"
+              countries={["ZA"]}
+              addInternationalOption={false}
               countryCallingCodeEditable={false}
-              placeholder="Your WhatsApp number"
+              countrySelectComponent={() => null}
+              placeholder="WhatsApp number"
               value={whatsapp}
               onChange={setWhatsapp}
-              className="text-foreground"
+              className="flex-1 text-foreground"
               numberInputProps={{ id: "contact-whatsapp", name: "whatsapp", autoComplete: "tel" }}
             />
           </div>
