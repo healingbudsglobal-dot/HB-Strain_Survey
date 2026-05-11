@@ -109,11 +109,26 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
       {/* Logo with nerve-signal shimmer (pink → pearl → green pulse across the mark) */}
       <motion.div variants={itemVariants} className="mb-8 relative">
         <div className="relative inline-block">
+          {/* Soft dark vignette behind the logo — guarantees contrast against the bud backdrop */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-10 -inset-y-6 -z-0 rounded-[40%]"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, hsl(180 50% 4% / 0.78) 0%, hsl(180 50% 4% / 0.55) 35%, hsl(180 50% 4% / 0.18) 65%, transparent 85%)",
+              filter: "blur(8px)",
+            }}
+          />
           <img
             src={hbLogoWhite}
             alt="Healing Buds"
             className="h-28 w-auto sm:h-36 md:h-40 relative z-10"
             draggable={false}
+            style={{
+              // Etched-into-surface effect: bright top highlight + dark bottom shadow + ambient depth shadow
+              filter:
+                "drop-shadow(0 -1px 0 hsl(160 30% 92% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.6)) drop-shadow(0 10px 22px hsl(180 60% 3% / 0.75))",
+            }}
           />
 
           {/* Nerve signal — masked to the logo silhouette so the pulse only paints the mark */}
