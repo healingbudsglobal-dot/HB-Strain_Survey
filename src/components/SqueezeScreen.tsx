@@ -58,6 +58,19 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
   const emailValid = validateEmail(email.trim()).valid;
   const emailFilled = email.length > 0;
 
+  // Award-level cursor parallax — subtle tilt on the glass card
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const rotX = useSpring(useTransform(tiltY, [-0.5, 0.5], [2.2, -2.2]), { stiffness: 120, damping: 18, mass: 0.4 });
+  const rotY = useSpring(useTransform(tiltX, [-0.5, 0.5], [-2.6, 2.6]), { stiffness: 120, damping: 18, mass: 0.4 });
+  const handleParallax = (e: React.PointerEvent<HTMLFormElement>) => {
+    if (reduceMotion || e.pointerType === "touch") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    tiltX.set((e.clientX - r.left) / r.width - 0.5);
+    tiltY.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const resetParallax = () => { tiltX.set(0); tiltY.set(0); };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim();
