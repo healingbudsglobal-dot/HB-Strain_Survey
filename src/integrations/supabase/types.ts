@@ -196,6 +196,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json
+          recipient_email: string
+          resend_id: string | null
+          status: string
+          subject: string | null
+          template_name: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          recipient_email: string
+          resend_id?: string | null
+          status?: string
+          subject?: string | null
+          template_name: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json
+          recipient_email?: string
+          resend_id?: string | null
+          status?: string
+          subject?: string | null
+          template_name?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           html_body: string
