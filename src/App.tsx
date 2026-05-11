@@ -9,6 +9,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSettings from "./pages/AdminSettings";
 import Legal from "./pages/Legal";
+import OtpTestHarness from "./pages/OtpTestHarness";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/legal" element={<Legal />} />
+          {import.meta.env.DEV && <Route path="/test/otp" element={<OtpTestHarness />} />}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
