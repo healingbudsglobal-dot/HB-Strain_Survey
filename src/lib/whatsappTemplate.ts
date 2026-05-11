@@ -75,7 +75,10 @@ export const buildWaLink = (
 };
 
 export const FALLBACK_WA_TEMPLATE =
-  "Hi Healing Buds 🌿\nI'm {{name}} and I just completed the Bio-Mapping Survey.\nMy #1 match: {{strain}} ({{compatibility}})\nProvince: {{province}}\nPlease send me details and next steps.";
+  "🌿 *NEW BIO-MAPPING LEAD* 🌿\n━━━━━━━━━━━━━━━\n\n👤 *Customer*\n• Name: {{name}}\n• WhatsApp: {{whatsapp}}\n• Email: {{email}}\n• Province: {{province}}\n\n🎯 *Match Result*\n• Strain: *{{strain}}*\n• Type: {{strain_type}}\n• Compatibility: *{{compatibility}}*\n\n🧪 *Product Specs*\n• THC: {{thc}}%\n• CBD: {{cbd}}%\n• Shop: {{shop_url}}\n\n━━━━━━━━━━━━━━━\n_Please follow up with this lead._";
+
+export const CUSTOMER_FALLBACK_WA_TEMPLATE =
+  "🌿 *Your Healing Buds Match* 🌿\n━━━━━━━━━━━━━━━\n\nHi {{name}}! Here's your personal bio-mapping result:\n\n🎯 *Your #1 Match*\n• {{strain}} ({{strain_type}})\n• Compatibility: *{{compatibility}}*\n• THC {{thc}}% · CBD {{cbd}}%\n\n📍 Province: {{province}}\n\n━━━━━━━━━━━━━━━\nKeep this for your records — our consultants will be in touch shortly. 💚";
 
 // Hardcoded fallback business number (matches app_settings seed value)
 export const FALLBACK_BUSINESS_NUMBER = "+351939455949";
