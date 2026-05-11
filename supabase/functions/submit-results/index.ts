@@ -525,6 +525,7 @@ Deno.serve(async (req) => {
     }
 
     // 2. Send results email to user via Resend
+    const resultsSubject = `Your Strain Match: ${payload.matched_strain} (${payload.compatibility} compatibility)`;
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -534,16 +535,16 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'Healing Buds <noreply@send.healingbuds.co.za>',
         to: [email],
-        subject: `Your Strain Match: ${payload.matched_strain} (${payload.compatibility} compatibility)`,
+        subject: resultsSubject,
         html: buildResultsHtml(payload),
       }),
     });
 
     const resendData = await resendRes.json();
-    if (!resendRes.ok) {
+    const resultsOk = resendRes.ok;
+    if (!resultsOk) {
       console.error('Resend error:', resendData);
     } else if (leadId) {
-      // Log email_sent event
       try {
         await supabase.from('lead_events').insert({
           lead_id: leadId,
@@ -551,17 +552,30 @@ Deno.serve(async (req) => {
           payload: {
             template: 'results',
             resend_id: resendData?.id ?? null,
-            subject: `Your Strain Match: ${payload.matched_strain}`,
+            subject: resultsSubject,
           },
         });
       } catch (e) {
         console.error('lead_events insert (email_sent) failed:', e);
       }
     }
+    // Audit log (admin-visible)
+    try {
+      await supabase.from('email_send_log').insert({
+        recipient_email: email,
+        template_name: 'results',
+        subject: resultsSubject,
+        resend_id: resultsOk ? (resendData?.id ?? null) : null,
+        status: resultsOk ? 'sent' : 'failed',
+        error_message: resultsOk ? null : JSON.stringify(resendData).slice(0, 500),
+        metadata: { matched_strain: payload.matched_strain, compatibility: payload.compatibility },
+      });
+    } catch (e) { console.error('email_send_log insert failed:', e); }
 
     // 3. Send admin notification email
+    const adminSubject = `🧬 New Lead: ${payload.name || 'Anonymous'} → ${payload.matched_strain} (${payload.compatibility})`;
     try {
-      await fetch('https://api.resend.com/emails', {
+      const adminRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${RESEND_API_KEY}`,
@@ -570,10 +584,22 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: 'Healing Buds Bio-Map <noreply@send.healingbuds.co.za>',
           to: [ADMIN_EMAIL],
-          subject: `🧬 New Lead: ${payload.name || 'Anonymous'} → ${payload.matched_strain} (${payload.compatibility})`,
+          subject: adminSubject,
           html: buildAdminNotificationHtml(payload),
         }),
       });
+      const adminData = await adminRes.json().catch(() => ({}));
+      try {
+        await supabase.from('email_send_log').insert({
+          recipient_email: ADMIN_EMAIL,
+          template_name: 'admin_notification',
+          subject: adminSubject,
+          resend_id: adminRes.ok ? (adminData?.id ?? null) : null,
+          status: adminRes.ok ? 'sent' : 'failed',
+          error_message: adminRes.ok ? null : JSON.stringify(adminData).slice(0, 500),
+          metadata: { lead_email: email },
+        });
+      } catch (e) { console.error('email_send_log admin insert failed:', e); }
     } catch (adminEmailErr) {
       console.error('Admin email error:', adminEmailErr);
     }
