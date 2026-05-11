@@ -70,7 +70,12 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
         strain: strainName || "your strain match",
         compatibility: compatibility || "",
         province: province || "",
-        shop_url: "",
+        shop_url: shopUrl || "",
+        thc: strainThc || "—",
+        cbd: strainCbd || "—",
+        strain_type: strainType || "—",
+        email: userEmail || "—",
+        whatsapp: finalNumber,
       });
       if (link) {
         // Track the conversion BEFORE navigating away (sendBeacon survives nav)
