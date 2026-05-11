@@ -91,10 +91,10 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
           <tr><td style="padding:16px;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Name</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2; font-weight:600;">${data.name || '—'}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Email</td><td style="padding:4px 0; font-size:14px; color:#4DBFA1; font-weight:500;">${data.email}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">WhatsApp</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${data.whatsapp || '—'}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Province</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${data.province || '—'}</td></tr>
+             <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Name</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2; font-weight:600;">${esc(data.name || '—')}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Email</td><td style="padding:4px 0; font-size:14px; color:#4DBFA1; font-weight:500;">${esc(data.email)}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">WhatsApp</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${esc(data.whatsapp || '—')}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Province</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${esc(data.province || '—')}</td></tr>
             </table>
           </td></tr>
         </table>
