@@ -239,7 +239,7 @@ const Index = () => {
         />
       )}
       {screen === "loading" && <LoadingScreen />}
-      {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} />}
+      {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} userEmail={email} />}
     </>
   );
 
