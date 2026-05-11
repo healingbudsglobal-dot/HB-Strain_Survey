@@ -112,3 +112,9 @@ export const buildMatchWaLink = (
   vars: Record<string, string>
 ): string | null => buildWaLink(businessNumber, renderTemplate(body, vars));
 
+export const buildCustomerWaLink = (
+  customerNumber: string | null | undefined,
+  vars: Record<string, string>
+): string | null =>
+  buildWaLink(customerNumber, renderTemplate(CUSTOMER_FALLBACK_WA_TEMPLATE, vars));
+
