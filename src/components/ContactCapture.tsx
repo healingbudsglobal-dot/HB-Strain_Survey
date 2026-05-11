@@ -34,7 +34,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility, province }: ContactCaptureProps) => {
+const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility, province, strainThc, strainCbd, strainType, shopUrl }: ContactCaptureProps) => {
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState<string | undefined>(undefined);
   const [optIn, setOptIn] = useState(true);
