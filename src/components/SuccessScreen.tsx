@@ -211,6 +211,26 @@ const SuccessScreen = ({ result, waLink }: SuccessScreenProps) => {
             </div>
           </motion.div>
 
+          {/* WhatsApp CTA — fallback if popup was blocked at submit */}
+          {waLink && (
+            <motion.a
+              variants={itemVariants}
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="mt-4 group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px]"
+              style={{
+                backgroundImage: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                boxShadow: "0 12px 32px -8px rgba(37,211,102,0.5)",
+              }}
+            >
+              <Share2 className="h-5 w-5" />
+              Open My Match on WhatsApp
+            </motion.a>
+          )}
+
           {/* Enquiry CTA — no direct shop link, SA ad-policy safe */}
           <motion.a
             variants={itemVariants}
