@@ -188,9 +188,25 @@ const Index = () => {
 
   const handleContactSubmit = useCallback(
     (name: string, whatsappE164?: string, optIn?: boolean) => {
+      setContactName(name);
+      if (whatsappE164 && optIn && strainResult) {
+        // Build the same wa.me link so SuccessScreen has a fallback CTA
+        import("@/lib/whatsappTemplate").then(({ loadDefaultWaConfig, buildMatchWaLink }) => {
+          loadDefaultWaConfig().then((cfg) => {
+            const link = buildMatchWaLink(cfg.businessNumber, cfg.body, {
+              name: name.split(" ")[0],
+              strain: strainResult.strain.name,
+              compatibility: `${strainResult.compatibility}%`,
+              province,
+              shop_url: strainResult.strain.shopUrl || "",
+            });
+            if (link) setWaLink(link);
+          });
+        });
+      }
       handleSendResults(name, whatsappE164, optIn);
     },
-    [handleSendResults]
+    [handleSendResults, strainResult, province]
   );
 
   const handleContactSkip = useCallback(() => {
