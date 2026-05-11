@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import budMacro from "@/assets/bud-macro.jpg";
+import heroEmeraldBud from "@/assets/hero-emerald-bud.jpg";
 
 /**
  * Crystal-clear hero image with a dark emerald-glass overlay.
@@ -61,23 +61,22 @@ const HeroBackdrop = () => {
     >
       <style>{`
         .hero-backdrop {
-          /* Crystal-clear emerald-glass: no blur, light tint, gentle scrim only */
-          --tint-a: 0.22;
-          --vignette-a: 0.42;
-          --scrim-top-a: 0.28;
-          --scrim-bot-a: 0.7;
-          --img-contrast: 1.12;
-          --img-brightness: 1.05;
-          --img-saturate: 1.35;
-          --img-blur: 0px;
+          /* Crystal-clear emerald-glass: sharp bud image, light tint, no blur */
+          --tint-a: 0.12;
+          --vignette-a: 0.30;
+          --scrim-top-a: 0.16;
+          --scrim-bot-a: 0.58;
+          --img-contrast: 1.18;
+          --img-brightness: 1.08;
+          --img-saturate: 1.22;
         }
         @media (prefers-color-scheme: light) {
           .hero-backdrop {
-            --tint-a: 0.32;
-            --vignette-a: 0.5;
-            --scrim-top-a: 0.35;
-            --scrim-bot-a: 0.78;
-            --img-brightness: 0.96;
+            --tint-a: 0.18;
+            --vignette-a: 0.38;
+            --scrim-top-a: 0.22;
+            --scrim-bot-a: 0.66;
+            --img-brightness: 1.02;
           }
         }
         @media (prefers-contrast: more) {
@@ -92,27 +91,28 @@ const HeroBackdrop = () => {
         }
         @media (max-width: 640px) {
           .hero-backdrop {
-            --tint-a: 0.34;
-            --vignette-a: 0.5;
-            --scrim-top-a: 0.38;
-            --scrim-bot-a: 0.78;
+            --tint-a: 0.14;
+            --vignette-a: 0.34;
+            --scrim-top-a: 0.18;
+            --scrim-bot-a: 0.62;
           }
         }
       `}</style>
 
       <motion.img
-        src={budMacro}
+        src={heroEmeraldBud}
         alt=""
         fetchPriority="high"
         decoding="async"
-        className="absolute top-1/2 left-1/2 w-[150vw] h-[150vh] max-w-none object-cover"
+        width={1088}
+        height={1920}
+        className="absolute inset-0 h-full w-full object-cover object-center"
         style={{
-          transform: "translate(-50%, -50%)",
           filter:
-            "saturate(var(--img-saturate)) contrast(var(--img-contrast)) brightness(var(--img-brightness)) blur(var(--img-blur))",
+            "saturate(var(--img-saturate)) contrast(var(--img-contrast)) brightness(var(--img-brightness))",
         }}
-        initial={{ scale: 1.15, x: "-50%", y: "-50%" }}
-        animate={lite ? { scale: 1.06, x: "-50%", y: "-50%" } : { scale: 1.0, x: "-50%", y: "-50%" }}
+        initial={{ scale: 1.05 }}
+        animate={lite ? { scale: 1.02 } : { scale: 1.0 }}
         transition={
           lite
             ? { duration: 0 }
