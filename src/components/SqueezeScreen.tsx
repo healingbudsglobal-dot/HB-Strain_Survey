@@ -1030,7 +1030,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
         }
 
         @media (prefers-reduced-motion: reduce) {
-          [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"] { animation: none !important; }
+          [style*="liquidBreathe"], [style*="liquidRipple"], [style*="iconPulse"], [style*="ctaHalo"], [style*="sheenSweep"], [style*="glassSheen"], [style*="ctaGradientFlow"] { animation: none !important; }
           .cta-ignite, .cta-spark, .cta-ember { animation: none !important; display: none; }
         }
 
