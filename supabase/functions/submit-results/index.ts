@@ -140,7 +140,7 @@ function buildResultsHtml(data: Record<string, string>): string {
   
   const profileRows = surveyKeys
     .filter(s => data[s.key])
-    .map(s => `<tr><td style="padding:6px 0; border-bottom:1px solid #2F3633;"><span style="font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.06em;">${s.label}</span><br/><span style="font-size:13px; color:#F0F3F2; font-weight:500;">${data[s.key]}</span></td></tr>`)
+    .map(s => `<tr><td style="padding:6px 0; border-bottom:1px solid #2F3633;"><span style="font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.06em;">${esc(s.label)}</span><br/><span style="font-size:13px; color:#F0F3F2; font-weight:500;">${esc(data[s.key])}</span></td></tr>`)
     .join('');
 
   return `<!DOCTYPE html>
