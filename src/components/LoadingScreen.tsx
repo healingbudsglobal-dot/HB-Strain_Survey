@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { AlertTriangle, Check, RotateCw, ArrowRight } from "lucide-react";
 import hbLogoJar from "@/assets/hb-logo-jar.png";
+import { Button } from "@/components/ui/button";
 
 const STATUS_MESSAGES = [
   "Comparing your answers to our strain library…",
@@ -10,6 +12,15 @@ const STATUS_MESSAGES = [
   "Building your personalised result…",
   "Done.",
 ];
+
+type LoadingStatus = "loading" | "slow" | "error" | "success";
+
+interface LoadingScreenProps {
+  status?: LoadingStatus;
+  errorReason?: string;
+  onRetry?: () => void;
+  onContinue?: () => void;
+}
 
 // DNA Helix component — geometric green dots spinning
 const DnaHelix = () => {
@@ -25,27 +36,18 @@ const DnaHelix = () => {
         const delay = i * 0.08;
         return (
           <motion.div key={i} className="absolute left-1/2" style={{ top: y }}>
-            {/* Strand 1 */}
             <motion.div
               className="absolute h-2.5 w-2.5 rounded-full bg-[hsl(var(--accent-green))]"
               style={{ left: x1 - 5 }}
-              animate={{
-                opacity: [0.3, 1, 0.3],
-                scale: [0.7, 1.1, 0.7],
-              }}
+              animate={{ opacity: [0.3, 1, 0.3], scale: [0.7, 1.1, 0.7] }}
               transition={{ duration: 1.8, delay, repeat: Infinity, ease: "easeInOut" }}
             />
-            {/* Strand 2 */}
             <motion.div
               className="absolute h-2 w-2 rounded-full bg-[hsl(var(--brand-gold))]"
               style={{ left: x2 - 4 }}
-              animate={{
-                opacity: [0.2, 0.8, 0.2],
-                scale: [0.6, 1, 0.6],
-              }}
+              animate={{ opacity: [0.2, 0.8, 0.2], scale: [0.6, 1, 0.6] }}
               transition={{ duration: 1.8, delay: delay + 0.3, repeat: Infinity, ease: "easeInOut" }}
             />
-            {/* Connector line */}
             <motion.div
               className="absolute h-px top-1"
               style={{
@@ -63,21 +65,47 @@ const DnaHelix = () => {
   );
 };
 
-const LoadingScreen = () => {
+const LoadingScreen = ({
+  status = "loading",
+  errorReason,
+  onRetry,
+  onContinue,
+}: LoadingScreenProps) => {
   const [msgIndex, setMsgIndex] = useState(0);
   const [progressWidth, setProgressWidth] = useState(0);
+  const reduce = useReducedMotion();
+
+  const isError = status === "error";
+  const isSuccess = status === "success";
+  const isSlow = status === "slow";
+  const isAnimating = !isError && !isSuccess;
 
   useEffect(() => {
+    if (!isAnimating) return;
     const interval = setInterval(() => {
-      setMsgIndex((i) => Math.min(i + 1, STATUS_MESSAGES.length - 1));
+      setMsgIndex((i) => Math.min(i + 1, STATUS_MESSAGES.length - 2));
     }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAnimating]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgressWidth(95), 100);
+    const timer = setTimeout(() => setProgressWidth(isSlow ? 80 : 95), 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isSlow]);
+
+  const headline = isError
+    ? "We couldn't save your results"
+    : isSuccess
+    ? "All set"
+    : isSlow
+    ? "Taking a little longer than usual…"
+    : "Finding Your Match…";
+
+  const subline = isSlow
+    ? "Hang tight, we're still working on it."
+    : isError
+    ? errorReason || "Something went wrong on our side."
+    : null;
 
   return (
     <motion.div
@@ -87,7 +115,7 @@ const LoadingScreen = () => {
       transition={{ duration: 0.4 }}
       className="relative z-10 flex flex-col items-center justify-center px-6 text-center"
     >
-      {/* Crisp backdrop — tint + film grain (no blur) */}
+      {/* Crisp backdrop */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,hsl(180_8%_7%_/_0.85)_80%)]" />
         <div className="absolute inset-0 bg-[hsl(var(--primary-green)_/_0.15)]" style={{ mixBlendMode: "overlay" }} />
@@ -100,62 +128,124 @@ const LoadingScreen = () => {
         />
       </div>
 
-      {/* DNA Helix animation */}
-      <motion.div
-        className="relative mb-8"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Outer spinning ring */}
-        <div className="absolute -inset-4 rounded-full border border-[hsl(var(--accent-green)_/_0.15)]" style={{ animation: "spin 8s linear infinite" }} />
-        <DnaHelix />
-        {/* Logo centered over helix */}
-        <span className="absolute inset-0 flex items-center justify-center">
-          <motion.img
-            src={hbLogoJar}
-            alt="HB"
-            className="h-8 w-auto drop-shadow-lg"
-            animate={{ scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+      {/* Visual area: helix while working, icon on terminal states */}
+      {isAnimating && (
+        <motion.div
+          className="relative mb-8"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div
+            className="absolute -inset-4 rounded-full border border-[hsl(var(--accent-green)_/_0.15)]"
+            style={{ animation: reduce ? undefined : "spin 8s linear infinite" }}
           />
-        </span>
-      </motion.div>
+          <DnaHelix />
+          <span className="absolute inset-0 flex items-center justify-center">
+            <motion.img
+              src={hbLogoJar}
+              alt="HB"
+              className="h-8 w-auto drop-shadow-lg"
+              animate={reduce ? undefined : { scale: [1, 1.08, 1], opacity: [0.8, 1, 0.8] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </span>
+        </motion.div>
+      )}
 
-      <h2 className="font-display text-xl font-bold tracking-[0.02em] text-foreground mb-4 text-glow sm:text-2xl">
-        Finding Your Match…
+      {isError && (
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-destructive/30 bg-destructive/10"
+        >
+          <AlertTriangle className="h-9 w-9 text-destructive" />
+        </motion.div>
+      )}
+
+      {isSuccess && (
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 18 }}
+          className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-[hsl(var(--accent-green)_/_0.4)] bg-[hsl(var(--accent-green)_/_0.15)]"
+        >
+          <Check className="h-9 w-9 text-[hsl(var(--accent-green))]" />
+        </motion.div>
+      )}
+
+      <h2
+        className={`font-display text-xl font-bold tracking-[0.02em] mb-2 sm:text-2xl ${
+          isError ? "text-destructive" : "text-foreground text-glow"
+        }`}
+      >
+        {headline}
       </h2>
 
-      {/* Cycling status messages */}
-      <div className="h-12 relative w-full max-w-xs">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={msgIndex}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className={`text-sm absolute inset-x-0 ${
-              msgIndex === STATUS_MESSAGES.length - 1
-                ? "font-bold text-[hsl(var(--accent-green))]"
-                : "text-muted-foreground"
-            }`}
-          >
-            {STATUS_MESSAGES[msgIndex]}
-          </motion.p>
-        </AnimatePresence>
-      </div>
+      {subline && (
+        <p className="max-w-xs text-sm text-muted-foreground mb-2">{subline}</p>
+      )}
 
-      {/* Progress bar */}
-      <div className="mt-6 w-56 h-1.5 rounded-full bg-[hsl(var(--surface-elevated))] overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-[3000ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-          style={{
-            width: `${progressWidth}%`,
-            background: "linear-gradient(90deg, hsl(var(--primary-green)), hsl(var(--accent-green)), hsl(var(--brand-gold)))",
-          }}
-        />
-      </div>
+      {/* Cycling status messages — only while animating */}
+      {isAnimating && (
+        <div className="h-12 relative w-full max-w-xs mt-2">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={isSlow ? "slow" : msgIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm absolute inset-x-0 text-muted-foreground"
+            >
+              {isSlow ? "Still finalising your match…" : STATUS_MESSAGES[msgIndex]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Progress bar — only while animating */}
+      {isAnimating && (
+        <div className="mt-4 w-56 h-1.5 rounded-full bg-[hsl(var(--surface-elevated))] overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-[3000ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+            style={{
+              width: `${progressWidth}%`,
+              background:
+                "linear-gradient(90deg, hsl(var(--primary-green)), hsl(var(--accent-green)), hsl(var(--brand-gold)))",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Error actions */}
+      {isError && (
+        <div className="mt-6 flex w-full max-w-xs flex-col gap-3">
+          {onRetry && (
+            <Button
+              onClick={onRetry}
+              className="w-full min-h-[48px] gap-2 font-display font-semibold"
+            >
+              <RotateCw className="h-4 w-4" />
+              Retry
+            </Button>
+          )}
+          {onContinue && (
+            <Button
+              variant="outline"
+              onClick={onContinue}
+              className="w-full min-h-[48px] gap-2 font-display"
+            >
+              Continue anyway
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          )}
+          <p className="mt-1 text-xs text-muted-foreground">
+            Your match is safe — we'll keep trying to deliver it to your inbox.
+          </p>
+        </div>
+      )}
     </motion.div>
   );
 };
