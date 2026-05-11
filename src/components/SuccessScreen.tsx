@@ -13,6 +13,7 @@ const strainTypeConfig = {
 
 interface SuccessScreenProps {
   result: StrainMatch | null;
+  waLink?: string;
 }
 
 const containerVariants = {
