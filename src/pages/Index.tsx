@@ -248,10 +248,18 @@ const Index = () => {
           userEmail={email}
           compatibility={strainResult ? `${strainResult.compatibility}%` : undefined}
           province={province}
+          strainThc={strainResult ? String(strainResult.strain.thc) : undefined}
+          strainCbd={strainResult ? String(strainResult.strain.cbd) : undefined}
+          strainType={
+            strainResult?.strain.type
+              ? strainResult.strain.type.charAt(0).toUpperCase() + strainResult.strain.type.slice(1)
+              : undefined
+          }
+          shopUrl={strainResult?.strain.shopUrl}
         />
       )}
       {screen === "loading" && <LoadingScreen />}
-      {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} userEmail={email} />}
+      {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} customerWaLink={customerWaLink} userEmail={email} />}
     </>
   );
 
