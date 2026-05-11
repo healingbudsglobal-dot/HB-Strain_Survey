@@ -24,22 +24,38 @@ function validateEmailServer(raw: unknown): { valid: boolean; error?: string; em
   if (typeof raw !== 'string') return { valid: false, error: 'Email is required' };
   const trimmed = raw.trim().toLowerCase();
   if (trimmed.length > 255) return { valid: false, error: 'Email too long' };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return { valid: false, error: 'Invalid email format' };
+  // Tightened: disallow <, >, ", ', whitespace to block HTML-injection via the email field.
+  if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(trimmed)) return { valid: false, error: 'Invalid email format' };
   const [local, domain] = trimmed.split('@');
   if (DISPOSABLE_DOMAINS.has(domain)) return { valid: false, error: 'Disposable email addresses are not allowed' };
   if (FAKE_LOCAL_PARTS.has(local) || local.length < 2) return { valid: false, error: 'Please use a real email address' };
   return { valid: true, email: trimmed };
 }
 
+function esc(s: unknown): string {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(raw: unknown): string {
+  const s = String(raw ?? '').trim();
+  if (!/^https:\/\/[^\s"'<>]+$/i.test(s)) return '#';
+  return esc(s);
+}
+
 function buildEffectPills(effects: string): string {
-  return effects.split(', ').map(e =>
-    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#162220; border:1px solid #2F3633; border-radius:20px; font-size:12px; color:#4DBFA1; font-weight:500;">${e}</span></td>`
+  return String(effects || '').split(', ').map(e =>
+    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#162220; border:1px solid #2F3633; border-radius:20px; font-size:12px; color:#4DBFA1; font-weight:500;">${esc(e)}</span></td>`
   ).join('');
 }
 
 function buildFlavourPills(flavours: string): string {
-  return flavours.split(', ').map(f =>
-    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#1C1A14; border:1px solid #3D3520; border-radius:20px; font-size:12px; color:#E5A31E; font-weight:500;">${f}</span></td>`
+  return String(flavours || '').split(', ').map(f =>
+    `<td style="padding:0 4px 6px 0;"><span style="display:inline-block; padding:5px 12px; background-color:#1C1A14; border:1px solid #3D3520; border-radius:20px; font-size:12px; color:#E5A31E; font-weight:500;">${esc(f)}</span></td>`
   ).join('');
 }
 
@@ -56,7 +72,7 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
 
   const surveyRows = surveyKeys
     .filter(s => data[s.key])
-    .map(s => `<tr><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:12px; color:#7F958E;">${s.label}</td><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:13px; color:#F0F3F2; font-weight:500;">${data[s.key]}</td></tr>`)
+    .map(s => `<tr><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:12px; color:#7F958E;">${esc(s.label)}</td><td style="padding:8px 12px; border-bottom:1px solid #2F3633; font-size:13px; color:#F0F3F2; font-weight:500;">${esc(data[s.key])}</td></tr>`)
     .join('');
 
   return `<!DOCTYPE html>
@@ -75,10 +91,10 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
           <tr><td style="padding:16px;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Name</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2; font-weight:600;">${data.name || '—'}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Email</td><td style="padding:4px 0; font-size:14px; color:#4DBFA1; font-weight:500;">${data.email}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">WhatsApp</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${data.whatsapp || '—'}</td></tr>
-              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Province</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${data.province || '—'}</td></tr>
+             <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Name</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2; font-weight:600;">${esc(data.name || '—')}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Email</td><td style="padding:4px 0; font-size:14px; color:#4DBFA1; font-weight:500;">${esc(data.email)}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">WhatsApp</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${esc(data.whatsapp || '—')}</td></tr>
+              <tr><td style="padding:4px 0; font-size:12px; color:#7F958E;">Province</td><td style="padding:4px 0; font-size:14px; color:#F0F3F2;">${esc(data.province || '—')}</td></tr>
             </table>
           </td></tr>
         </table>
@@ -87,8 +103,8 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
           <tr><td style="padding:16px;">
             <p style="margin:0 0 4px; font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.1em;">Matched Strain</p>
-            <p style="margin:0 0 8px; font-size:24px; font-weight:700; color:#E5A31E;">${data.matched_strain}</p>
-            <p style="margin:0; font-size:14px; color:#4DBFA1; font-weight:600;">${data.compatibility} compatibility</p>
+           <p style="margin:0 0 8px; font-size:24px; font-weight:700; color:#E5A31E;">${esc(data.matched_strain)}</p>
+            <p style="margin:0; font-size:14px; color:#4DBFA1; font-weight:600;">${esc(data.compatibility)} compatibility</p>
           </td></tr>
         </table>
       </td></tr>
@@ -124,7 +140,7 @@ function buildResultsHtml(data: Record<string, string>): string {
   
   const profileRows = surveyKeys
     .filter(s => data[s.key])
-    .map(s => `<tr><td style="padding:6px 0; border-bottom:1px solid #2F3633;"><span style="font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.06em;">${s.label}</span><br/><span style="font-size:13px; color:#F0F3F2; font-weight:500;">${data[s.key]}</span></td></tr>`)
+    .map(s => `<tr><td style="padding:6px 0; border-bottom:1px solid #2F3633;"><span style="font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.06em;">${esc(s.label)}</span><br/><span style="font-size:13px; color:#F0F3F2; font-weight:500;">${esc(data[s.key])}</span></td></tr>`)
     .join('');
 
   return `<!DOCTYPE html>
@@ -147,7 +163,7 @@ function buildResultsHtml(data: Record<string, string>): string {
 
 <!-- Preheader -->
 <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
-  ${name}, your precision bio-mapped strain match is ${data.matched_strain} with ${data.compatibility} compatibility. View your full clinical profile inside.
+  ${esc(name)}, your precision bio-mapped strain match is ${esc(data.matched_strain)} with ${esc(data.compatibility)} compatibility. View your full clinical profile inside.
   &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
 </div>
 
@@ -168,19 +184,19 @@ function buildResultsHtml(data: Record<string, string>): string {
         <tr><td align="center" style="padding:8px 32px 4px;"><h1 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; color:#F0F3F2; letter-spacing:0.02em;">Your Clinical Strain Profile</h1></td></tr>
 
         <!-- Subtext -->
-        <tr><td align="center" style="padding:4px 32px 24px;"><p style="margin:0; font-size:14px; line-height:1.6; color:#7F958E;">Hey <span style="color:#F0F3F2; font-weight:500;">${name}</span>, your precision bio-mapping is complete. Here's your personalised match.</p></td></tr>
+        <tr><td align="center" style="padding:4px 32px 24px;"><p style="margin:0; font-size:14px; line-height:1.6; color:#7F958E;">Hey <span style="color:#F0F3F2; font-weight:500;">${esc(name)}</span>, your precision bio-mapping is complete. Here's your personalised match.</p></td></tr>
 
         <!-- ═══ STRAIN MATCH CARD (Hero + Gauge) ═══ -->
         <tr><td style="padding:0 24px 20px;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#0B2A22; border:1px solid #14463A; border-radius:14px; overflow:hidden;">
             <!-- Hero image -->
             <tr><td style="padding:0; font-size:0; line-height:0; position:relative;">
-              <img src="${data.strain_image_url || 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${data.matched_strain}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
+              <img src="${safeUrl(data.strain_image_url) !== '#' ? safeUrl(data.strain_image_url) : 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
             </td></tr>
             <!-- Strain name band -->
             <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
               <p style="margin:0 0 2px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.16em; font-weight:700;">Your Matched Strain</p>
-              <h2 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#F0F3F2; letter-spacing:-0.01em; line-height:1.15;">${data.matched_strain}</h2>
+              <h2 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#F0F3F2; letter-spacing:-0.01em; line-height:1.15;">${esc(data.matched_strain)}</h2>
             </td></tr>
             <!-- BOLD GAUGE -->
             <tr><td align="center" style="padding:18px 22px 24px; background-color:#0B2A22;">
@@ -207,7 +223,7 @@ function buildResultsHtml(data: Record<string, string>): string {
                   <!-- Label -->
                   <td valign="middle" style="vertical-align:middle;">
                     <p style="margin:0 0 4px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.14em; font-weight:700;">Bio-Match Score</p>
-                    <p style="margin:0 0 6px; font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#F0F3F2; line-height:1.2;">${data.compatibility} compatibility</p>
+                    <p style="margin:0 0 6px; font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#F0F3F2; line-height:1.2;">${esc(data.compatibility)} compatibility</p>
                     <p style="margin:0; font-size:12px; line-height:1.5; color:#A0D9C4;">A precision match across your terpene, vibe &amp; lifestyle profile.</p>
                   </td>
                 </tr>
@@ -228,23 +244,23 @@ function buildResultsHtml(data: Record<string, string>): string {
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
                   <tr><td align="center" style="padding:16px 8px;">
                     <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">THC</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${data.strain_thc}</p>
-                  </td></tr>
-                </table>
-              </td>
-              <td style="width:33%; padding:0 4px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
-                  <tr><td align="center" style="padding:16px 8px;">
-                    <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">CBD</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${data.strain_cbd}</p>
-                  </td></tr>
-                </table>
-              </td>
-              <td style="width:33%; padding:0 0 0 4px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
-                  <tr><td align="center" style="padding:16px 8px;">
-                    <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">Price</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; color:#F0F3F2;">${data.strain_price}</p>
+                   <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${esc(data.strain_thc)}</p>
+                </td></tr>
+              </table>
+            </td>
+            <td style="width:33%; padding:0 4px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
+                <tr><td align="center" style="padding:16px 8px;">
+                  <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">CBD</p>
+                  <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${esc(data.strain_cbd)}</p>
+                </td></tr>
+              </table>
+            </td>
+            <td style="width:33%; padding:0 0 0 4px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
+                <tr><td align="center" style="padding:16px 8px;">
+                  <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">Price</p>
+                  <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; color:#F0F3F2;">${esc(data.strain_price)}</p>
                   </td></tr>
                 </table>
               </td>
@@ -264,7 +280,7 @@ function buildResultsHtml(data: Record<string, string>): string {
 
         <!-- ═══ CTA BUTTON ═══ -->
         <tr><td align="center" style="padding:8px 32px 24px;">
-          <a href="${data.strain_shop_url}" style="display:inline-block; background:linear-gradient(135deg, #7CE3B4, #4DBFA1); color:#0B2A22; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:700; text-decoration:none; padding:16px 40px; border-radius:10px; letter-spacing:0.02em; box-shadow:0 8px 24px -8px rgba(124,227,180,0.4);">Shop ${data.matched_strain} →</a>
+          <a href="${safeUrl(data.strain_shop_url)}" style="display:inline-block; background:linear-gradient(135deg, #7CE3B4, #4DBFA1); color:#0B2A22; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:700; text-decoration:none; padding:16px 40px; border-radius:10px; letter-spacing:0.02em; box-shadow:0 8px 24px -8px rgba(124,227,180,0.4);">Shop ${esc(data.matched_strain)} →</a>
         </td></tr>
 
         <!-- Divider -->
@@ -593,7 +609,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('submit-results error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
