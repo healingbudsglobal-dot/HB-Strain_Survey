@@ -950,6 +950,14 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           60%  { transform: translateX(320%); }
           100% { transform: translateX(320%); }
         }
+        @keyframes glassSheen {
+          0%   { transform: rotate(0deg) scale(1.2); }
+          100% { transform: rotate(360deg) scale(1.2); }
+        }
+        @keyframes ctaGradientFlow {
+          0%, 100% { background-position: 0% 50%; }
+          50%      { background-position: 100% 50%; }
+        }
         /* === Match-head ignition flash === */
         .cta-ignite {
           position: absolute;
