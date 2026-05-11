@@ -97,9 +97,12 @@ const HeroBackdrop = () => {
         }
         @media (max-width: 640px) {
           .hero-backdrop {
-            --tint-a: calc(var(--tint-a) + 0.06);
-            --img-contrast: 1.26;
-            --img-blur: 1px;
+            --tint-a: 0.62;
+            --vignette-a: 0.7;
+            --scrim-top-a: 0.55;
+            --scrim-bot-a: 0.9;
+            --img-contrast: 1.28;
+            --img-blur: 2px;
           }
         }
       `}</style>
