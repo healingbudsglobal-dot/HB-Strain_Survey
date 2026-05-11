@@ -43,6 +43,9 @@ const Index = () => {
   const [waLink, setWaLink] = useState<string | undefined>(undefined);
   const [customerWaLink, setCustomerWaLink] = useState<string | undefined>(undefined);
   const [contactName, setContactName] = useState<string>("");
+  const [submitStatus, setSubmitStatus] = useState<"loading" | "slow" | "error" | "success">("loading");
+  const [submitError, setSubmitError] = useState<string>("");
+  const [pendingPayload, setPendingPayload] = useState<{ payload: Record<string, string>; answersMap: Record<string, string> } | null>(null);
   const { toast } = useToast();
   const utm = useUtmTracking();
   const reduceMotion = useReducedMotion();
