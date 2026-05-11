@@ -59,3 +59,39 @@ export const buildWaLink = (
   if (digits.length < 8) return null;
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 };
+
+export const FALLBACK_WA_TEMPLATE =
+  "Hi Healing Buds 🌿\nI'm {{name}} and I just completed the Bio-Mapping Survey.\nMy #1 match: {{strain}} ({{compatibility}})\nProvince: {{province}}\nPlease send me details and next steps.";
+
+// Hardcoded fallback business number (matches app_settings seed value)
+export const FALLBACK_BUSINESS_NUMBER = "+351939455949";
+
+import { supabase } from "@/integrations/supabase/client";
+
+let cached: { businessNumber: string; body: string } | null = null;
+
+export const loadDefaultWaConfig = async (): Promise<{ businessNumber: string; body: string }> => {
+  if (cached) return cached;
+  try {
+    const [settingRes, tplRes] = await Promise.all([
+      supabase.from("app_settings").select("value").eq("key", "whatsapp_business_number").maybeSingle(),
+      supabase.from("whatsapp_templates").select("body").eq("is_default", true).maybeSingle(),
+    ]);
+    const raw = settingRes.data?.value as unknown;
+    const num = typeof raw === "string" ? raw : (raw && typeof raw === "object" ? String(raw) : "");
+    cached = {
+      businessNumber: num || FALLBACK_BUSINESS_NUMBER,
+      body: tplRes.data?.body || FALLBACK_WA_TEMPLATE,
+    };
+  } catch {
+    cached = { businessNumber: FALLBACK_BUSINESS_NUMBER, body: FALLBACK_WA_TEMPLATE };
+  }
+  return cached;
+};
+
+export const buildMatchWaLink = (
+  businessNumber: string,
+  body: string,
+  vars: Record<string, string>
+): string | null => buildWaLink(businessNumber, renderTemplate(body, vars));
+

@@ -40,6 +40,8 @@ const Index = () => {
   const [province, setProvince] = useState("");
   const [surveyAnswers, setSurveyAnswers] = useState<Record<string, string>>({});
   const [strainResult, setStrainResult] = useState<StrainMatch | null>(null);
+  const [waLink, setWaLink] = useState<string | undefined>(undefined);
+  const [contactName, setContactName] = useState<string>("");
   const { toast } = useToast();
   const utm = useUtmTracking();
   const reduceMotion = useReducedMotion();
@@ -186,9 +188,25 @@ const Index = () => {
 
   const handleContactSubmit = useCallback(
     (name: string, whatsappE164?: string, optIn?: boolean) => {
+      setContactName(name);
+      if (whatsappE164 && optIn && strainResult) {
+        // Build the same wa.me link so SuccessScreen has a fallback CTA
+        import("@/lib/whatsappTemplate").then(({ loadDefaultWaConfig, buildMatchWaLink }) => {
+          loadDefaultWaConfig().then((cfg) => {
+            const link = buildMatchWaLink(cfg.businessNumber, cfg.body, {
+              name: name.split(" ")[0],
+              strain: strainResult.strain.name,
+              compatibility: `${strainResult.compatibility}%`,
+              province,
+              shop_url: strainResult.strain.shopUrl || "",
+            });
+            if (link) setWaLink(link);
+          });
+        });
+      }
       handleSendResults(name, whatsappE164, optIn);
     },
-    [handleSendResults]
+    [handleSendResults, strainResult, province]
   );
 
   const handleContactSkip = useCallback(() => {
@@ -216,10 +234,12 @@ const Index = () => {
           onSkip={handleContactSkip}
           strainName={strainResult?.strain.name}
           userEmail={email}
+          compatibility={strainResult ? `${strainResult.compatibility}%` : undefined}
+          province={province}
         />
       )}
       {screen === "loading" && <LoadingScreen />}
-      {screen === "success" && <SuccessScreen result={strainResult} />}
+      {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} />}
     </>
   );
 

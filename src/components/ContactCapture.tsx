@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Shield, User, MessageCircle, Mail, Lock } from "lucide-react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import {
+  loadDefaultWaConfig,
+  buildMatchWaLink,
+  FALLBACK_BUSINESS_NUMBER,
+  FALLBACK_WA_TEMPLATE,
+} from "@/lib/whatsappTemplate";
 
 interface ContactCaptureProps {
   onSubmit: (name: string, whatsappE164?: string, optIn?: boolean) => void;
   onSkip: () => void;
   strainName?: string;
   userEmail?: string;
+  compatibility?: string;
+  province?: string;
 }
 
 const containerVariants = {
@@ -22,11 +30,19 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCaptureProps) => {
+const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility, province }: ContactCaptureProps) => {
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState<string | undefined>(undefined);
   const [optIn, setOptIn] = useState(true);
   const [error, setError] = useState("");
+  const [waConfig, setWaConfig] = useState<{ businessNumber: string; body: string }>({
+    businessNumber: FALLBACK_BUSINESS_NUMBER,
+    body: FALLBACK_WA_TEMPLATE,
+  });
+
+  useEffect(() => {
+    loadDefaultWaConfig().then(setWaConfig).catch(() => {});
+  }, []);
 
   const hasValidWa = !!whatsapp && isValidPhoneNumber(whatsapp);
 
@@ -41,8 +57,20 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail }: ContactCapt
       return;
     }
     setError("");
-    // Only pass the number if user opted in AND it's valid
     const finalNumber = hasValidWa && optIn ? whatsapp : undefined;
+
+    // Open wa.me synchronously during click so iOS Safari doesn't block it
+    if (finalNumber) {
+      const link = buildMatchWaLink(waConfig.businessNumber, waConfig.body, {
+        name: name.trim().split(" ")[0],
+        strain: strainName || "your strain match",
+        compatibility: compatibility || "",
+        province: province || "",
+        shop_url: "",
+      });
+      if (link) window.open(link, "_blank", "noopener,noreferrer");
+    }
+
     onSubmit(name.trim(), finalNumber, !!finalNumber);
   };
 
