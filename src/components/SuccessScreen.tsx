@@ -55,23 +55,22 @@ const SuccessScreen = ({ result }: SuccessScreenProps) => {
         }}
       />
 
-      {/* Success icon — green */}
-      <motion.div variants={itemVariants} className="relative mb-6">
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-          className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[hsl(var(--accent-green)_/_0.1)] border border-[hsl(var(--accent-green)_/_0.25)] shadow-[var(--shadow-glow-teal)]"
-        >
-          <CheckCircle className="h-10 w-10 text-[hsl(var(--accent-green))]" />
+      {/* Cinematic strain reveal — count-up, ring, glow, typewriter */}
+      {strain && (
+        <motion.div variants={itemVariants} className="mb-2 w-full">
+          <CinematicMatchReveal
+            value={result.compatibility}
+            strainName={strain.name}
+            startDelay={0.2}
+          />
         </motion.div>
-      </motion.div>
+      )}
 
       <motion.h2
         variants={itemVariants}
-        className="font-display text-2xl font-extrabold tracking-[0.02em] text-foreground sm:text-3xl mb-2 text-glow"
+        className="font-display text-lg font-semibold tracking-[0.02em] text-muted-foreground sm:text-xl mb-4"
       >
-        We Found Your Match
+        Your precision-matched strain
       </motion.h2>
 
       {strain && (
