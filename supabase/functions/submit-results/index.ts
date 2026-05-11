@@ -264,7 +264,7 @@ function buildResultsHtml(data: Record<string, string>): string {
 
         <!-- ═══ CTA BUTTON ═══ -->
         <tr><td align="center" style="padding:8px 32px 24px;">
-          <a href="${data.strain_shop_url}" style="display:inline-block; background:linear-gradient(135deg, #E5A31E, #C98B0A); color:#101414; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:700; text-decoration:none; padding:16px 40px; border-radius:10px; letter-spacing:0.02em;">Shop ${data.matched_strain} →</a>
+          <a href="${data.strain_shop_url}" style="display:inline-block; background:linear-gradient(135deg, #7CE3B4, #4DBFA1); color:#0B2A22; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:15px; font-weight:700; text-decoration:none; padding:16px 40px; border-radius:10px; letter-spacing:0.02em; box-shadow:0 8px 24px -8px rgba(124,227,180,0.4);">Shop ${data.matched_strain} →</a>
         </td></tr>
 
         <!-- Divider -->
