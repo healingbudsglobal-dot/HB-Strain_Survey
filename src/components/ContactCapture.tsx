@@ -18,6 +18,10 @@ interface ContactCaptureProps {
   userEmail?: string;
   compatibility?: string;
   province?: string;
+  strainThc?: string;
+  strainCbd?: string;
+  strainType?: string;
+  shopUrl?: string;
 }
 
 const containerVariants = {
