@@ -1,5 +1,6 @@
-import { CheckCircle, Mail, RotateCcw, Leaf, Share2 } from "lucide-react";
+import { Mail, RotateCcw, Leaf, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
+import CinematicMatchReveal from "./CinematicMatchReveal";
 import { Badge } from "@/components/ui/badge";
 
 import type { StrainMatch } from "@/lib/strainMatcher";
