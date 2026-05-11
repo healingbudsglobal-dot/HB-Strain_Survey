@@ -14,6 +14,7 @@ const strainTypeConfig = {
 interface SuccessScreenProps {
   result: StrainMatch | null;
   waLink?: string;
+  customerWaLink?: string;
   userEmail?: string;
 }
 
@@ -27,7 +28,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-const SuccessScreen = ({ result, waLink, userEmail }: SuccessScreenProps) => {
+const SuccessScreen = ({ result, waLink, customerWaLink, userEmail }: SuccessScreenProps) => {
   const strain = result?.strain;
 
   const handleShare = async () => {
