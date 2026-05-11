@@ -16,7 +16,7 @@ import { surveyQuestions } from "@/data/surveyQuestions";
 import { matchStrain, type StrainMatch } from "@/lib/strainMatcher";
 import { sendOtpEmail, submitResults, postSurveyAnswersWebhook } from "@/lib/webhook";
 import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+
 import { useUtmTracking, utmToPayload } from "@/hooks/useUtmTracking";
 
 type Screen = "squeeze" | "otp" | "survey" | "contact" | "loading" | "success";
