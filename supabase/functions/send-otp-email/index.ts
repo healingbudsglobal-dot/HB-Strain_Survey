@@ -222,6 +222,17 @@ Deno.serve(async (req) => {
     });
 
     const resendData = await resendRes.json();
+    // Audit log (admin-visible)
+    try {
+      await admin.from('email_send_log').insert({
+        recipient_email: trimmed,
+        template_name: 'otp_verification',
+        subject: `${otp_code} is your Healing Buds code`,
+        resend_id: resendRes.ok ? (resendData?.id ?? null) : null,
+        status: resendRes.ok ? 'sent' : 'failed',
+        error_message: resendRes.ok ? null : JSON.stringify(resendData).slice(0, 500),
+      });
+    } catch (e) { console.error('email_send_log otp insert failed:', e); }
     if (!resendRes.ok) {
       console.error('Resend error:', resendData);
       return new Response(
