@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
-import heroFlower from "@/assets/hero-flower.jpg";
+import budMacro from "@/assets/bud-macro.jpg";
 
 /**
  * Crystal-clear hero image with a dark emerald-glass overlay.
@@ -61,61 +61,79 @@ const HeroBackdrop = () => {
     >
       <style>{`
         .hero-backdrop {
-          --tint-a: 0.55;
-          --vignette-a: 0.55;
-          --scrim-top-a: 0.45;
-          --scrim-bot-a: 0.78;
-          --img-contrast: 1.18;
-          --img-brightness: 0.95;
+          --tint-a: 0.42;
+          --vignette-a: 0.6;
+          --scrim-top-a: 0.4;
+          --scrim-bot-a: 0.82;
+          --img-contrast: 1.22;
+          --img-brightness: 1.02;
+          --img-saturate: 1.25;
+          --img-blur: 1.5px;
         }
         @media (prefers-color-scheme: light) {
           .hero-backdrop {
-            --tint-a: 0.72;
-            --vignette-a: 0.7;
-            --scrim-top-a: 0.55;
-            --scrim-bot-a: 0.88;
-            --img-brightness: 0.85;
+            --tint-a: 0.62;
+            --vignette-a: 0.72;
+            --scrim-top-a: 0.5;
+            --scrim-bot-a: 0.9;
+            --img-brightness: 0.9;
           }
         }
         @media (prefers-contrast: more) {
           .hero-backdrop {
-            --tint-a: 0.78;
-            --vignette-a: 0.78;
-            --scrim-top-a: 0.6;
-            --scrim-bot-a: 0.92;
-            --img-contrast: 1.28;
-            --img-brightness: 0.8;
+            --tint-a: 0.7;
+            --vignette-a: 0.8;
+            --scrim-top-a: 0.55;
+            --scrim-bot-a: 0.94;
+            --img-contrast: 1.32;
+            --img-brightness: 0.85;
           }
         }
         @media (dynamic-range: high) {
           .hero-backdrop {
-            --tint-a: 0.5;
-            --vignette-a: 0.5;
+            --tint-a: 0.38;
+            --vignette-a: 0.55;
           }
         }
         @media (max-width: 640px) {
           .hero-backdrop {
-            --tint-a: calc(var(--tint-a) + 0.05);
-            --img-contrast: 1.22;
+            --tint-a: 0.62;
+            --vignette-a: 0.7;
+            --scrim-top-a: 0.55;
+            --scrim-bot-a: 0.9;
+            --img-contrast: 1.28;
+            --img-blur: 2px;
           }
         }
       `}</style>
 
       <motion.img
-        src={heroFlower}
+        src={budMacro}
         alt=""
-        className="absolute top-1/2 left-1/2 w-[145vw] h-[145vh] max-w-none object-cover"
+        fetchPriority="high"
+        decoding="async"
+        className="absolute top-1/2 left-1/2 w-[150vw] h-[150vh] max-w-none object-cover"
         style={{
           transform: "translate(-50%, -50%)",
-          filter: "saturate(1.15) contrast(var(--img-contrast)) brightness(var(--img-brightness))",
+          filter:
+            "saturate(var(--img-saturate)) contrast(var(--img-contrast)) brightness(var(--img-brightness)) blur(var(--img-blur))",
         }}
-        initial={{ scale: 1.12, x: "-50%", y: "-50%" }}
-        animate={lite ? { scale: 1.05, x: "-50%", y: "-50%" } : { scale: 1.0, x: "-50%", y: "-50%" }}
+        initial={{ scale: 1.15, x: "-50%", y: "-50%" }}
+        animate={lite ? { scale: 1.06, x: "-50%", y: "-50%" } : { scale: 1.0, x: "-50%", y: "-50%" }}
         transition={
           lite
             ? { duration: 0 }
-            : { duration: 32, ease: "linear", repeat: Infinity, repeatType: "reverse" }
+            : { duration: 36, ease: "linear", repeat: Infinity, repeatType: "reverse" }
         }
+      />
+
+      {/* Subtle mint bloom at center to lift trichomes */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 55% 45% at 50% 42%, hsl(164 70% 55% / 0.10), transparent 70%)",
+        }}
       />
 
       <div className="absolute inset-0" style={{ background: "hsl(165 55% 6% / var(--tint-a))" }} />
