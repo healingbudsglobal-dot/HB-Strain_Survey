@@ -184,7 +184,7 @@ function buildResultsHtml(data: Record<string, string>): string {
         <tr><td align="center" style="padding:8px 32px 4px;"><h1 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; color:#F0F3F2; letter-spacing:0.02em;">Your Clinical Strain Profile</h1></td></tr>
 
         <!-- Subtext -->
-        <tr><td align="center" style="padding:4px 32px 24px;"><p style="margin:0; font-size:14px; line-height:1.6; color:#7F958E;">Hey <span style="color:#F0F3F2; font-weight:500;">${name}</span>, your precision bio-mapping is complete. Here's your personalised match.</p></td></tr>
+        <tr><td align="center" style="padding:4px 32px 24px;"><p style="margin:0; font-size:14px; line-height:1.6; color:#7F958E;">Hey <span style="color:#F0F3F2; font-weight:500;">${esc(name)}</span>, your precision bio-mapping is complete. Here's your personalised match.</p></td></tr>
 
         <!-- ═══ STRAIN MATCH CARD (Hero + Gauge) ═══ -->
         <tr><td style="padding:0 24px 20px;">
