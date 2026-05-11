@@ -14,6 +14,7 @@ const strainTypeConfig = {
 interface SuccessScreenProps {
   result: StrainMatch | null;
   waLink?: string;
+  userEmail?: string;
 }
 
 const containerVariants = {
