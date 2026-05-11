@@ -219,6 +219,18 @@ const SuccessScreen = ({ result, waLink, userEmail }: SuccessScreenProps) => {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                import("@/lib/trackEvent").then(({ trackEvent }) => {
+                  trackEvent("whatsapp_click", {
+                    email: userEmail,
+                    payload: {
+                      surface: "success_screen",
+                      strain: strain?.name,
+                      compatibility: result?.compatibility,
+                    },
+                  });
+                });
+              }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="mt-4 group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px]"
