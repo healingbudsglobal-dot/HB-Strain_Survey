@@ -197,7 +197,7 @@ function buildResultsHtml(data: Record<string, string>): string {
         <tr><td style="height:3px; background:linear-gradient(90deg, #4DBFA1, #E5A31E, #4DBFA1); border-radius:16px 16px 0 0; font-size:0; line-height:0;">&nbsp;</td></tr>
 
         <!-- Logo -->
-        <tr><td align="center" style="padding:32px 32px 16px;"><img src="https://biomapsurvey.lovable.app/images/hb-logo-white-full.png" alt="Healing Buds" width="180" style="display:block; width:180px; height:auto;" /></td></tr>
+        <tr><td align="center" style="padding:32px 32px 16px;"><img src="${LOGO_URL}" alt="Healing Buds" width="180" style="display:block; width:180px; height:auto;" /></td></tr>
 
         <!-- Heading -->
         <tr><td align="center" style="padding:8px 32px 4px;"><h1 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:22px; font-weight:700; color:#F0F3F2; letter-spacing:0.02em;">Your Clinical Strain Profile</h1></td></tr>
@@ -210,7 +210,7 @@ function buildResultsHtml(data: Record<string, string>): string {
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#0B2A22; border:1px solid #14463A; border-radius:14px; overflow:hidden;">
             <!-- Hero image -->
             <tr><td style="padding:0; font-size:0; line-height:0; position:relative;">
-              <img src="${safeUrl(data.strain_image_url) !== '#' ? safeUrl(data.strain_image_url) : 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
+              <img src="${strainImageFor(data.matched_strain)}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
             </td></tr>
             <!-- Strain name band -->
             <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
