@@ -244,23 +244,23 @@ function buildResultsHtml(data: Record<string, string>): string {
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
                   <tr><td align="center" style="padding:16px 8px;">
                     <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">THC</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${data.strain_thc}</p>
-                  </td></tr>
-                </table>
-              </td>
-              <td style="width:33%; padding:0 4px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
-                  <tr><td align="center" style="padding:16px 8px;">
-                    <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">CBD</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${data.strain_cbd}</p>
-                  </td></tr>
-                </table>
-              </td>
-              <td style="width:33%; padding:0 0 0 4px;">
-                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
-                  <tr><td align="center" style="padding:16px 8px;">
-                    <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">Price</p>
-                    <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; color:#F0F3F2;">${data.strain_price}</p>
+                   <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${esc(data.strain_thc)}</p>
+                </td></tr>
+              </table>
+            </td>
+            <td style="width:33%; padding:0 4px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
+                <tr><td align="center" style="padding:16px 8px;">
+                  <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">CBD</p>
+                  <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:22px; font-weight:700; color:#F0F3F2;">${esc(data.strain_cbd)}</p>
+                </td></tr>
+              </table>
+            </td>
+            <td style="width:33%; padding:0 0 0 4px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
+                <tr><td align="center" style="padding:16px 8px;">
+                  <p style="margin:0 0 2px; font-size:10px; color:#7F958E; text-transform:uppercase; letter-spacing:0.08em;">Price</p>
+                  <p style="margin:0; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:700; color:#F0F3F2;">${esc(data.strain_price)}</p>
                   </td></tr>
                 </table>
               </td>
