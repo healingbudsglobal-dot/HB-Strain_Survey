@@ -68,7 +68,22 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
         province: province || "",
         shop_url: "",
       });
-      if (link) window.open(link, "_blank", "noopener,noreferrer");
+      if (link) {
+        // Track the conversion BEFORE navigating away (sendBeacon survives nav)
+        import("@/lib/trackEvent").then(({ trackEvent }) => {
+          trackEvent("whatsapp_click", {
+            email: userEmail,
+            payload: {
+              surface: "contact_capture",
+              strain: strainName,
+              compatibility,
+              province,
+              business_number: waConfig.businessNumber,
+            },
+          });
+        });
+        window.open(link, "_blank", "noopener,noreferrer");
+      }
     }
 
     onSubmit(name.trim(), finalNumber, !!finalNumber);
