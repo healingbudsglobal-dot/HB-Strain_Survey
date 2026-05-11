@@ -170,32 +170,51 @@ function buildResultsHtml(data: Record<string, string>): string {
         <!-- Subtext -->
         <tr><td align="center" style="padding:4px 32px 24px;"><p style="margin:0; font-size:14px; line-height:1.6; color:#7F958E;">Hey <span style="color:#F0F3F2; font-weight:500;">${name}</span>, your precision bio-mapping is complete. Here's your personalised match.</p></td></tr>
 
-        <!-- ═══ STRAIN MATCH CARD ═══ -->
-        <tr><td style="padding:0 24px 16px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:12px; overflow:hidden;">
-            <tr><td style="padding:24px 24px 16px; background:linear-gradient(135deg, rgba(77,191,161,0.12), rgba(229,163,30,0.08));">
-              <p style="margin:0 0 2px; font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.1em; font-weight:600;">🧬 Your Matched Strain</p>
-              <h2 style="margin:0 0 4px; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#E5A31E; letter-spacing:-0.01em;">${data.matched_strain}</h2>
+        <!-- ═══ STRAIN MATCH CARD (Hero + Gauge) ═══ -->
+        <tr><td style="padding:0 24px 20px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#0B2A22; border:1px solid #14463A; border-radius:14px; overflow:hidden;">
+            <!-- Hero image -->
+            <tr><td style="padding:0; font-size:0; line-height:0; position:relative;">
+              <img src="${data.strain_image_url || 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${data.matched_strain}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
             </td></tr>
-            <tr><td align="center" style="padding:16px 24px;">
+            <!-- Strain name band -->
+            <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
+              <p style="margin:0 0 2px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.16em; font-weight:700;">Your Matched Strain</p>
+              <h2 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#F0F3F2; letter-spacing:-0.01em; line-height:1.15;">${data.matched_strain}</h2>
+            </td></tr>
+            <!-- BOLD GAUGE -->
+            <tr><td align="center" style="padding:18px 22px 24px; background-color:#0B2A22;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
                 <tr>
-                  <td style="width:100%; padding-bottom:8px;">
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
-                      <tr>
-                        <td style="font-size:12px; color:#7F958E;">Compatibility</td>
-                        <td align="right" style="font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#4DBFA1;">${data.compatibility}</td>
-                      </tr>
-                    </table>
+                  <!-- Gauge SVG -->
+                  <td align="center" valign="middle" style="width:160px; padding-right:16px;">
+                    <div style="position:relative; display:inline-block; width:150px; height:96px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="150" height="96" viewBox="0 0 150 96" style="display:block;">
+                        <defs>
+                          <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7CE3B4"/>
+                            <stop offset="100%" stop-color="#4DBFA1"/>
+                          </linearGradient>
+                        </defs>
+                        <path d="M12,84 A63,63 0 0,1 138,84" fill="none" stroke="#14463A" stroke-width="14" stroke-linecap="round"/>
+                        <path d="M12,84 A63,63 0 0,1 138,84" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round"
+                              stroke-dasharray="198" stroke-dashoffset="${(198 * (100 - compatNum) / 100).toFixed(1)}"/>
+                        <text x="75" y="74" text-anchor="middle" font-family="DM Sans, Helvetica, Arial, sans-serif"
+                              font-size="34" font-weight="700" fill="#7CE3B4">${compatNum}<tspan font-size="18" fill="#A0D9C4" dx="2">%</tspan></text>
+                      </svg>
+                    </div>
+                  </td>
+                  <!-- Label -->
+                  <td valign="middle" style="vertical-align:middle;">
+                    <p style="margin:0 0 4px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.14em; font-weight:700;">Bio-Match Score</p>
+                    <p style="margin:0 0 6px; font-family:'DM Sans',sans-serif; font-size:18px; font-weight:700; color:#F0F3F2; line-height:1.2;">${data.compatibility} compatibility</p>
+                    <p style="margin:0; font-size:12px; line-height:1.5; color:#A0D9C4;">A precision match across your terpene, vibe &amp; lifestyle profile.</p>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; height:6px; background-color:#1A1D1C; border-radius:3px;">
-                      <tr><td style="width:${compatNum}%; height:6px; background:linear-gradient(90deg, #4DBFA1, #2C7D7A); border-radius:3px;"></td><td></td></tr>
-                    </table>
-                  </td>
-                </tr>
+              </table>
+              <!-- Fallback bar (shown for clients that drop SVG) -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; margin-top:16px; height:8px; background-color:#14463A; border-radius:4px;">
+                <tr><td style="width:${compatNum}%; height:8px; background:linear-gradient(90deg, #7CE3B4, #4DBFA1); border-radius:4px; font-size:0; line-height:0;">&nbsp;</td><td style="font-size:0; line-height:0;">&nbsp;</td></tr>
               </table>
             </td></tr>
           </table>
