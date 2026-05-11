@@ -103,8 +103,8 @@ function buildAdminNotificationHtml(data: Record<string, string>): string {
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#101414; border:1px solid #2F3633; border-radius:10px;">
           <tr><td style="padding:16px;">
             <p style="margin:0 0 4px; font-size:11px; color:#7F958E; text-transform:uppercase; letter-spacing:0.1em;">Matched Strain</p>
-            <p style="margin:0 0 8px; font-size:24px; font-weight:700; color:#E5A31E;">${data.matched_strain}</p>
-            <p style="margin:0; font-size:14px; color:#4DBFA1; font-weight:600;">${data.compatibility} compatibility</p>
+           <p style="margin:0 0 8px; font-size:24px; font-weight:700; color:#E5A31E;">${esc(data.matched_strain)}</p>
+            <p style="margin:0; font-size:14px; color:#4DBFA1; font-weight:600;">${esc(data.compatibility)} compatibility</p>
           </td></tr>
         </table>
       </td></tr>
