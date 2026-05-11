@@ -41,6 +41,7 @@ const Index = () => {
   const [surveyAnswers, setSurveyAnswers] = useState<Record<string, string>>({});
   const [strainResult, setStrainResult] = useState<StrainMatch | null>(null);
   const [waLink, setWaLink] = useState<string | undefined>(undefined);
+  const [customerWaLink, setCustomerWaLink] = useState<string | undefined>(undefined);
   const [contactName, setContactName] = useState<string>("");
   const { toast } = useToast();
   const utm = useUtmTracking();
