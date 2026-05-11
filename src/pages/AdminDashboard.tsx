@@ -5,6 +5,7 @@ import { LogOut, Search, Download, Users, TrendingUp, Calendar, MessageCircle, C
 import { motion } from "framer-motion";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { renderTemplate, buildWaLink, getLeadVars } from "@/lib/whatsappTemplate";
+import EmailLogPanel from "@/components/admin/EmailLogPanel";
 
 interface Lead {
   id: string;
@@ -254,6 +255,7 @@ const AdminDashboard = () => {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
+        <EmailLogPanel />
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-xl border border-border bg-card p-4">
