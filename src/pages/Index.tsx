@@ -268,7 +268,14 @@ const Index = () => {
           shopUrl={strainResult?.strain.shopUrl}
         />
       )}
-      {screen === "loading" && <LoadingScreen />}
+      {screen === "loading" && (
+        <LoadingScreen
+          status={submitStatus}
+          errorReason={submitError}
+          onRetry={handleRetrySubmit}
+          onContinue={handleContinueAnyway}
+        />
+      )}
       {screen === "success" && <SuccessScreen result={strainResult} waLink={waLink} customerWaLink={customerWaLink} userEmail={email} />}
     </>
   );
