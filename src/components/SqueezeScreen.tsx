@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, Dna, Sparkles, Mail, MapPin, ChevronDown, Check, Lock } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
