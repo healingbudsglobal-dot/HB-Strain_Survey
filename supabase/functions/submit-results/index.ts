@@ -196,7 +196,7 @@ function buildResultsHtml(data: Record<string, string>): string {
             <!-- Strain name band -->
             <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
               <p style="margin:0 0 2px; font-size:10px; color:#7CE3B4; text-transform:uppercase; letter-spacing:0.16em; font-weight:700;">Your Matched Strain</p>
-              <h2 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#F0F3F2; letter-spacing:-0.01em; line-height:1.15;">${data.matched_strain}</h2>
+              <h2 style="margin:0; font-family:'DM Sans','Helvetica Neue',Arial,sans-serif; font-size:30px; font-weight:700; color:#F0F3F2; letter-spacing:-0.01em; line-height:1.15;">${esc(data.matched_strain)}</h2>
             </td></tr>
             <!-- BOLD GAUGE -->
             <tr><td align="center" style="padding:18px 22px 24px; background-color:#0B2A22;">
