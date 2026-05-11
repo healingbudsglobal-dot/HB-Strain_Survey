@@ -18,6 +18,10 @@ interface ContactCaptureProps {
   userEmail?: string;
   compatibility?: string;
   province?: string;
+  strainThc?: string;
+  strainCbd?: string;
+  strainType?: string;
+  shopUrl?: string;
 }
 
 const containerVariants = {
@@ -30,7 +34,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility, province }: ContactCaptureProps) => {
+const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility, province, strainThc, strainCbd, strainType, shopUrl }: ContactCaptureProps) => {
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState<string | undefined>(undefined);
   const [optIn, setOptIn] = useState(true);
@@ -66,7 +70,12 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
         strain: strainName || "your strain match",
         compatibility: compatibility || "",
         province: province || "",
-        shop_url: "",
+        shop_url: shopUrl || "",
+        thc: strainThc || "—",
+        cbd: strainCbd || "—",
+        strain_type: strainType || "—",
+        email: userEmail || "—",
+        whatsapp: finalNumber,
       });
       if (link) {
         // Track the conversion BEFORE navigating away (sendBeacon survives nav)
