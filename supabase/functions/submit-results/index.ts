@@ -163,7 +163,7 @@ function buildResultsHtml(data: Record<string, string>): string {
 
 <!-- Preheader -->
 <div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">
-  ${name}, your precision bio-mapped strain match is ${data.matched_strain} with ${data.compatibility} compatibility. View your full clinical profile inside.
+  ${esc(name)}, your precision bio-mapped strain match is ${esc(data.matched_strain)} with ${esc(data.compatibility)} compatibility. View your full clinical profile inside.
   &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
 </div>
 
