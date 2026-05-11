@@ -190,7 +190,13 @@ const AdminDashboard = () => {
       l.matched_strain || "",
       l.compatibility || "",
     ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    // CSV formula-injection defense: prefix any cell starting with =, +, -, @, tab, or CR with a single quote.
+    const sanitizeCell = (raw: unknown) => {
+      const s = String(raw ?? "");
+      const safe = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s;
+      return `"${safe.replace(/"/g, '""')}"`;
+    };
+    const csv = [headers, ...rows].map((r) => r.map(sanitizeCell).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
