@@ -191,7 +191,7 @@ function buildResultsHtml(data: Record<string, string>): string {
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#0B2A22; border:1px solid #14463A; border-radius:14px; overflow:hidden;">
             <!-- Hero image -->
             <tr><td style="padding:0; font-size:0; line-height:0; position:relative;">
-              <img src="${data.strain_image_url || 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${data.matched_strain}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
+              <img src="${safeUrl(data.strain_image_url) !== '#' ? safeUrl(data.strain_image_url) : 'https://biomapsurvey.lovable.app/images/email-trichomes.jpg'}" alt="${esc(data.matched_strain)}" width="520" style="display:block; width:100%; max-width:520px; height:200px; object-fit:cover; border-radius:14px 14px 0 0;" />
             </td></tr>
             <!-- Strain name band -->
             <tr><td style="padding:18px 22px 4px; background:linear-gradient(180deg, #0E3B2E, #0B2A22);">
