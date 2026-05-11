@@ -434,6 +434,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className={`relative z-10 flex w-full flex-col gap-3 overflow-hidden rounded-[28px] py-5 pr-5 pl-7 border transition-[border-color,box-shadow] duration-500 ${
             focused ? "border-[hsl(164_80%_60%_/_0.35)]" : "border-white/[0.10]"
           }`}
+          onPointerMove={handleParallax}
+          onPointerLeave={resetParallax}
           style={{
             background:
               "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
@@ -443,8 +445,32 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
               : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
             animation: "liquidBreathe 7s ease-in-out infinite",
+            transformPerspective: 1100,
+            rotateX: rotX as unknown as number,
+            rotateY: rotY as unknown as number,
+            transformStyle: "preserve-3d",
           }}
         >
+          {/* Ambient drifting conic sheen — catches the light like real glass */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
+            style={{
+              background:
+                "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
+              animation: "glassSheen 18s linear infinite",
+              filter: "blur(40px)",
+            }}
+          />
+          {/* Filmic grain — premium texture */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+            }}
+          />
           {/* Focus ripple — radial pulse from center when input gains focus */}
           {focused && (
             <span
