@@ -872,8 +872,10 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               className="group relative w-full overflow-hidden rounded-[22px] py-5 font-display font-bold text-[18px] tracking-[-0.01em] transition-[background,box-shadow] duration-150 flex items-center justify-center gap-2.5 min-h-[64px] disabled:cursor-not-allowed will-change-transform"
               style={{
                 backgroundImage: agreed
-                  ? "linear-gradient(180deg, hsl(164 78% 68%) 0%, hsl(164 70% 55%) 45%, hsl(168 72% 46%) 100%)"
+                  ? "linear-gradient(115deg, hsl(164 78% 68%) 0%, hsl(168 72% 50%) 35%, hsl(172 75% 42%) 65%, hsl(164 78% 68%) 100%)"
                   : "linear-gradient(180deg, hsl(180 10% 26%) 0%, hsl(180 10% 18%) 100%)",
+                backgroundSize: agreed ? "220% 220%" : "100% 100%",
+                animation: agreed ? "ctaGradientFlow 8s ease-in-out infinite" : undefined,
                 boxShadow: agreed
                   ? "inset 0 2px 0 hsl(0 0% 100% / 0.55), inset 0 -3px 0 hsl(170 70% 22% / 0.6), inset 0 0 0 1px hsl(164 60% 40% / 0.4), 0 1px 2px hsl(180 50% 5% / 0.3)"
                   : "inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -1px 0 hsl(180 50% 3% / 0.4)",
