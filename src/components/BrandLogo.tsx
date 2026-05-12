@@ -22,11 +22,16 @@ const SIZE_CLASSES: Record<Size, string> = {
   xl: "h-28 w-auto sm:h-36 md:h-40",
 };
 
-const ETCH_FILTER =
+const ETCH_FILTER_FULL =
   "drop-shadow(0 -0.5px 0 hsl(0 0% 100% / 0.85)) " +
   "drop-shadow(0 1px 0 hsl(180 65% 4% / 0.95)) " +
   "drop-shadow(0 2px 3px hsl(180 60% 3% / 0.55)) " +
   "drop-shadow(0 8px 18px hsl(180 60% 3% / 0.45))";
+
+/** Mobile path: keep top highlight + crisp 1px bottom shadow only. */
+const ETCH_FILTER_LITE =
+  "drop-shadow(0 -0.5px 0 hsl(0 0% 100% / 0.85)) " +
+  "drop-shadow(0 1px 0 hsl(180 65% 4% / 0.95))";
 
 /**
  * Inline SVG: low-amplitude turbulence + a handful of hair-thin diagonal
