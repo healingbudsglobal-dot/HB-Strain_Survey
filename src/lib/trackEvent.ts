@@ -1,6 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const STORAGE_KEY = "hb_utm_v1";
+const DEDUPE_MS = 5000;
+
+/** In-memory dedupe buffer — keys expire after DEDUPE_MS */
+const RECENT = new Map<string, number>();
 
 function readUtm(): Record<string, unknown> {
   try {
@@ -11,17 +15,43 @@ function readUtm(): Record<string, unknown> {
   }
 }
 
+function makeDedupeKey(
+  event_type: string,
+  opts: { email?: string; payload?: Record<string, unknown> }
+): string {
+  const p = opts.payload ?? {};
+  return [
+    event_type,
+    opts.email ?? "",
+    String(p.recipient ?? ""),
+    String(p.strain ?? ""),
+  ].join("|");
+}
+
+function pruneExpired(): void {
+  const cutoff = Date.now() - DEDUPE_MS;
+  for (const [k, ts] of RECENT) {
+    if (ts < cutoff) RECENT.delete(k);
+  }
+}
+
 /**
- * Fire-and-forget event tracker. Inserts a row into lead_events via the
- * `track-event` edge function with full UTM/source attribution attached.
- *
- * Uses sendBeacon when available so the request survives navigation
- * (e.g. when the user is being sent off to wa.me in a new tab).
+ * Fire-and-forget event tracker with deduplication and throttling.
+ * Identical events within 5s are dropped to prevent double-tap duplicates.
+ * Returns a Promise so callers can await before navigating away.
  */
-export function trackEvent(
+export async function trackEvent(
   event_type: string,
   opts: { email?: string; payload?: Record<string, unknown> } = {}
-): void {
+): Promise<void> {
+  const key = makeDedupeKey(event_type, opts);
+  const last = RECENT.get(key);
+  if (last && Date.now() - last < DEDUPE_MS) {
+    return; // deduped
+  }
+  RECENT.set(key, Date.now());
+  pruneExpired();
+
   const utm = readUtm();
   const body = {
     event_type,
@@ -46,7 +76,7 @@ export function trackEvent(
   }
 
   // Fallback — supabase-js invoke (handles auth headers automatically)
-  supabase.functions.invoke("track-event", { body }).catch((err) => {
+  await supabase.functions.invoke("track-event", { body }).catch((err) => {
     console.warn("trackEvent failed:", err);
   });
 }
