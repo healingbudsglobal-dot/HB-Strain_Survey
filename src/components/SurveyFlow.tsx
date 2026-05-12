@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { ChevronLeft, Dna, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import bgFlower from "@/assets/hero-flower.jpg";
