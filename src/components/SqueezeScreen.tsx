@@ -247,8 +247,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             backgroundSize: disableAurora ? "100% 100%" : "200% 100%",
             animation: disableAurora ? "none" : "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
-            filter:
-              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
+            filter: disableAurora
+              ? "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9))"
+              : "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           perfect match.
