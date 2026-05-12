@@ -1,5 +1,6 @@
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 /**
  * BrandLogo
