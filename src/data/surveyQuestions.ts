@@ -129,7 +129,7 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Very sensitive – a tiny amount goes a long way", icon: "alert-triangle" },
-      { label: "Average – standard profiles suit me", icon: "minus" },
+      { label: "Average – standard profiles suit me", icon: "equal" },
       { label: "Higher tolerance – I prefer richer profiles", icon: "trending-up" },
       { label: "I can feel a bit on-edge if it's too strong", icon: "shield-alert" },
       { label: "I lean toward gentler, balanced ratios", icon: "scale" },
