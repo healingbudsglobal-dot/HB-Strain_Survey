@@ -247,62 +247,46 @@ const SuccessScreen = ({ result, waLink, customerWaLink, userEmail }: SuccessScr
             <motion.div variants={itemVariants} className="mt-4 w-full flex flex-col gap-3">
               {customerWaLink && (
                 <motion.a
-                  href={customerWaLink}
+                  href={tracking === "customer" ? undefined : customerWaLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => {
-                    import("@/lib/trackEvent").then(({ trackEvent }) => {
-                      trackEvent("whatsapp_click", {
-                        email: userEmail,
-                        payload: {
-                          surface: "success_screen",
-                          recipient: "customer",
-                          strain: strain?.name,
-                          compatibility: result?.compatibility,
-                        },
-                      });
-                    });
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px]"
+                  onClick={(e) => handleWaClick(e, customerWaLink, "customer")}
+                  whileHover={tracking ? {} : { scale: 1.02 }}
+                  whileTap={tracking ? {} : { scale: 0.97 }}
+                  className={`group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px] ${isDisabled("customer") ? "opacity-50 cursor-not-allowed" : ""}`}
                   style={{
                     backgroundImage: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
                     boxShadow: "0 12px 32px -8px rgba(37,211,102,0.5)",
                   }}
                 >
-                  <Share2 className="h-5 w-5" />
-                  Send My Match To Me
+                  {tracking === "customer" ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-5 w-5" />
+                  )}
+                  {tracking === "customer" ? "Sending…" : "Send My Match To Me"}
                 </motion.a>
               )}
               {waLink && (
                 <motion.a
-                  href={waLink}
+                  href={tracking === "budstacks" ? undefined : waLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => {
-                    import("@/lib/trackEvent").then(({ trackEvent }) => {
-                      trackEvent("whatsapp_click", {
-                        email: userEmail,
-                        payload: {
-                          surface: "success_screen",
-                          recipient: "budstacks",
-                          strain: strain?.name,
-                          compatibility: result?.compatibility,
-                        },
-                      });
-                    });
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px] border border-white/15"
+                  onClick={(e) => handleWaClick(e, waLink, "budstacks")}
+                  whileHover={tracking ? {} : { scale: 1.02 }}
+                  whileTap={tracking ? {} : { scale: 0.97 }}
+                  className={`group w-full rounded-2xl py-4 font-display font-bold text-white text-base transition-all flex items-center justify-center gap-2 min-h-[52px] border border-white/15 ${isDisabled("budstacks") ? "opacity-50 cursor-not-allowed" : ""}`}
                   style={{
                     backgroundImage: "linear-gradient(135deg, hsl(var(--primary-green)) 0%, hsl(var(--secondary-green)) 100%)",
                     boxShadow: "0 12px 32px -8px hsl(var(--primary-green) / 0.5)",
                   }}
                 >
-                  <Share2 className="h-5 w-5" />
-                  Send Order To BudStacks
+                  {tracking === "budstacks" ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Share2 className="h-5 w-5" />
+                  )}
+                  {tracking === "budstacks" ? "Sending…" : "Send Order To BudStacks"}
                 </motion.a>
               )}
             </motion.div>
