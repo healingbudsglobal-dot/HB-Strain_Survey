@@ -94,9 +94,9 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Physical comfort & ease", icon: "activity" },
-      { label: "Calm & unwind from a busy day", icon: "brain" },
+      { label: "Calm & unwind from a busy day", icon: "coffee" },
       { label: "Restful nights", icon: "moon" },
-      { label: "Focus & flow state", icon: "target" },
+      { label: "Focus & flow state", icon: "crosshair" },
       { label: "Creative spark", icon: "palette" },
       { label: "Everyday balance", icon: "heart-pulse" },
       { label: "Confidence in social settings", icon: "users" },
