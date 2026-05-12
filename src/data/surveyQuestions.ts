@@ -65,8 +65,8 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Energized & Productive", icon: "zap" },
-      { label: "Relaxed & Stress-Free", icon: "heart" },
-      { label: "Creative & Inspired", icon: "lightbulb" },
+      { label: "Relaxed & Stress-Free", icon: "wind" },
+      { label: "Creative & Inspired", icon: "palette" },
       { label: "Deep Sleep & Sedation", icon: "moon" },
       { label: "Social & Talkative", icon: "users" },
       { label: "Focused & Clear", icon: "target" },
