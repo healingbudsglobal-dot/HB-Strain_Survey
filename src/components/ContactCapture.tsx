@@ -139,7 +139,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
       `}</style>
 
       <motion.div variants={itemVariants} className="mb-6">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
+        <BrandLogo size="md" vignette="subtle" priority />
       </motion.div>
 
       <motion.h2
