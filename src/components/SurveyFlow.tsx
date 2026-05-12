@@ -37,6 +37,7 @@ const ICON_EMERALD =
 const getIconColor = (_q: string, _o: string, _i: number): string => ICON_EMERALD;
 
 const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
+  const reduced = useReducedMotion();
   const { hydrated, initial, save, clear } = useSurveyProgress();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
