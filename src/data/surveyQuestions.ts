@@ -229,8 +229,8 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "multi",
     options: [
       { label: "Paranoia/Anxiety", icon: "alert-triangle" },
-      { label: "Sleepiness", icon: "moon" },
-      { label: "Racing thoughts", icon: "zap" },
+      { label: "Sleepiness", icon: "bed-double" },
+      { label: "Racing thoughts", icon: "gauge" },
       { label: "Dry mouth/eyes", icon: "droplets" },
       { label: "Memory fog", icon: "cloud" },
       { label: "Munchies", icon: "utensils" },
