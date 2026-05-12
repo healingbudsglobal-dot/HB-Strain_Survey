@@ -96,11 +96,13 @@ export function BrandLogo({
               vignette === "strong"
                 ? "radial-gradient(ellipse at center, hsl(180 50% 4% / 0.78) 0%, hsl(180 50% 4% / 0.55) 35%, hsl(180 50% 4% / 0.18) 65%, transparent 85%)"
                 : "radial-gradient(ellipse at center, hsl(180 50% 4% / 0.35) 0%, hsl(180 50% 4% / 0.20) 45%, transparent 78%)",
-            filter: vignette === "strong" ? "blur(8px)" : "blur(6px)",
+            filter: vignette === "strong"
+              ? lite ? "blur(4px)" : "blur(8px)"
+              : lite ? "blur(3px)" : "blur(6px)",
           }}
         />
       )}
-      {vignette !== "none" && (
+      {vignette !== "none" && !lite && (
         <div
           aria-hidden
           className={cn(
@@ -127,7 +129,7 @@ export function BrandLogo({
         decoding={priority ? "sync" : "async"}
         loading={priority ? "eager" : "lazy"}
         className={cn(SIZE_CLASSES[size], "relative z-10", imgClassName)}
-        style={{ filter: ETCH_FILTER }}
+        style={{ filter: lite ? ETCH_FILTER_LITE : ETCH_FILTER_FULL }}
       />
     </div>
   );
