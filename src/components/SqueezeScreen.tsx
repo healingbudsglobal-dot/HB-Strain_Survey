@@ -151,46 +151,56 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
                 animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
               }}
             />
-            {/* Trailing ember — slower, deeper green afterglow */}
-            <div
-              className="absolute -inset-x-1/2 inset-y-0 opacity-70"
-              style={{
-                background:
-                  "linear-gradient(115deg, transparent 42%, hsl(155 95% 55% / 0.55) 50%, transparent 58%)",
-                filter: "blur(2px)",
-                mixBlendMode: "screen",
-                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
-                animationDelay: "0.18s",
-              }}
-            />
-            {/* Pink leading spark */}
-            <div
-              className="absolute -inset-x-1/2 inset-y-0 opacity-80"
-              style={{
-                background:
-                  "linear-gradient(115deg, transparent 38%, hsl(330 100% 78% / 0.7) 46%, transparent 54%)",
-                filter: "blur(2.5px)",
-                mixBlendMode: "screen",
-                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
-                animationDelay: "-0.15s",
-              }}
-            />
+            {/* Trailing ember — slower, deeper green afterglow (desktop only) */}
+            {!disableAurora && (
+              <div
+                className="absolute -inset-x-1/2 inset-y-0 opacity-70"
+                style={{
+                  background:
+                    "linear-gradient(115deg, transparent 42%, hsl(155 95% 55% / 0.55) 50%, transparent 58%)",
+                  filter: "blur(2px)",
+                  mixBlendMode: "screen",
+                  animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                  animationDelay: "0.18s",
+                }}
+              />
+            )}
+            {/* Pink leading spark (desktop only) */}
+            {!disableAurora && (
+              <div
+                className="absolute -inset-x-1/2 inset-y-0 opacity-80"
+                style={{
+                  background:
+                    "linear-gradient(115deg, transparent 38%, hsl(330 100% 78% / 0.7) 46%, transparent 54%)",
+                  filter: "blur(2.5px)",
+                  mixBlendMode: "screen",
+                  animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                  animationDelay: "-0.15s",
+                }}
+              />
+            )}
           </div>
 
-          {/* Subtle synaptic flicker glow that pulses with the sweep */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 rounded-full"
-            style={{
-              background:
-                "radial-gradient(ellipse at 20% 50%, hsl(330 90% 65% / 0.18), transparent 55%), radial-gradient(ellipse at 80% 50%, hsl(155 90% 55% / 0.22), transparent 55%)",
-              filter: "blur(28px)",
-              transform: "scale(2)",
-              animation: "nervePulse 4.6s ease-in-out infinite",
-            }}
-          />
+          {/* Subtle synaptic flicker glow that pulses with the sweep (desktop only) */}
+          {!disableAurora && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 20% 50%, hsl(330 90% 65% / 0.18), transparent 55%), radial-gradient(ellipse at 80% 50%, hsl(155 90% 55% / 0.22), transparent 55%)",
+                filter: "blur(28px)",
+                transform: "scale(2)",
+                animation: "nervePulse 4.6s ease-in-out infinite",
+              }}
+            />
+          )}
         </div>
-        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.18)] rounded-full scale-[2]" />
+        <div
+          className={`absolute inset-0 -z-10 rounded-full bg-[hsl(var(--accent-green)_/_0.18)] ${
+            disableAurora ? "blur-2xl scale-[1.4]" : "blur-3xl scale-[2]"
+          }`}
+        />
 
         <style>{`
           @keyframes nerveSweep {
@@ -220,8 +230,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
             WebkitBackgroundClip: "text",
             // Embossed: top highlight + bottom shadow + soft outer glow
-            filter:
-              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+            filter: disableAurora
+              ? "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85))"
+              : "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
           }}
         >
           Discover your
@@ -236,8 +247,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             backgroundSize: disableAurora ? "100% 100%" : "200% 100%",
             animation: disableAurora ? "none" : "auroraShift 6s ease-in-out infinite",
             WebkitBackgroundClip: "text",
-            filter:
-              "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
+            filter: disableAurora
+              ? "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9))"
+              : "drop-shadow(0 -1px 0 hsl(164 80% 88% / 0.7)) drop-shadow(0 1px 0 hsl(180 70% 3% / 0.9)) drop-shadow(0 2px 1px hsl(180 70% 3% / 0.6)) drop-shadow(0 0 28px hsl(164 80% 50% / 0.55))",
           }}
         >
           perfect match.
@@ -420,8 +432,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           style={{
             background:
               "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
-            backdropFilter: "blur(24px) saturate(160%)",
-            WebkitBackdropFilter: "blur(24px) saturate(160%)",
+            backdropFilter: disableAurora ? "blur(12px) saturate(130%)" : "blur(24px) saturate(160%)",
+            WebkitBackdropFilter: disableAurora ? "blur(12px) saturate(130%)" : "blur(24px) saturate(160%)",
             boxShadow: focused
               ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
               : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
@@ -432,17 +444,19 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             transformStyle: "preserve-3d",
           }}
         >
-          {/* Ambient drifting conic sheen — catches the light like real glass */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
-            style={{
-              background:
-                "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
-              animation: "glassSheen 18s linear infinite",
-              filter: "blur(40px)",
-            }}
-          />
+          {/* Ambient drifting conic sheen — desktop only */}
+          {!disableAurora && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
+              style={{
+                background:
+                  "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
+                animation: "glassSheen 18s linear infinite",
+                filter: "blur(40px)",
+              }}
+            />
+          )}
           {/* Filmic grain — premium texture */}
           <div
             aria-hidden
@@ -470,8 +484,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className="pointer-events-none absolute -top-16 -left-12 h-44 w-44 rounded-full opacity-60 mix-blend-screen"
           style={{
             background: "radial-gradient(circle, hsl(164 85% 55% / 0.45) 0%, transparent 65%)",
-            filter: "blur(28px)",
-            animation: "glassDrift 14s ease-in-out infinite",
+            filter: disableAurora ? "blur(16px)" : "blur(28px)",
+            animation: disableAurora ? "none" : "glassDrift 14s ease-in-out infinite",
           }}
         />
         <div
@@ -480,8 +494,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className="pointer-events-none absolute -bottom-20 -right-10 h-52 w-52 rounded-full opacity-50 mix-blend-screen"
           style={{
             background: "radial-gradient(circle, hsl(38 90% 60% / 0.35) 0%, transparent 65%)",
-            filter: "blur(32px)",
-            animation: "glassDrift 18s ease-in-out infinite reverse",
+            filter: disableAurora ? "blur(18px)" : "blur(32px)",
+            animation: disableAurora ? "none" : "glassDrift 18s ease-in-out infinite reverse",
           }}
         />
         {/* Top sheen — wet highlight */}
@@ -771,7 +785,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               className="pointer-events-none absolute -inset-3 rounded-[32px]"
               style={{
                 background: "radial-gradient(60% 60% at 50% 55%, hsl(164 80% 55% / 0.55), transparent 70%)",
-                filter: "blur(22px)",
+                filter: disableAurora ? "blur(14px)" : "blur(22px)",
                 animation: "ctaHalo 2.6s ease-in-out infinite",
               }}
             />
