@@ -151,46 +151,56 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
                 animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
               }}
             />
-            {/* Trailing ember — slower, deeper green afterglow */}
-            <div
-              className="absolute -inset-x-1/2 inset-y-0 opacity-70"
-              style={{
-                background:
-                  "linear-gradient(115deg, transparent 42%, hsl(155 95% 55% / 0.55) 50%, transparent 58%)",
-                filter: "blur(2px)",
-                mixBlendMode: "screen",
-                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
-                animationDelay: "0.18s",
-              }}
-            />
-            {/* Pink leading spark */}
-            <div
-              className="absolute -inset-x-1/2 inset-y-0 opacity-80"
-              style={{
-                background:
-                  "linear-gradient(115deg, transparent 38%, hsl(330 100% 78% / 0.7) 46%, transparent 54%)",
-                filter: "blur(2.5px)",
-                mixBlendMode: "screen",
-                animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
-                animationDelay: "-0.15s",
-              }}
-            />
+            {/* Trailing ember — slower, deeper green afterglow (desktop only) */}
+            {!disableAurora && (
+              <div
+                className="absolute -inset-x-1/2 inset-y-0 opacity-70"
+                style={{
+                  background:
+                    "linear-gradient(115deg, transparent 42%, hsl(155 95% 55% / 0.55) 50%, transparent 58%)",
+                  filter: "blur(2px)",
+                  mixBlendMode: "screen",
+                  animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                  animationDelay: "0.18s",
+                }}
+              />
+            )}
+            {/* Pink leading spark (desktop only) */}
+            {!disableAurora && (
+              <div
+                className="absolute -inset-x-1/2 inset-y-0 opacity-80"
+                style={{
+                  background:
+                    "linear-gradient(115deg, transparent 38%, hsl(330 100% 78% / 0.7) 46%, transparent 54%)",
+                  filter: "blur(2.5px)",
+                  mixBlendMode: "screen",
+                  animation: "nerveSweep 4.6s cubic-bezier(0.65,0.05,0.36,1) infinite",
+                  animationDelay: "-0.15s",
+                }}
+              />
+            )}
           </div>
 
-          {/* Subtle synaptic flicker glow that pulses with the sweep */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 rounded-full"
-            style={{
-              background:
-                "radial-gradient(ellipse at 20% 50%, hsl(330 90% 65% / 0.18), transparent 55%), radial-gradient(ellipse at 80% 50%, hsl(155 90% 55% / 0.22), transparent 55%)",
-              filter: "blur(28px)",
-              transform: "scale(2)",
-              animation: "nervePulse 4.6s ease-in-out infinite",
-            }}
-          />
+          {/* Subtle synaptic flicker glow that pulses with the sweep (desktop only) */}
+          {!disableAurora && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-10 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 20% 50%, hsl(330 90% 65% / 0.18), transparent 55%), radial-gradient(ellipse at 80% 50%, hsl(155 90% 55% / 0.22), transparent 55%)",
+                filter: "blur(28px)",
+                transform: "scale(2)",
+                animation: "nervePulse 4.6s ease-in-out infinite",
+              }}
+            />
+          )}
         </div>
-        <div className="absolute inset-0 -z-10 blur-3xl bg-[hsl(var(--accent-green)_/_0.18)] rounded-full scale-[2]" />
+        <div
+          className={`absolute inset-0 -z-10 rounded-full bg-[hsl(var(--accent-green)_/_0.18)] ${
+            disableAurora ? "blur-2xl scale-[1.4]" : "blur-3xl scale-[2]"
+          }`}
+        />
 
         <style>{`
           @keyframes nerveSweep {
