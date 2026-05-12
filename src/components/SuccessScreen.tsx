@@ -1,4 +1,5 @@
-import { Mail, RotateCcw, Leaf, Share2 } from "lucide-react";
+import { useState } from "react";
+import { Mail, RotateCcw, Leaf, Share2, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import CinematicMatchReveal from "./CinematicMatchReveal";
 import { Badge } from "@/components/ui/badge";
