@@ -78,6 +78,8 @@ export function BrandLogo({
   priority = false,
   imgClassName,
 }: BrandLogoProps) {
+  const isMobile = useIsMobile();
+  const lite = isMobile;
   return (
     <div className={cn("relative inline-block", className)}>
       {vignette !== "none" && (
