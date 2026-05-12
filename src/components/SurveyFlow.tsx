@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { surveyQuestions } from "@/data/surveyQuestions";
 import { ChevronLeft, Dna, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { icons } from "lucide-react";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
 import bgFlower from "@/assets/hero-flower.jpg";
@@ -37,6 +37,7 @@ const ICON_EMERALD =
 const getIconColor = (_q: string, _o: string, _i: number): string => ICON_EMERALD;
 
 const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
+  const reduced = useReducedMotion();
   const { hydrated, initial, save, clear } = useSurveyProgress();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -400,30 +401,54 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
                       animate={{ opacity: 1, x: 0, scale: 1 }}
                       transition={{ delay: 0.08 + i * 0.06, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       onClick={() => handleSelect(option.label)}
-                      whileHover={{ scale: 1.02, x: 4 }}
-                      whileTap={{ scale: 0.96 }}
+                      whileHover={reduced ? undefined : { scale: 1.02, x: 4 }}
+                      whileTap={reduced ? undefined : { scale: 0.96 }}
                       className={`group option-emerald-focus w-full rounded-xl border px-4 py-4 text-left text-base font-semibold text-foreground transition-all duration-200 sm:text-lg min-h-[64px] ${
                         isSelected
-                          ? 'option-emerald-selected border-[hsl(164_90%_60%/0.9)] bg-[hsl(var(--accent-green)_/_0.12)]'
+                          ? 'border-[hsl(164_90%_60%/0.9)] bg-[hsl(var(--accent-green)_/_0.12)] shadow-[0_0_32px_-6px_hsl(164_80%_55%_/_0.55)]'
                           : 'border-[hsl(170_8%_25%)] bg-[hsl(var(--surface))] hover:border-[hsl(var(--accent-green)_/_0.6)] hover:bg-[hsl(var(--accent-green)_/_0.05)] hover:shadow-[0_0_28px_-6px_hsl(164_80%_55%_/_0.45)]'
                       }`}
                     >
                       <span className="flex items-center gap-3">
-                        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg transition-all duration-300 ${
-                          isSelected
-                            ? 'bg-[hsl(var(--accent-green)_/_0.22)] text-[hsl(var(--accent-green))] scale-110 ring-1 ring-[hsl(var(--accent-green)_/_0.4)]'
-                            : `${iconColorClass} group-hover:scale-105`
-                        }`}>
+                        <motion.span
+                          className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-lg ${
+                            isSelected
+                              ? 'bg-[hsl(var(--accent-green)_/_0.22)] text-[hsl(var(--accent-green))] ring-1 ring-[hsl(var(--accent-green)_/_0.4)]'
+                              : `${iconColorClass} group-hover:scale-105 transition-transform duration-300`
+                          }`}
+                          animate={
+                            isSelected && !reduced
+                              ? { scale: [1, 1.18, 1.1] }
+                              : { scale: 1 }
+                          }
+                          transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1], times: [0, 0.55, 1] }}
+                        >
+                          {/* One-shot ring burst on select */}
+                          {isSelected && !reduced && (
+                            <motion.span
+                              key={`burst-${option.label}`}
+                              aria-hidden
+                              className="pointer-events-none absolute inset-0 rounded-xl border-2 border-[hsl(var(--accent-green))]"
+                              initial={{ opacity: 0.6, scale: 1 }}
+                              animate={{ opacity: 0, scale: 1.6 }}
+                              transition={{ duration: 0.55, ease: "easeOut" }}
+                            />
+                          )}
                           {option.icon ? getIcon(option.icon) : String.fromCharCode(65 + i)}
-                        </span>
-                        <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                        </motion.span>
+                        <span>
                           {option.label}
                         </span>
                         {/* Selection indicator */}
                         <motion.span
                           className="ml-auto"
                           initial={false}
-                          animate={{ opacity: isSelected ? 1 : 0, scale: isSelected ? 1 : 0.5 }}
+                          animate={{
+                            opacity: isSelected ? 1 : 0,
+                            scale: isSelected ? 1 : 0.5,
+                            rotate: isSelected ? 0 : (reduced ? 0 : -90),
+                          }}
+                          transition={{ type: "spring", stiffness: 360, damping: 18 }}
                         >
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[hsl(var(--accent-green))]">
                             <svg className="h-3 w-3 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

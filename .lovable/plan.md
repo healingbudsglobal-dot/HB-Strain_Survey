@@ -1,41 +1,56 @@
-## Goal
+# Survey icon + animation polish
 
-Right now the loading screen runs for a fixed 3-second timer regardless of what the webhook actually does — failures only surface as a small toast and slow networks get no feedback at all. We'll make the loading screen reflect the real status of `submitResults` + `postSurveyAnswersWebhook` and give users a clear way to recover.
+Goal: every survey option icon should map cleanly to its label (no duplicate "dartboards"), and the select/hover feedback should feel intentional and rewarding without competing motion or indefinite pulses.
 
-## States
+---
 
-The loading screen will move through four states driven by Index:
+## 1. Fix icon relevance — `src/data/surveyQuestions.ts`
 
-1. **`loading`** — current animation + cycling status messages (default)
-2. **`slow`** — after 6s with no response, swap the headline to "Taking a little longer than usual…" and show a soft sub-line "Hang tight, we're still working on it." Animation keeps running.
-3. **`error`** — webhook failed (network or non-2xx). Stop the animation, show a friendly error icon, headline "We couldn't save your results", short description with the underlying reason (offline / server error), plus two buttons: **Retry** (re-runs the webhook calls) and **Continue anyway** (proceeds to success screen — results already exist client-side).
-4. **`success`** — brief confirmation tick, then auto-advance to SuccessScreen (replaces the current blind 3-second `setTimeout`).
+Current issues found in the 15 questions:
 
-## Files to change
+| Question | Option | Today | Change to | Why |
+|---|---|---|---|---|
+| primary_vibe | "Relaxed & Stress-Free" | `heart` | `wind` | `heart` is reused for "Sex/Intimacy" later — visual collision |
+| primary_vibe | "Creative & Inspired" | `lightbulb` | `palette` | Match the other two "creative" options (consistent visual language) |
+| specific_benefit | "Focus & flow state" | `target` | `crosshair` | Removes the duplicate "dartboard" — `target` stays only on "Focused & Clear" |
+| specific_benefit | "Calm & unwind from a busy day" | `brain` | `coffee` | `brain` reads cognitive, not unwind |
+| thc_reaction | "Average – standard profiles suit me" | `minus` | `equal` | Conveys "balanced/average" vs a generic dash |
+| terpene_pref | "No strong preference" | `minus` | `shuffle` | More expressive of "any/open" |
+| recovery_support | "Not a priority right now" | `minus` | `circle-dashed` | Soft "skip" cue |
+| effects_avoid | "Racing thoughts" | `zap` | `gauge` | `zap` is reused for "Energized & Productive" (positive) — semantic clash |
+| effects_avoid | "Sleepiness" | `moon` | `bed-double` | `moon` is positive for "Restful nights" elsewhere |
 
-### `src/components/LoadingScreen.tsx`
-- Add `status: "loading" | "slow" | "error" | "success"` and `onRetry`, `onContinue`, `errorReason?` props (all optional, defaults preserve current behaviour).
-- When `status === "slow"`: swap headline + freeze the cycling status text on a reassuring line.
-- When `status === "error"`: hide the DNA helix progress bar, render an `AlertTriangle` icon in destructive tint, the reason, and the two action buttons (uses existing Button + design tokens).
-- When `status === "success"`: render a checkmark + "All set" before the parent transitions away.
-- All new motion gated behind `useReducedMotion`.
+No structural changes — only string swaps. Lucide icon names verified.
 
-### `src/pages/Index.tsx`
-- Replace the fixed `setTimeout(() => setScreen("success"), 3000)` with real status tracking:
-  - Add `submitStatus` state (`"loading" | "slow" | "error" | "success"`) and `submitError` string.
-  - Extract the webhook block from `handleSendResults` into a `runSubmit` function that returns `{ resultsOk, webhookRes }`, so Retry can call it again.
-  - Start a 6-second timer when submission begins; if still pending, set status to `"slow"`.
-  - On `Promise.all` resolve: if either failed, set `"error"` with a humanised reason (offline vs. status code); otherwise set `"success"` and advance to SuccessScreen after ~600ms.
-  - Pass `status`, `errorReason`, `onRetry`, `onContinue` into `<LoadingScreen />`.
-- Remove the duplicated retry toast (the inline button on the loading screen replaces it). Keep the `resultsOk` toast as a soft non-blocking notice since email is the backup channel.
+---
 
-### Out of scope
-- No backend, edge function, or webhook payload changes.
+## 2. Tighten select + hover micro-interactions — `src/components/SurveyFlow.tsx`
+
+**Problem today**
+- Selected option pulses indefinitely via `emeraldPulse` (2.4s loop). Loud and counter to the ADHD-safe UX rule.
+- Hover stacks three competing motions on each option: button `scale 1.02 + x:4`, label `translate-x-0.5`, and an extra hover shadow.
+- The icon "snap" on select is just a `scale-110` Tailwind class — no satisfying micro-burst.
+
+**Changes**
+- Remove `option-emerald-selected` infinite pulse class. Replace with a one-shot framer-motion sequence on the icon container: scale 1 → 1.18 → 1.1 (spring), opacity ring burst from 0 → 0.6 → 0 over 450ms.
+- Keep `option-emerald-focus` keyboard pulse (a11y — only fires on `:focus-visible`).
+- Drop the label's `group-hover:translate-x-0.5` so only the parent button moves on hover. Keep `whileHover={{ scale: 1.02, x: 4 }}`.
+- Add `useReducedMotion()` guard: when set, skip hover/x motion and the ring burst; selection just shows a quick opacity fade on the check.
+- The selected-state check icon (already there) gets a subtle `rotate: -90 → 0` on entry for a "snap into place" feel.
+
+**Net effect**: each tap feels like a single satisfying click instead of a constant heartbeat; hover feels lighter; nothing loops forever once chosen.
+
+---
+
+## 3. Out of scope
+
+- No changes to scoring logic, question count, section copy, or section emojis.
+- No changes to SuccessScreen, LoadingScreen, ContactCapture, SqueezeScreen.
 - No new dependencies.
-- No changes to OTP, SqueezeScreen, ContactCapture, or SuccessScreen.
 
-## Verification
-- Happy path: submit survey → loading animation → success advance, no flicker.
-- Throttle network to "Slow 3G" in DevTools → after ~6s the headline swaps to the slow copy, animation continues.
-- Block `track-event` / `submit-results` in DevTools → error state appears with both buttons; Retry re-runs and recovers; Continue jumps straight to SuccessScreen.
-- macOS Reduce Motion → no jitter, all transitions still legible.
+## 4. Verification
+
+- Walk through all 15 questions in preview; confirm each icon visually matches its label and no two options in the same question share an icon.
+- Tap an option: icon should pulse once and settle, then auto-advance (single-select) — no ongoing pulse on the previous selection when navigating back.
+- Toggle macOS Reduce Motion → hover/x and burst suppressed; selection still legible.
+- Tab-focus an option → emerald keyboard pulse still appears (a11y preserved).

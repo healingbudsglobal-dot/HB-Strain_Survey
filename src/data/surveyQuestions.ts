@@ -65,8 +65,8 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Energized & Productive", icon: "zap" },
-      { label: "Relaxed & Stress-Free", icon: "heart" },
-      { label: "Creative & Inspired", icon: "lightbulb" },
+      { label: "Relaxed & Stress-Free", icon: "wind" },
+      { label: "Creative & Inspired", icon: "palette" },
       { label: "Deep Sleep & Sedation", icon: "moon" },
       { label: "Social & Talkative", icon: "users" },
       { label: "Focused & Clear", icon: "target" },
@@ -94,9 +94,9 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Physical comfort & ease", icon: "activity" },
-      { label: "Calm & unwind from a busy day", icon: "brain" },
+      { label: "Calm & unwind from a busy day", icon: "coffee" },
       { label: "Restful nights", icon: "moon" },
-      { label: "Focus & flow state", icon: "target" },
+      { label: "Focus & flow state", icon: "crosshair" },
       { label: "Creative spark", icon: "palette" },
       { label: "Everyday balance", icon: "heart-pulse" },
       { label: "Confidence in social settings", icon: "users" },
@@ -129,7 +129,7 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "single",
     options: [
       { label: "Very sensitive – a tiny amount goes a long way", icon: "alert-triangle" },
-      { label: "Average – standard profiles suit me", icon: "minus" },
+      { label: "Average – standard profiles suit me", icon: "equal" },
       { label: "Higher tolerance – I prefer richer profiles", icon: "trending-up" },
       { label: "I can feel a bit on-edge if it's too strong", icon: "shield-alert" },
       { label: "I lean toward gentler, balanced ratios", icon: "scale" },
@@ -147,7 +147,7 @@ export const surveyQuestions: SurveyQuestion[] = [
       { label: "Earthy/Spicy (Myrcene/Caryophyllene)", icon: "mountain" },
       { label: "Sweet/Floral (Linalool)", icon: "flower" },
       { label: "Gassy/Diesel", icon: "fuel" },
-      { label: "No strong preference", icon: "minus" },
+      { label: "No strong preference", icon: "shuffle" },
     ],
   },
   {
@@ -178,7 +178,7 @@ export const surveyQuestions: SurveyQuestion[] = [
       { label: "Yes – ongoing physical recovery", icon: "activity" },
       { label: "Yes – post-workout cooldown", icon: "dumbbell" },
       { label: "Yes – everyday tension & stiffness", icon: "bone" },
-      { label: "Not a priority right now", icon: "minus" },
+      { label: "Not a priority right now", icon: "circle-dashed" },
     ],
   },
   {
@@ -229,8 +229,8 @@ export const surveyQuestions: SurveyQuestion[] = [
     type: "multi",
     options: [
       { label: "Paranoia/Anxiety", icon: "alert-triangle" },
-      { label: "Sleepiness", icon: "moon" },
-      { label: "Racing thoughts", icon: "zap" },
+      { label: "Sleepiness", icon: "bed-double" },
+      { label: "Racing thoughts", icon: "gauge" },
       { label: "Dry mouth/eyes", icon: "droplets" },
       { label: "Memory fog", icon: "cloud" },
       { label: "Munchies", icon: "utensils" },
