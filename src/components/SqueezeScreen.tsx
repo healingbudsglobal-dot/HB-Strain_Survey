@@ -432,8 +432,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           style={{
             background:
               "linear-gradient(155deg, hsl(180 30% 10% / 0.55) 0%, hsl(178 35% 7% / 0.65) 50%, hsl(170 40% 6% / 0.7) 100%)",
-            backdropFilter: "blur(24px) saturate(160%)",
-            WebkitBackdropFilter: "blur(24px) saturate(160%)",
+            backdropFilter: disableAurora ? "blur(12px) saturate(130%)" : "blur(24px) saturate(160%)",
+            WebkitBackdropFilter: disableAurora ? "blur(12px) saturate(130%)" : "blur(24px) saturate(160%)",
             boxShadow: focused
               ? "0 40px 90px -20px hsl(180 40% 2% / 0.7), 0 0 0 1px hsl(164 80% 55% / 0.18), 0 0 60px -12px hsl(164 80% 55% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.10), inset 0 -1px 0 hsl(180 50% 5% / 0.4)"
               : "0 40px 90px -20px hsl(180 40% 2% / 0.7), inset 0 1px 0 hsl(0 0% 100% / 0.08), inset 0 -1px 0 hsl(180 50% 5% / 0.4)",
