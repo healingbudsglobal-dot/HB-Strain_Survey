@@ -494,8 +494,8 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
           className="pointer-events-none absolute -bottom-20 -right-10 h-52 w-52 rounded-full opacity-50 mix-blend-screen"
           style={{
             background: "radial-gradient(circle, hsl(38 90% 60% / 0.35) 0%, transparent 65%)",
-            filter: "blur(32px)",
-            animation: "glassDrift 18s ease-in-out infinite reverse",
+            filter: disableAurora ? "blur(18px)" : "blur(32px)",
+            animation: disableAurora ? "none" : "glassDrift 18s ease-in-out infinite reverse",
           }}
         />
         {/* Top sheen — wet highlight */}
