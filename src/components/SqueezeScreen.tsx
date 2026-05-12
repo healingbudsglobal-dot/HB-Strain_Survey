@@ -230,8 +230,9 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               "linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 25% 92%) 60%, hsl(164 35% 78%) 100%)",
             WebkitBackgroundClip: "text",
             // Embossed: top highlight + bottom shadow + soft outer glow
-            filter:
-              "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
+            filter: disableAurora
+              ? "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85))"
+              : "drop-shadow(0 -1px 0 hsl(164 60% 95% / 0.55)) drop-shadow(0 1px 0 hsl(180 60% 3% / 0.85)) drop-shadow(0 2px 1px hsl(180 60% 3% / 0.55)) drop-shadow(0 0 22px hsl(164 60% 40% / 0.35))",
           }}
         >
           Discover your
