@@ -785,7 +785,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
               className="pointer-events-none absolute -inset-3 rounded-[32px]"
               style={{
                 background: "radial-gradient(60% 60% at 50% 55%, hsl(164 80% 55% / 0.55), transparent 70%)",
-                filter: "blur(22px)",
+                filter: disableAurora ? "blur(14px)" : "blur(22px)",
                 animation: "ctaHalo 2.6s ease-in-out infinite",
               }}
             />
