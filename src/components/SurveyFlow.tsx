@@ -263,11 +263,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
 
       {/* Header — logo + animated progress rail + step counter */}
       <div className="mb-5 flex items-center justify-between pt-4">
-        <img
-          src={hbLogoWhite}
-          alt="Healing Buds"
-          className="h-12 w-auto sm:h-14"
-        />
+        <BrandLogo size="md" vignette="subtle" />
         <motion.span
           key={currentIndex}
           initial={{ opacity: 0, y: -8 }}
