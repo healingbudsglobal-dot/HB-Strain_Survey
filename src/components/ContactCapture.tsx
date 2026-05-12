@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Shield, User, MessageCircle, Mail, Lock } from "lucide-react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   loadDefaultWaConfig,
   buildMatchWaLink,
@@ -139,7 +139,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
       `}</style>
 
       <motion.div variants={itemVariants} className="mb-6">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
+        <BrandLogo size="md" vignette="subtle" priority />
       </motion.div>
 
       <motion.h2

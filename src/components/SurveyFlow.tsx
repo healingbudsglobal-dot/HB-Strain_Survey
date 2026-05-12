@@ -3,7 +3,7 @@ import { surveyQuestions } from "@/data/surveyQuestions";
 import { ChevronLeft, Dna, Sparkles } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { icons } from "lucide-react";
-import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import { BrandLogo } from "@/components/BrandLogo";
 import bgFlower from "@/assets/hero-flower.jpg";
 import bgTrichomes from "@/assets/hero-trichomes.jpg";
 import bgBud from "@/assets/hero-bud.jpg";
@@ -263,11 +263,7 @@ const SurveyFlow = ({ onComplete }: SurveyFlowProps) => {
 
       {/* Header — logo + animated progress rail + step counter */}
       <div className="mb-5 flex items-center justify-between pt-4">
-        <img
-          src={hbLogoWhite}
-          alt="Healing Buds"
-          className="h-12 w-auto sm:h-14"
-        />
+        <BrandLogo size="md" vignette="subtle" />
         <motion.span
           key={currentIndex}
           initial={{ opacity: 0, y: -8 }}

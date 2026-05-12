@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Shield, RotateCw, Mail, CheckCircle2, Clock } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import { BrandLogo } from "@/components/BrandLogo";
 import { verifyOtp } from "@/lib/webhook";
 import { markOtpReady } from "@/lib/perf";
 
@@ -104,7 +104,7 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
   return (
     <div className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full">
       <div className="mb-6">
-        <img src={hbLogoWhite} alt="Healing Buds" className="h-12 w-auto sm:h-14" />
+        <BrandLogo size="md" vignette="subtle" priority />
       </div>
 
       <div className="mb-3 flex flex-col items-center gap-3">
