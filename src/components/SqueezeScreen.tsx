@@ -444,17 +444,19 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
             transformStyle: "preserve-3d",
           }}
         >
-          {/* Ambient drifting conic sheen — catches the light like real glass */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
-            style={{
-              background:
-                "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
-              animation: "glassSheen 18s linear infinite",
-              filter: "blur(40px)",
-            }}
-          />
+          {/* Ambient drifting conic sheen — desktop only */}
+          {!disableAurora && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
+              style={{
+                background:
+                  "conic-gradient(from 0deg at 50% 50%, transparent 0deg, hsl(164 80% 70% / 0.35) 60deg, transparent 120deg, transparent 240deg, hsl(180 70% 60% / 0.25) 300deg, transparent 360deg)",
+                animation: "glassSheen 18s linear infinite",
+                filter: "blur(40px)",
+              }}
+            />
+          )}
           {/* Filmic grain — premium texture */}
           <div
             aria-hidden
