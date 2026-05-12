@@ -112,6 +112,7 @@ export function BrandLogo({
           }}
         />
       )}
+      <img
         src={hbLogoWhite}
         alt="Healing Buds"
         draggable={false}
