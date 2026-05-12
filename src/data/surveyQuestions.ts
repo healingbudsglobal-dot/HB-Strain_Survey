@@ -178,7 +178,7 @@ export const surveyQuestions: SurveyQuestion[] = [
       { label: "Yes – ongoing physical recovery", icon: "activity" },
       { label: "Yes – post-workout cooldown", icon: "dumbbell" },
       { label: "Yes – everyday tension & stiffness", icon: "bone" },
-      { label: "Not a priority right now", icon: "minus" },
+      { label: "Not a priority right now", icon: "circle-dashed" },
     ],
   },
   {
