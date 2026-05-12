@@ -31,6 +31,7 @@ const itemVariants = {
 
 const SuccessScreen = ({ result, waLink, customerWaLink, userEmail }: SuccessScreenProps) => {
   const strain = result?.strain;
+  const [tracking, setTracking] = useState<string | null>(null);
 
   const handleShare = async () => {
     const text = `I just got matched with ${strain?.name} on Healing Buds! 🌿`;
@@ -42,6 +43,34 @@ const SuccessScreen = ({ result, waLink, customerWaLink, userEmail }: SuccessScr
       await navigator.clipboard.writeText(text + " " + window.location.href);
     }
   };
+
+  const handleWaClick = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string | undefined,
+    recipient: "customer" | "budstacks"
+  ) => {
+    e.preventDefault();
+    if (!href || tracking) return;
+
+    setTracking(recipient);
+
+    const { trackEvent } = await import("@/lib/trackEvent");
+    await trackEvent("whatsapp_click", {
+      email: userEmail,
+      payload: {
+        surface: "success_screen",
+        recipient,
+        strain: strain?.name,
+        compatibility: result?.compatibility,
+      },
+    });
+
+    window.open(href, "_blank", "noopener,noreferrer");
+    setTracking(null);
+  };
+
+  const isDisabled = (recipient: "customer" | "budstacks") =>
+    tracking !== null && tracking !== recipient;
 
   return (
     <motion.div
