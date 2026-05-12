@@ -4,6 +4,7 @@ import { motion, useReducedMotion, useMotionValue, useSpring, useTransform } fro
 import { useIsMobile } from "@/hooks/use-mobile";
 import { validateEmail } from "@/lib/emailValidation";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
+import { BrandLogo } from "@/components/BrandLogo";
 
 
 import {
