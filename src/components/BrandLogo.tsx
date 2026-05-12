@@ -92,7 +92,26 @@ export function BrandLogo({
           }}
         />
       )}
-      <img
+      {vignette !== "none" && (
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute z-[1] rounded-[40%]",
+            vignette === "strong"
+              ? "-inset-x-8 -inset-y-5"
+              : "-inset-x-5 -inset-y-3"
+          )}
+          style={{
+            backgroundImage: FIBER_URL,
+            backgroundSize: "220px 120px",
+            backgroundRepeat: "repeat",
+            opacity: vignette === "strong" ? 0.18 : 0.12,
+            mixBlendMode: "soft-light",
+            WebkitMaskImage: FIBER_MASK,
+            maskImage: FIBER_MASK,
+          }}
+        />
+      )}
         src={hbLogoWhite}
         alt="Healing Buds"
         draggable={false}
