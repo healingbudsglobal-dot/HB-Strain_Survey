@@ -147,7 +147,7 @@ export const surveyQuestions: SurveyQuestion[] = [
       { label: "Earthy/Spicy (Myrcene/Caryophyllene)", icon: "mountain" },
       { label: "Sweet/Floral (Linalool)", icon: "flower" },
       { label: "Gassy/Diesel", icon: "fuel" },
-      { label: "No strong preference", icon: "minus" },
+      { label: "No strong preference", icon: "shuffle" },
     ],
   },
   {
