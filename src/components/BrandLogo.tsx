@@ -69,6 +69,8 @@ interface BrandLogoProps {
   priority?: boolean;
   /** Optional ref-like className for the inner <img>, e.g. extra z-index. */
   imgClassName?: string;
+  /** Multiplier (0..1+) for fiber overlay opacity. Default 1. Dev preview only. */
+  fiberDensity?: number;
 }
 
 export function BrandLogo({
@@ -77,6 +79,7 @@ export function BrandLogo({
   className,
   priority = false,
   imgClassName,
+  fiberDensity = 1,
 }: BrandLogoProps) {
   const isMobile = useIsMobile();
   const lite = isMobile;
@@ -115,7 +118,7 @@ export function BrandLogo({
             backgroundImage: FIBER_URL,
             backgroundSize: "220px 120px",
             backgroundRepeat: "repeat",
-            opacity: vignette === "strong" ? 0.18 : 0.12,
+            opacity: (vignette === "strong" ? 0.18 : 0.12) * fiberDensity,
             mixBlendMode: "soft-light",
             WebkitMaskImage: FIBER_MASK,
             maskImage: FIBER_MASK,
