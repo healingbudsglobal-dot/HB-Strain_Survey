@@ -1,45 +1,49 @@
-# Trim expensive filters/blurs on the squeeze page
+## Logo Preview Route
 
-The squeeze page currently composites many large blurred layers + multi-stop `drop-shadow()` filter stacks every frame. On mobile GPUs each filter region forces an offscreen pass; combined with `backdrop-filter: blur(24px) saturate(160%)` on the form, animated `glassDrift`/`glassSheen`/`nervePulse`, and a 4-stop drop-shadow on the headline — scroll/animation can stutter.
+Hidden dev route to compare the etched `BrandLogo` against multiple backdrops and confirm legibility.
 
-Strategy: keep the desktop look intact, gate the heaviest effects behind the existing `disableAurora` flag (true on mobile or `prefers-reduced-motion`), and shrink/collapse blur radii where the visual delta is imperceptible.
+### Route
 
-## Changes
+- New file `src/pages/LogoPreview.tsx`, registered in `src/App.tsx` at `/dev/logo-preview` (not linked anywhere in the app, no nav entry, no auth — just URL-only).
 
-**`src/components/BrandLogo.tsx`**
-- Accept already-existing call sites; add an internal `useIsMobile()` (or a new `lite?: boolean` prop — preferred: read `useIsMobile()` once so consumers don't change).
-- On mobile / reduced motion:
-  - Reduce `ETCH_FILTER` from 4 drop-shadows to 2: keep top highlight + bottom shadow, drop the 2px contact + 8px ambient.
-  - Reduce vignette `blur(8px|6px)` → `blur(4px|3px)`.
-  - Skip the fiber-texture layer entirely (it adds an extra masked composited layer for near-zero perceived value at small sizes).
+### Layout
 
-**`src/components/SqueezeScreen.tsx`** — gate behind `disableAurora` (already computed, line 53):
-1. **Logo nerve-signal** (lines 144-191): when `disableAurora`, render only the primary sweep gradient (drop the trailing ember + pink spark + 28px-blur pulse). Keeps the wow on desktop, removes 3 blurred composited layers on mobile.
-2. **Headline embossed text** (lines 222-224, 239-240): reduce both `drop-shadow` stacks from 4 stops to 2 (top highlight + bottom shadow). Drop the 22px / 28px outer glows when `disableAurora`.
-3. **Form backdrop-filter** (lines 423-424): reduce `blur(24px) saturate(160%)` → `blur(12px) saturate(130%)` when `disableAurora`. (`backdrop-filter` over a large rounded rect is the single biggest mobile cost.)
-4. **Conic sheen** (lines 436-445): when `disableAurora`, set `display: none` (already animated 18s, but the 40px blur on a large conic gradient is expensive).
-5. **Chromatic blobs** (lines 467-486): when `disableAurora`, reduce `blur(28px|32px)` → `blur(16px|18px)` and stop the `glassDrift` animation (already covered by reduced-motion CSS, but explicit gate avoids GPU upload churn).
-6. **Ambient logo halo** (line 193): the `blur-3xl` (~64px) on a `scale-2` rounded full bg is huge — when `disableAurora`, swap to `blur-2xl` (40px) and remove `scale-[2]` (use `scale-[1.4]`).
-7. **CTA halo** (line 774): reduce `blur(22px)` → `blur(14px)` on mobile.
+A single full-bleed page, dark page background, simple top toolbar then a 3×2 grid of tiles. Each tile is a square card showing one backdrop with the `BrandLogo` centered.
 
-No changes to layout, copy, color tokens, click handlers, or animation timing on desktop. Reduced-motion users automatically get the lite path via `disableAurora`.
+Toolbar controls (all client-state, no persistence):
+- Vignette: `none` / `subtle` / `strong` (passed to `BrandLogo`).
+- Size: `sm` / `md` / `lg` / `xl` (drives logo width 96 / 160 / 240 / 320 px).
+- Pattern density: slider 0 → 1 (0 = no fiber, 1 = current default). Multiplies the texture opacity inside `BrandLogo`.
+- Light / dark page toggle for the surrounding chrome.
 
-## Technical notes
+Tiles (curated 6):
+1. Solid `--primary-green` (#1C4F4D)
+2. `--gradient-teal-midnight`
+3. `--gradient-sage-radial`
+4. `--gradient-hero` over off-white
+5. Bud photo backdrop (reuse an existing hero image asset under `src/assets/`; fall back to a CSS-only mossy radial if none found during exploration).
+6. Noisy textured backdrop (inline SVG turbulence at higher density, deep teal base) — stress test for fiber clash.
 
-- All gates inline via `disableAurora ? <lite> : <full>` ternaries on existing style objects — no new state, no new components.
-- BrandLogo gains one internal hook call; props API unchanged so SqueezeScreen / ContactCapture / OtpVerification / SurveyFlow consumers stay identical.
-- Filter-region cost ≈ pixel-area × pass-count. Cutting blur radii roughly halves the offscreen buffer; eliminating layers is multiplicative.
-- No new dependencies, no asset changes.
+Each tile shows a small caption underneath with the backdrop name and the resolved background CSS, so it's obvious what's being compared.
 
-## Verification
+### Pattern-density wiring
 
-- Visual diff at desktop viewport: nerve sweep, embossed headline, glass form, drift blobs all unchanged.
-- Mobile viewport (390×844) via `set_preview_device_viewport`: confirm logo still legible/etched, form still glassy, no visible banding.
-- `browser--performance_profile` before/after on mobile viewport: expect lower script + paint cost during scroll/idle.
-- `tsc --noEmit` clean.
+`BrandLogo` currently hardcodes the fiber overlay opacity (0.18 strong / 0.12 subtle). Add an optional `fiberDensity?: number` prop (default `1`) that multiplies the existing opacity. Existing call sites are unaffected. The preview page passes the slider value through.
 
-## Out of scope
+### Contrast confirmation
 
-- No removal of any animation desktop users see today.
-- No restructuring of SqueezeScreen layout or BrandLogo public API.
-- No changes to ContactCapture / OTP / SurveyFlow surfaces beyond what BrandLogo's internal mobile gate gives them automatically.
+No automated WCAG readout (per the choice). Instead, render a thin "contrast guide" strip across the bottom of each tile: 5 swatches of pure white at opacities 100/80/60/40/20% sitting on the same backdrop. If the logo (white) reads at least as well as the 60% swatch, it passes the visual target. This is a fast eyeball check and avoids a misleading numeric ratio (the etch effect is decorative, not a flat fill).
+
+### Technical notes
+
+- Pure presentation, no data, no Supabase, no analytics.
+- `LogoPreview.tsx` ~150 lines: tile array + small `Tile` subcomponent.
+- `BrandLogo` change: one new optional prop, one multiplication at the opacity calc — no behavioral change for existing usage.
+- Mobile is fine but the page is intentionally desktop-first (grid collapses to 1 column under `md`).
+- No new dependencies.
+
+### Files touched
+
+- new: `src/pages/LogoPreview.tsx`
+- edit: `src/App.tsx` (add route)
+- edit: `src/components/BrandLogo.tsx` (add `fiberDensity` prop)
