@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Star, Trash2, Save, Loader2, Phone, MessageSquare } from "lucide-react";
+import { ArrowLeft, Plus, Star, Trash2, Save, Loader2, Phone, MessageSquare, Mail, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
