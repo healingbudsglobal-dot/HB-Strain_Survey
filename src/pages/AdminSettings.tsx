@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Star, Trash2, Save, Loader2, Phone, MessageSquare } from "lucide-react";
+import { ArrowLeft, Plus, Star, Trash2, Save, Loader2, Phone, MessageSquare, Mail, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import hbLogoWhite from "@/assets/hb-logo-white-full.svg";
@@ -32,6 +32,46 @@ const AdminSettings = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [sampleVars, setSampleVars] = useState<Record<string, string>>(getSampleVars());
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+
+  // --- Email diagnostics ---
+  const [testEmail, setTestEmail] = useState("");
+  const [sendingTest, setSendingTest] = useState<null | "otp" | "results" | "admin" | "all">(null);
+  const [lastTestResult, setLastTestResult] = useState<null | { ok: boolean; detail: string }>(null);
+
+  const sendTestEmail = async (template: "otp" | "results" | "admin" | "all") => {
+    const recipient = testEmail.trim().toLowerCase();
+    if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(recipient)) {
+      toast.error("Enter a valid email address first");
+      return;
+    }
+    setSendingTest(template);
+    setLastTestResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-test-email", {
+        body: { recipient, template },
+      });
+      if (error) throw error;
+      const results = (data as any)?.results || {};
+      const sent = Object.entries(results)
+        .filter(([, v]: any) => v?.ok)
+        .map(([k]) => k);
+      const failed = Object.entries(results)
+        .filter(([, v]: any) => !v?.ok)
+        .map(([k, v]: any) => `${k}: ${v?.error || `HTTP ${v?.status}`}`);
+      if (failed.length === 0) {
+        toast.success(`Test email${sent.length > 1 ? "s" : ""} sent → ${recipient}`);
+        setLastTestResult({ ok: true, detail: `Delivered: ${sent.join(", ")}` });
+      } else {
+        toast.error(`Some sends failed: ${failed.join(" · ")}`);
+        setLastTestResult({ ok: false, detail: failed.join(" · ") });
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to send test email");
+      setLastTestResult({ ok: false, detail: e?.message || "Unknown error" });
+    } finally {
+      setSendingTest(null);
+    }
+  };
 
   const updateSampleVar = (key: string, value: string) =>
     setSampleVars((prev) => ({ ...prev, [key]: value }));
@@ -276,6 +316,77 @@ const AdminSettings = () => {
               ))}
             </div>
           </div>
+        </motion.section>
+
+        {/* Email Diagnostics */}
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.04 }}
+          className="rounded-xl border border-border bg-card p-5"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <Mail className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground text-etched">Email Diagnostics</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Send a branded test email to verify subject lines, links, logos, and Resend deliverability end-to-end.
+            Uses sample data — no leads or webhooks are written.
+          </p>
+
+          <label className="block text-sm font-medium text-foreground mb-1">Recipient email</label>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {[
+              { id: "otp" as const, label: "OTP" },
+              { id: "results" as const, label: "Results" },
+              { id: "admin" as const, label: "Admin notif." },
+              { id: "all" as const, label: "Send all 3" },
+            ].map((b) => (
+              <button
+                key={b.id}
+                onClick={() => sendTestEmail(b.id)}
+                disabled={sendingTest !== null}
+                className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
+                  b.id === "all"
+                    ? "bg-primary text-primary-foreground hover:opacity-90"
+                    : "border border-input bg-background text-foreground hover:bg-accent"
+                }`}
+              >
+                {sendingTest === b.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                {b.label}
+              </button>
+            ))}
+          </div>
+
+          {lastTestResult && (
+            <div
+              className={`mt-3 rounded-lg border px-3 py-2 text-xs ${
+                lastTestResult.ok
+                  ? "border-primary/30 bg-primary/10 text-foreground"
+                  : "border-destructive/40 bg-destructive/10 text-destructive"
+              }`}
+            >
+              {lastTestResult.detail}
+            </div>
+          )}
+
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Subjects are prefixed with <code>[TEST]</code>. Sends are recorded in the email log with <code>template_name = test_*</code>.
+          </p>
         </motion.section>
 
         {/* Templates */}
