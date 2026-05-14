@@ -33,6 +33,46 @@ const AdminSettings = () => {
   const [sampleVars, setSampleVars] = useState<Record<string, string>>(getSampleVars());
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
+  // --- Email diagnostics ---
+  const [testEmail, setTestEmail] = useState("");
+  const [sendingTest, setSendingTest] = useState<null | "otp" | "results" | "admin" | "all">(null);
+  const [lastTestResult, setLastTestResult] = useState<null | { ok: boolean; detail: string }>(null);
+
+  const sendTestEmail = async (template: "otp" | "results" | "admin" | "all") => {
+    const recipient = testEmail.trim().toLowerCase();
+    if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(recipient)) {
+      toast.error("Enter a valid email address first");
+      return;
+    }
+    setSendingTest(template);
+    setLastTestResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-test-email", {
+        body: { recipient, template },
+      });
+      if (error) throw error;
+      const results = (data as any)?.results || {};
+      const sent = Object.entries(results)
+        .filter(([, v]: any) => v?.ok)
+        .map(([k]) => k);
+      const failed = Object.entries(results)
+        .filter(([, v]: any) => !v?.ok)
+        .map(([k, v]: any) => `${k}: ${v?.error || `HTTP ${v?.status}`}`);
+      if (failed.length === 0) {
+        toast.success(`Test email${sent.length > 1 ? "s" : ""} sent → ${recipient}`);
+        setLastTestResult({ ok: true, detail: `Delivered: ${sent.join(", ")}` });
+      } else {
+        toast.error(`Some sends failed: ${failed.join(" · ")}`);
+        setLastTestResult({ ok: false, detail: failed.join(" · ") });
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to send test email");
+      setLastTestResult({ ok: false, detail: e?.message || "Unknown error" });
+    } finally {
+      setSendingTest(null);
+    }
+  };
+
   const updateSampleVar = (key: string, value: string) =>
     setSampleVars((prev) => ({ ...prev, [key]: value }));
 
