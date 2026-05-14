@@ -4,6 +4,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { BrandLogo } from "@/components/BrandLogo";
 import { verifyOtp } from "@/lib/webhook";
 import { markOtpReady } from "@/lib/perf";
+import bgTrichomes from "@/assets/hero-trichomes.jpg";
 
 const LOCKOUT_SECONDS = 60;
 
@@ -103,6 +104,20 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center px-5 text-center max-w-sm w-full">
+      {/* Atmospheric trichome backdrop — subtle, fixed, page-wide */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.18] scale-110"
+          style={{
+            backgroundImage: `url(${bgTrichomes})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(8px) saturate(120%)",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,hsl(180_15%_5%/0.55)_55%,hsl(180_20%_4%/0.85)_100%)]" />
+      </div>
+
       <div className="mb-6">
         <BrandLogo size="md" vignette="subtle" priority />
       </div>
