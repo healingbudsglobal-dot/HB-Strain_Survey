@@ -128,7 +128,7 @@ const CinematicMatchReveal = ({ value, strainName, startDelay = 0.1 }: Cinematic
             initial={reduced ? { opacity: 1 } : { opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: startDelay + 0.1, ease: EASE }}
-            className="font-display text-5xl font-extrabold leading-none text-foreground tabular-nums tracking-tight"
+            className="font-display text-5xl font-extrabold leading-none text-foreground tabular-nums tracking-tight text-etched-strong"
             style={{ textShadow: "0 0 24px hsl(var(--accent-green) / 0.45)" }}
           >
             {display}

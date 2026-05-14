@@ -144,7 +144,7 @@ const ContactCapture = ({ onSubmit, onSkip, strainName, userEmail, compatibility
 
       <motion.h2
         variants={itemVariants}
-        className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl mb-2"
+        className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl mb-2 text-etched"
       >
         <span
           className="bg-clip-text text-transparent"
