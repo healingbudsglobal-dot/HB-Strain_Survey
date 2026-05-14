@@ -4,6 +4,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { BrandLogo } from "@/components/BrandLogo";
 import { verifyOtp } from "@/lib/webhook";
 import { markOtpReady } from "@/lib/perf";
+import bgTrichomes from "@/assets/hero-trichomes.jpg";
 
 const LOCKOUT_SECONDS = 60;
 
