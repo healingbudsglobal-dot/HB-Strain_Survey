@@ -224,7 +224,7 @@ const AdminSettings = () => {
         >
           <div className="flex items-center gap-2 mb-4">
             <Phone className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Channel & Sender</h2>
+            <h2 className="text-lg font-semibold text-foreground text-etched">Channel &amp; Sender</h2>
           </div>
 
           <label className="block text-sm font-medium text-foreground mb-1">
@@ -287,7 +287,7 @@ const AdminSettings = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">Message Templates</h2>
+              <h2 className="text-lg font-semibold text-foreground text-etched">Message Templates</h2>
             </div>
             <button
               onClick={addTemplate}

@@ -101,7 +101,7 @@ const SuccessScreen = ({ result, waLink, customerWaLink, userEmail }: SuccessScr
 
       <motion.h2
         variants={itemVariants}
-        className="font-display text-lg font-semibold tracking-[0.02em] text-muted-foreground sm:text-xl mb-4"
+        className="font-display text-lg font-semibold tracking-[0.02em] text-muted-foreground sm:text-xl mb-4 text-etched"
       >
         Your precision-matched strain
       </motion.h2>

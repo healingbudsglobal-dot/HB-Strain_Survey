@@ -118,7 +118,7 @@ const OtpVerification = ({ email, onVerified, onResend, onBack }: OtpVerificatio
           )}
         </div>
 
-        <h2 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl text-foreground">
+        <h2 className="font-display text-[1.75rem] font-bold tracking-[-0.02em] sm:text-3xl text-foreground text-etched">
           {verified ? "Verified!" : "Verify Your Email"}
         </h2>
       </div>

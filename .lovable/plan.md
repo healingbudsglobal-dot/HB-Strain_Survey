@@ -1,49 +1,71 @@
-## Logo Preview Route
+# Whole-app polish cascade
 
-Hidden dev route to compare the etched `BrandLogo` against multiple backdrops and confirm legibility.
+Bring the etched-logo quality bar to every surface. Focused on visual/UX layers only — no business logic, scoring, or data flow changes.
 
-### Route
+## 1. Shared design primitives (index.css + tailwind)
 
-- New file `src/pages/LogoPreview.tsx`, registered in `src/App.tsx` at `/dev/logo-preview` (not linked anywhere in the app, no nav entry, no auth — just URL-only).
+Add a small set of reusable tokens so the same polish lands everywhere instead of being re-coded per component.
 
-### Layout
+- **Etched text utilities** — `.text-etched` (subtle inset white highlight on top, soft dark shadow on bottom) and `.text-etched-strong` for headings on dark/teal backdrops. Mirrors the new BrandLogo treatment.
+- **Glass surface utilities** — `.glass-card` (border, inner highlight ring, backdrop-blur, sage-tinted shadow), `.glass-card-strong`, `.glass-input` (matching field treatment). Single source of truth so SqueezeScreen / SurveyFlow / ContactCapture / OTP / Admin all share one look.
+- **Contrast scrim utility** — `.scrim-readable` for any text laid over photo/gradient backdrops (used today only on squeeze; will extend to results + success).
+- **Motion tokens** — formalize `--ease-spring`, `--ease-smooth` (already partially there) and add `.animate-step-in` / `.animate-step-out` for funnel step transitions.
 
-A single full-bleed page, dark page background, simple top toolbar then a 3×2 grid of tiles. Each tile is a square card showing one backdrop with the `BrandLogo` centered.
+Tokens stay HSL; no new colors.
 
-Toolbar controls (all client-state, no persistence):
-- Vignette: `none` / `subtle` / `strong` (passed to `BrandLogo`).
-- Size: `sm` / `md` / `lg` / `xl` (drives logo width 96 / 160 / 240 / 320 px).
-- Pattern density: slider 0 → 1 (0 = no fiber, 1 = current default). Multiplies the texture opacity inside `BrandLogo`.
-- Light / dark page toggle for the surrounding chrome.
+## 2. Squeeze screen (`SqueezeScreen.tsx`)
 
-Tiles (curated 6):
-1. Solid `--primary-green` (#1C4F4D)
-2. `--gradient-teal-midnight`
-3. `--gradient-sage-radial`
-4. `--gradient-hero` over off-white
-5. Bud photo backdrop (reuse an existing hero image asset under `src/assets/`; fall back to a CSS-only mossy radial if none found during exploration).
-6. Noisy textured backdrop (inline SVG turbulence at higher density, deep teal base) — stress test for fiber clash.
+- Re-skin headline + subhead with `.text-etched-strong`.
+- Convert the email card and CTA cluster to `.glass-card` + `.glass-input`.
+- Tighten vignette stops where text sits (mobile keeps the existing lite path; desktop richer per your "Allow richer mobile" choice — we will still gate the heaviest filters behind `prefers-reduced-motion` and a low-end heuristic).
+- Add micro-motion: CTA press + email focus ring spring.
 
-Each tile shows a small caption underneath with the backdrop name and the resolved background CSS, so it's obvious what's being compared.
+## 3. Survey flow (`SurveyFlow.tsx`, `StepProgress.tsx`)
 
-### Pattern-density wiring
+- Each question card → `.glass-card-strong` with embossed question label.
+- Option chips/buttons get etched depth on hover/active, spring scale on press.
+- Step transitions use `.animate-step-in/out` with crossfade + 8px slide.
+- Progress bar gets a subtle inner highlight + sage glow at the active fill edge.
+- Audit text/background contrast on all option states (especially selected on light cards).
 
-`BrandLogo` currently hardcodes the fiber overlay opacity (0.18 strong / 0.12 subtle). Add an optional `fiberDensity?: number` prop (default `1`) that multiplies the existing opacity. Existing call sites are unaffected. The preview page passes the slider value through.
+## 4. OTP + Contact capture (`OtpVerification.tsx`, `ContactCapture.tsx`)
 
-### Contrast confirmation
+- Card → `.glass-card-strong`.
+- OTP digit boxes → `.glass-input` with focus glow + spring fill animation as digits arrive.
+- Province + contact-pref selectors → consistent chip styling shared with survey options.
+- Inline validation messaging uses `text-destructive` token (not arbitrary reds) and respects AA on the glass background.
 
-No automated WCAG readout (per the choice). Instead, render a thin "contrast guide" strip across the bottom of each tile: 5 swatches of pure white at opacities 100/80/60/40/20% sitting on the same backdrop. If the logo (white) reads at least as well as the 60% swatch, it passes the visual target. This is a fast eyeball check and avoids a misleading numeric ratio (the etch effect is decorative, not a flat fill).
+## 5. Reveal, success, loading (`CinematicMatchReveal.tsx`, `SuccessScreen.tsx`, `LoadingScreen.tsx`)
 
-### Technical notes
+- Match reveal headline + product card → etched headings, glass card consistency, gentle parallax already there preserved.
+- Success screen CTAs (download PDF, contact, share) → unified glass button treatment + hover/press motion.
+- Loading screen copy → etched on dark backdrop; spinner unchanged.
 
-- Pure presentation, no data, no Supabase, no analytics.
-- `LogoPreview.tsx` ~150 lines: tile array + small `Tile` subcomponent.
-- `BrandLogo` change: one new optional prop, one multiplication at the opacity calc — no behavioral change for existing usage.
-- Mobile is fine but the page is intentionally desktop-first (grid collapses to 1 column under `md`).
+## 6. Admin (`AdminLogin`, `AdminDashboard`, `AdminSettings`)
+
+Lighter pass — admin should feel from the same family without becoming flashy.
+
+- Login card → `.glass-card-strong`, etched H1, spring on submit.
+- Dashboard stat cards → `.glass-card`, hover lift, consistent shadow token.
+- Settings forms → `.glass-input` for all fields; section headings get `.text-etched`.
+- Tables and destructive actions: leave structure alone, only token + contrast cleanup.
+
+## 7. Cross-cutting QA
+
+- Run a contrast pass on every text/background pair touched; fix any below WCAG AA by darkening foreground or boosting scrim, not by changing brand colors.
+- Verify mobile: confirm the new effects don't regress the "lite mode" budget — keep the `useIsMobile` gate already added on heavy filters; allow richer effects only where measurably smooth.
+- Use `/dev/logo-preview` pattern as visual reference for etched depth.
+
+## Out of scope
+
+- No copy rewrites, no new screens, no scoring/data changes, no schema or webhook edits.
 - No new dependencies.
+- Branding palette unchanged; only token additions, never overrides.
 
-### Files touched
+## Technical notes
 
-- new: `src/pages/LogoPreview.tsx`
-- edit: `src/App.tsx` (add route)
-- edit: `src/components/BrandLogo.tsx` (add `fiberDensity` prop)
+- All new utilities live in `src/index.css` under a clearly-marked "Polish cascade" block.
+- `.glass-*` utilities will replace ad-hoc `backdrop-blur-* bg-white/10 border border-white/20` clusters scattered across components — search-and-replace per file.
+- `.text-etched` uses two `text-shadow` layers (top inset highlight, bottom soft drop) and is GPU-cheap; safe on mobile.
+- Step transitions wired via existing AnimatePresence in SurveyFlow — no new animation lib.
+- Estimated edit footprint: ~10 files, ~250–350 LOC net (mostly class swaps + token additions).

@@ -221,7 +221,7 @@ const SqueezeScreen = ({ onSubmit }: SqueezeScreenProps) => {
 
       <motion.h1
         variants={itemVariants}
-        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-5xl md:text-6xl"
+        className="mb-4 font-display text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.03em] sm:text-5xl md:text-6xl text-etched-strong"
       >
         <span
           className="relative inline-block bg-clip-text text-transparent"

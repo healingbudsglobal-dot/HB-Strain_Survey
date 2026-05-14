@@ -177,7 +177,7 @@ const LoadingScreen = ({
 
       <h2
         className={`font-display text-xl font-bold tracking-[0.02em] mb-2 sm:text-2xl ${
-          isError ? "text-destructive" : "text-foreground text-glow"
+          isError ? "text-destructive" : "text-foreground text-glow text-etched"
         }`}
       >
         {headline}

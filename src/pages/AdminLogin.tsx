@@ -41,7 +41,7 @@ const AdminLogin = () => {
       >
         <div className="text-center mb-8">
           <img src={hbLogoWhite} alt="Healing Buds" className="h-10 mx-auto mb-6" />
-          <h1 className="font-display text-2xl font-bold text-foreground">Admin Dashboard</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground text-etched">Admin Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">Sign in to view leads</p>
         </div>
 
