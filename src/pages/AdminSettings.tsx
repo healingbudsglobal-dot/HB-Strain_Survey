@@ -38,6 +38,30 @@ const AdminSettings = () => {
   const [sendingTest, setSendingTest] = useState<null | "otp" | "results" | "admin" | "all">(null);
   const [lastTestResult, setLastTestResult] = useState<null | { ok: boolean; detail: string }>(null);
 
+  // --- Email preview ---
+  type PreviewKey = "otp" | "results" | "admin";
+  const [previews, setPreviews] = useState<Record<PreviewKey, { subject: string; html: string }> | null>(null);
+  const [previewTab, setPreviewTab] = useState<PreviewKey>("otp");
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [loadingPreviews, setLoadingPreviews] = useState(false);
+
+  const loadPreviews = async () => {
+    setLoadingPreviews(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-test-email", {
+        body: { mode: "preview", recipient: testEmail.trim().toLowerCase() || "preview@example.com" },
+      });
+      if (error) throw error;
+      const p = (data as any)?.previews;
+      if (!p) throw new Error("No previews returned");
+      setPreviews(p);
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to load previews");
+    } finally {
+      setLoadingPreviews(false);
+    }
+  };
+
   const sendTestEmail = async (template: "otp" | "results" | "admin" | "all") => {
     const recipient = testEmail.trim().toLowerCase();
     if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(recipient)) {
