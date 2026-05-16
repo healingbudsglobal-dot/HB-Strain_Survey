@@ -413,6 +413,109 @@ const AdminSettings = () => {
           </p>
         </motion.section>
 
+        {/* Email Preview */}
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.045 }}
+          className="rounded-xl border border-border bg-card p-5"
+        >
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground text-etched">Email Preview</h2>
+            </div>
+            <button
+              onClick={loadPreviews}
+              disabled={loadingPreviews}
+              className="flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent disabled:opacity-50"
+            >
+              {loadingPreviews ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
+              {previews ? "Refresh" : "Load previews"}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Render the OTP, customer Results, and Admin notification emails inline — exactly as recipients will see them — without sending anything.
+          </p>
+
+          {!previews && !loadingPreviews && (
+            <div className="rounded-lg border border-dashed border-border bg-background/40 px-4 py-8 text-center text-sm text-muted-foreground">
+              Click <span className="text-foreground font-medium">Load previews</span> to render the three branded templates with sample data.
+            </div>
+          )}
+
+          {loadingPreviews && (
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin mr-2" /> Rendering templates…
+            </div>
+          )}
+
+          {previews && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="inline-flex rounded-lg border border-input bg-background p-1">
+                  {([
+                    { id: "otp" as const, label: "OTP" },
+                    { id: "results" as const, label: "Results" },
+                    { id: "admin" as const, label: "Admin" },
+                  ]).map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setPreviewTab(t.id)}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                        previewTab === t.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="inline-flex rounded-lg border border-input bg-background p-1">
+                  <button
+                    onClick={() => setPreviewDevice("desktop")}
+                    className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      previewDevice === "desktop" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-label="Desktop width"
+                  >
+                    <Monitor className="h-3.5 w-3.5" /> Desktop
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice("mobile")}
+                    className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                      previewDevice === "mobile" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-label="Mobile width"
+                  >
+                    <Smartphone className="h-3.5 w-3.5" /> Mobile
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-border bg-background/60 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Subject</p>
+                <p className="text-sm font-medium text-foreground break-words">{previews[previewTab].subject}</p>
+              </div>
+
+              <div className="rounded-lg border border-border bg-[#101414] overflow-hidden flex justify-center">
+                <iframe
+                  key={`${previewTab}-${previewDevice}`}
+                  title={`${previewTab} email preview`}
+                  srcDoc={previews[previewTab].html}
+                  sandbox=""
+                  style={{
+                    width: previewDevice === "mobile" ? "390px" : "100%",
+                    maxWidth: "100%",
+                    height: "720px",
+                    border: "0",
+                    backgroundColor: "#101414",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </motion.section>
+
         {/* Templates */}
         <motion.section
           initial={{ opacity: 0, y: 8 }}
