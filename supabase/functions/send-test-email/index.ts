@@ -236,8 +236,37 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
+    const mode = String(body.mode || 'send'); // 'send' | 'preview'
     const recipientRaw = String(body.recipient || '').trim().toLowerCase();
     const template = String(body.template || 'all');
+
+    // Preview mode: render templates and return HTML/subject without sending.
+    if (mode === 'preview') {
+      const previewEmail = recipientRaw && /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(recipientRaw)
+        ? recipientRaw
+        : 'preview@example.com';
+      const sample = { ...SAMPLE_PAYLOAD, email: previewEmail };
+      const code = '123456';
+      const previews: Record<string, { subject: string; html: string }> = {
+        otp: {
+          subject: `[TEST] ${code} is your Healing Buds code`,
+          html: buildOtpHtml(previewEmail, code),
+        },
+        results: {
+          subject: `[TEST] Your Strain Match: ${sample.matched_strain} (${sample.compatibility} compatibility)`,
+          html: buildResultsHtml(sample),
+        },
+        admin: {
+          subject: `[TEST] 🧬 New Lead: ${sample.name} → ${sample.matched_strain} (${sample.compatibility})`,
+          html: buildAdminNotificationHtml(sample),
+        },
+      };
+      return new Response(JSON.stringify({ success: true, previews }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (!/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/.test(recipientRaw)) {
       return new Response(JSON.stringify({ error: 'Invalid recipient email' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
